@@ -18,6 +18,9 @@ namespace elevate {
 
 		Vector3(real x, real y, real z) : x(x), y(y), z(z) {};
 
+		const static Vector3 GRAVITY;
+		const static Vector3 HIGH_GRAVITY;
+
 		void operator+= (const Vector3& v) {
 			x += v.x;
 			y += v.y;
@@ -103,6 +106,10 @@ namespace elevate {
 			x += v.x * scale;
 			y += v.y * scale;
 			z += v.z * scale;
+		}
+
+		void clear() {
+			x = y = z = 0;
 		}
 	};
 };
