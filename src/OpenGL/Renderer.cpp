@@ -1,5 +1,5 @@
-#include "Renderer.h"
-#include "src/Tools/Logger.h"
+#include "OpenGL/Renderer.h"
+#include "Tools/Logger.h"
 
 Renderer::Renderer(GLFWwindow* window)
 {
@@ -11,7 +11,6 @@ bool Renderer::init(unsigned int width, unsigned int height)
 	mRenderData.rdWidth = width;
 	mRenderData.rdHeight = height;
 
-	// Load all OpenGL function pointers with GLAD
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		Logger::log(1, "%s error: failed to initialize GLAD\n", __FUNCTION__);
@@ -52,8 +51,6 @@ void Renderer::draw(GameObject* gameObj, glm::mat4 viewMat, glm::mat4 proj)
 	shader->setVec3("dirLight.diffuse", sun.diffuse);
 	shader->setVec3("dirLight.specular", sun.specular);
 
-
-//	gameObj->ApplySkinning();
 	gameObj->Draw(viewMat, proj);
 }
 

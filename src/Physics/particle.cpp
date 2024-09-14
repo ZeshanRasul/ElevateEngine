@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "elevate/particle.h"
+#include "elevate/Physics/particle.h"
 
 using namespace elevate;
 

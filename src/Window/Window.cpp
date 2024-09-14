@@ -3,7 +3,7 @@
 #include "imgui/backend/imgui_impl_opengl3.h"
 
 #include "Window.h"
-#include "InputManager.h"
+#include "App/InputManager.h"
 #include "Tools/Logger.h"
 
 // TODO: Move these to Renderer

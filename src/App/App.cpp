@@ -1,4 +1,4 @@
-#include "App.h"
+#include "App/App.h"
 #include "Tools/Logger.h"
 
 App::App(unsigned int screenWidth, unsigned int screenHeight)
@@ -6,7 +6,7 @@ App::App(unsigned int screenWidth, unsigned int screenHeight)
 {
     mWindow = new Window();
 
-    if (!mWindow->init(screenWidth, screenHeight, "NPC AI System")) {
+    if (!mWindow->init(screenWidth, screenHeight, "Elevate Engine")) {
         Logger::log(1, "%s error: Window init error\n", __FUNCTION__);
     }
 

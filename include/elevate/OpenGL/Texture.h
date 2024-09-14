@@ -6,7 +6,7 @@
 class Texture {
 public:
     bool loadTexture(std::string textureFilename, bool flipImage = true);
-    void bind();
+    void bind() const;
     void unbind();
     void cleanup();
 

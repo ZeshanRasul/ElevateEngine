@@ -1,8 +1,8 @@
 #pragma once
 #include "RenderData.h"
-#include "src/Camera.h"
-#include "src/GameObjects/GameObject.h"
-#include "Shader.h"
+#include "App/Camera.h"
+#include "GameObjects/GameObject.h"
+#include "OpenGL/Shader.h"
 
 #include <GLFW/glfw3.h>
 

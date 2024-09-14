@@ -1,7 +1,8 @@
+#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include "Texture.h"
-#include "src/Tools/Logger.h"
+#include "OpenGL/Texture.h"
+#include "Tools/Logger.h"
 
 void Texture::cleanup() {
     glDeleteTextures(1, &mTexture);
@@ -37,7 +38,7 @@ bool Texture::loadTexture(std::string textureFilename, bool flipImage) {
     return true;
 }
 
-void Texture::bind() {
+void Texture::bind() const {
     glBindTexture(GL_TEXTURE_2D, mTexture);
 }
 

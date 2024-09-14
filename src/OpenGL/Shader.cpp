@@ -6,8 +6,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Shader.h"
-#include "src/Tools/Logger.h"
+#include "OpenGL/Shader.h"
+#include "Tools/Logger.h"
 
 bool Shader::loadShaders(std::string vertexShaderFileName, std::string fragmentShaderFileName) {
     Logger::log(1, "%s: loading vertex shader '%s' and fragment shader '%s'\n", __FUNCTION__, vertexShaderFileName.c_str(), fragmentShaderFileName.c_str());

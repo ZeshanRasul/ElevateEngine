@@ -14,9 +14,6 @@ enum CameraMovement {
 
 enum CameraMode {
 	FLY,
-	PLAYER_FOLLOW,
-	ENEMY_FOLLOW,
-	PLAYER_AIM,
 	MODE_COUNT
 };
 
@@ -36,7 +33,7 @@ public:
 	glm::vec3 WorldUp;
 	glm::vec3 Offset;
 
-	CameraMode Mode = PLAYER_FOLLOW;
+	CameraMode Mode = FLY;
 
 	float Yaw;
 	float Pitch;
@@ -45,20 +42,10 @@ public:
 	float MouseSensitivity;
 	float Zoom;
 
-	float playerCamRearOffset = 15.0f;
-	float playerCamHeightOffset = 5.0f;
-	float enemyCamRearOffset = 15.0f;
-	float enemyCamHeightOffset = 5.0f;
-
 	Camera(glm::vec3 position = glm::vec3(0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH);
 	Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
 
 	glm::mat4 GetViewMatrix() const { return lookAt(Position, Position + Front, Up); }
-
-	glm::mat4 GetViewMatrixPlayerFollow(const glm::vec3& targetPos, const glm::vec3& targetUp) const { return lookAt(Position, targetPos, targetUp); }
-	glm::mat4 GetViewMatrixEnemyFollow(const glm::vec3& targetPos, const glm::vec3& targetUp) const { return lookAt(Position, targetPos, targetUp); }
-
-	void FollowTarget(const glm::vec3& targetPosition, const glm::vec3& playerFront, float distanceBehind, float heightOffset);
 
 	void ProcessKeyboard(CameraMovement direction, float deltaTime);
 	void ProcessMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch = true);

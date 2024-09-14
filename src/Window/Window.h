@@ -2,8 +2,8 @@
 #include <string>
 #include <memory>
 
-#include "src/OpenGL/Renderer.h"
-#include "src/InputManager.h"
+#include "OpenGL/Renderer.h"
+#include "App/InputManager.h"
 #include <GLFW/glfw3.h>
 
 class Window {

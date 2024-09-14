@@ -1,8 +1,8 @@
 #include <vector>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "UniformBuffer.h"
-#include "src/Tools/Logger.h"
+#include "OpenGL/UniformBuffer.h"
+#include "Tools/Logger.h"
 
 void UniformBuffer::init(size_t bufferSize) {
 	mBufferSize = bufferSize;
@@ -14,7 +14,7 @@ void UniformBuffer::init(size_t bufferSize) {
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void UniformBuffer::uploadUboData(std::vector<glm::mat4> bufferData, int bindingPoint) {
+void UniformBuffer::uploadUboData(std::vector<glm::mat4> bufferData, int bindingPoint) const {
 	if (bufferData.size() == 0) {
 		return;
 	}
@@ -25,7 +25,7 @@ void UniformBuffer::uploadUboData(std::vector<glm::mat4> bufferData, int binding
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void UniformBuffer::uploadColorUboData(std::vector<glm::vec3> bufferData, int bindingPoint) {
+void UniformBuffer::uploadColorUboData(std::vector<glm::vec3> bufferData, int bindingPoint) const {
 	if (bufferData.size() == 0) {
 		return;
 	}
@@ -36,6 +36,6 @@ void UniformBuffer::uploadColorUboData(std::vector<glm::vec3> bufferData, int bi
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void UniformBuffer::cleanup() {
+void UniformBuffer::cleanup() const {
 	glDeleteBuffers(1, &mUboBuffer);
 }

@@ -9,12 +9,12 @@
 class VertexBuffer {
 public:
     void init();
-    void uploadData(Mesh vertexData);
-    void bind();
+    void uploadData(Mesh vertexData) const;
+    void bind() const;
     void unbind();
     void draw(GLuint mode, unsigned int start, unsigned int num);
     void bindAndDraw(GLuint mode, unsigned int start, unsigned int num);
-    void cleanup();
+    void cleanup() const;
 
 private:
     GLuint mVAO = 0;

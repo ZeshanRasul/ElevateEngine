@@ -1,5 +1,5 @@
-#include "Framebuffer.h"
-#include "src/Tools/Logger.h"
+#include "OpenGL/Framebuffer.h"
+#include "Tools/Logger.h"
 
 bool Framebuffer::init(unsigned int width, unsigned int height) {
     mBufferWidth = width;

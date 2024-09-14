@@ -1,5 +1,5 @@
-#include "VertexBuffer.h"
-#include "src/Tools/Logger.h"
+#include "OpenGL/VertexBuffer.h"
+#include "Tools/Logger.h"
 
 void VertexBuffer::init() {
 	glGenVertexArrays(1, &mVAO);
@@ -22,12 +22,12 @@ void VertexBuffer::init() {
 	Logger::log(1, "%s: VAO and VBO initialized\n", __FUNCTION__);
 }
 
-void VertexBuffer::cleanup() {
+void VertexBuffer::cleanup() const {
 	glDeleteBuffers(1, &mVertexVBO);
 	glDeleteVertexArrays(1, &mVAO);
 }
 
-void VertexBuffer::uploadData(Mesh vertexData) {
+void VertexBuffer::uploadData(Mesh vertexData) const {
 	glBindVertexArray(mVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, mVertexVBO);
 
@@ -37,7 +37,7 @@ void VertexBuffer::uploadData(Mesh vertexData) {
 	glBindVertexArray(0);
 }
 
-void VertexBuffer::bind() {
+void VertexBuffer::bind() const {
 	glBindVertexArray(mVAO);
 }
 

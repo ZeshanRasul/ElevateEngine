@@ -1,49 +1,19 @@
 #pragma once
 #include "GameObject.h"
 #include "OpenGL/Texture.h"
-#include "Physics/AABB.h"
 
 class Cube : public GameObject {
 public:
-    Cube(glm::vec3 pos, glm::vec3 scale, Shader* shdr, bool applySkinning, GameManager* gameMgr, float yaw = 0.0f)
-        : GameObject(pos, scale, yaw, shdr, applySkinning, gameMgr)
-    {
-
-        ComputeAudioWorldTransform();
-    }
+    Cube(elevate::Vector3 pos, elevate::Vector3 scale, Shader* shdr, GameManager* gameMgr, float yaw = 0.0f)
+        : GameObject(pos, scale, yaw, shdr, gameMgr)
+    {}
 
     void LoadMesh();
 
     void drawObject(glm::mat4 viewMat, glm::mat4 proj) override;
 
-    void ComputeAudioWorldTransform() override {};
+    void CreateAndUploadVertexBuffer() const;
 
-    void CreateAndUploadVertexBuffer();
-
-    void OnHit() override {
-        Logger::log(1, "Cover was hit!\n", __FUNCTION__);
-		setAABBColor(glm::vec3(1.0f, 0.0f, 1.0f));
-    };
-    void OnMiss() override {
-        setAABBColor(glm::vec3(1.0f, 1.0f, 1.0f));
-    };
-
-    void updateAABB() {
-        glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), position) *
-            glm::rotate(glm::mat4(1.0f), glm::radians(yaw), glm::vec3(0.0f, 1.0f, 0.0f)) *
-            glm::scale(glm::mat4(1.0f), scale);
-        aabb->mModelMatrix = modelMatrix;
-        aabb->update(modelMatrix);
-    };
-
-    void SetUpAABB();
-
-    AABB* GetAABB() const { return aabb; }
-    void renderAABB(glm::mat4 proj, glm::mat4 viewMat, glm::mat4 model, Shader* shader);
-
-    void setAABBColor(glm::vec3 color) { aabbColor = color; }
-
-	void SetAABBShader(Shader* shdr) { aabbShader = shdr; }
 private:
 
     float vertices[192] = {
@@ -108,8 +78,4 @@ private:
     GLuint mVAO;
     GLuint mVBO;
     GLuint mEBO;
-
-    AABB* aabb;
-    Shader* aabbShader;
-    glm::vec3 aabbColor = glm::vec3(0.0f, 0.0f, 1.0f);
 };

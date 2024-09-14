@@ -1,5 +1,5 @@
-#include "ShaderStorageBuffer.h"
-#include "Logger.h"
+#include "OpenGL/ShaderStorageBuffer.h"
+#include "Tools/Logger.h"
 
 void ShaderStorageBuffer::init(size_t bufferSize) {
     mBufferSize = bufferSize;

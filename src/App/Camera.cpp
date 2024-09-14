@@ -1,5 +1,5 @@
-#include "Camera.h"
-#include "GameManager.h"
+#include "App/Camera.h"
+#include "App/GameManager.h"
 
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
 	:
@@ -28,14 +28,6 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float u
 	Pitch = pitch;
 	UpdateCameraVectors();
 
-}
-
-void Camera::FollowTarget(const glm::vec3& targetPosition, const glm::vec3& targetFront, float distanceBehind, float heightOffset)
-{
-	glm::vec3 offset = -targetFront * distanceBehind;
-	offset.y += heightOffset;
-	Position = targetPosition + offset;
-	UpdateCameraVectors();
 }
 
 void Camera::ProcessKeyboard(CameraMovement direction, float deltaTime)
@@ -69,13 +61,6 @@ void Camera::ProcessMouseMovement(float xOffset, float yOffset, GLboolean constr
 			if (Pitch < -89.0f)
 				Pitch = -89.0f;
 		}
-		else if (Mode == PLAYER_AIM)
-		{
-			if (Pitch > 19.0f)
-				Pitch = 19.0f;
-			if (Pitch < -19.0f)
-				Pitch = -19.0f;
-		}
 	}
 
 	UpdateCameraVectors();
@@ -91,11 +76,6 @@ void Camera::ProcessMouseScroll(float yOffset)
 		if (Zoom > 45.0f)
 			Zoom = 45.0f;
 	}
-	else if (Mode == PLAYER_FOLLOW || Mode == ENEMY_FOLLOW)
-	{
-		Offset -= (float)yOffset;
-	}
-
 }
 
 void Camera::UpdateCameraVectors()
