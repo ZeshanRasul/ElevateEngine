@@ -53,6 +53,12 @@ private:
     Shader artilleryShader{};
     Shader fireballShader{};
 	Shader laserShader{};
+	Shader cubeShader{};
+
+    Cube* cube;
+    Cube* cube2;
+    Cube* cube3;
+    Cube* cube4;
 
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection = glm::mat4(1.0f);

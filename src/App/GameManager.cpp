@@ -1,4 +1,5 @@
 #include "App/GameManager.h"
+#include "Physics/core.h"
 
 #include "imgui/imgui.h"
 #include "imgui/backend/imgui_impl_glfw.h"
@@ -22,17 +23,37 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     renderer = window->getRenderer();
 
     /*
-    pistolShader.loadShaders("C:/dev/NPC_RL_Prototype/NPC_RL_Prototype/src/Shaders/vertex_gpu_dquat.glsl", "C:/dev/NPC_RL_Prototype/NPC_RL_Prototype/src/Shaders/fragment_gpu_dquat.glsl");
-    artilleryShader.loadShaders("C:/dev/NPC_RL_Prototype/NPC_RL_Prototype/src/Shaders/vertex_gpu_dquat.glsl", "C:/dev/NPC_RL_Prototype/NPC_RL_Prototype/src/Shaders/fragment_gpu_dquat.glsl");
-    fireballShader.loadShaders("C:/dev/NPC_RL_Prototype/NPC_RL_Prototype/src/Shaders/gridVertex.glsl", "C:/dev/NPC_RL_Prototype/NPC_RL_Prototype/src/Shaders/gridFragment.glsl");
-    laserShader.loadShaders("C:/dev/NPC_RL_Prototype/NPC_RL_Prototype/src/Shaders/crosshair_vert.glsl", "C:/dev/NPC_RL_Prototype/NPC_RL_Prototype/src/Shaders/crosshair_frag.glsl");
+    pistolShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
+    artilleryShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
+    fireballShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
+    laserShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
     */
-    camera = new Camera(glm::vec3(0.0f, 0.0f, 0.0f));
+
+    cubeShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
+
+    camera = new Camera(glm::vec3(0.0f, 2.0f, 0.0f));
 
     inputManager->setContext(camera, width, height);
 
+	elevate::Vector3 pos = { 0.0f, 0.0f, -10.0f };
+	elevate::Vector3 pos2 = { 0.0f, 0.0f, -20.0f };
+	elevate::Vector3 pos3 = { 0.0f, 0.0f, -30.0f };
+	elevate::Vector3 pos4 = { 0.0f, 0.0f, -40.0f };
+	elevate::Vector3 scale = { 1.0f, 1.0f, 1.0f };
+    cube = new Cube(pos, scale, &cubeShader, this);
+    cube->LoadMesh();
+    cube2 = new Cube(pos2, scale, &cubeShader, this);
+    cube2->LoadMesh();
+    cube3 = new Cube(pos3, scale, &cubeShader, this);
+    cube3->LoadMesh();
+    cube4 = new Cube(pos4, scale, &cubeShader, this);
+    cube4->LoadMesh();
+
 	// TODO: Create gameobjects and add to gameObjects vector
-    // gameObjects.push_back(player);
+    gameObjects.push_back(cube);
+    gameObjects.push_back(cube2);
+    gameObjects.push_back(cube3);
+    gameObjects.push_back(cube4);
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
