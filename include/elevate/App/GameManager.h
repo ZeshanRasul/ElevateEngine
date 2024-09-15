@@ -8,6 +8,7 @@
 
 #include "App/Camera.h"
 #include "GameObjects/Cube.h"
+#include "GameObjects/Sphere.h"
 
 class GameManager {
 public:
@@ -59,6 +60,7 @@ private:
     Cube* cube2;
     Cube* cube3;
     Cube* cube4;
+    Sphere* sphere;
 
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection = glm::mat4(1.0f);

@@ -4,6 +4,8 @@
 
 namespace elevate {
 
+	constexpr float PI = 3.14159265359f;
+
 	class Vector3 {
 	public:
 		real x;

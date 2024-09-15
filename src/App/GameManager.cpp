@@ -49,11 +49,18 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     cube4 = new Cube(pos4, scale, &cubeShader, this);
     cube4->LoadMesh();
 
+	elevate::Vector3 spherePos = { 0.0f, 5.0f, -10.0f };
+	sphere = new Sphere(spherePos, scale, &cubeShader, this);
+	sphere->GenerateSphere(1.0f, 30, 30);
+	sphere->LoadMesh();
+
+
 	// TODO: Create gameobjects and add to gameObjects vector
     gameObjects.push_back(cube);
     gameObjects.push_back(cube2);
     gameObjects.push_back(cube3);
     gameObjects.push_back(cube4);
+	gameObjects.push_back(sphere);
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)

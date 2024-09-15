@@ -10,9 +10,9 @@ public:
 
     void LoadMesh();
 
-    void drawObject(glm::mat4 viewMat, glm::mat4 proj) override;
-
     void CreateAndUploadVertexBuffer() const;
+
+    void drawObject(glm::mat4 viewMat, glm::mat4 proj) override;
 
 private:
 

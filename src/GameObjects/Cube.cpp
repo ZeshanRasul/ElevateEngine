@@ -11,24 +11,6 @@ void Cube::LoadMesh()
 	glBindVertexArray(0);
 }
 
-void Cube::drawObject(glm::mat4 viewMat, glm::mat4 proj)
-{
-	glm::mat4 modelMat = glm::mat4(1.0f);
-	glm::vec3 posVec = glm::vec3(GetPosition().x, GetPosition().y, GetPosition().z);
-	glm::vec3 scaleVec = glm::vec3(GetScale().x, GetScale().y, GetScale().z);
-	modelMat = glm::translate(modelMat, posVec);
-	modelMat = glm::scale(modelMat, scaleVec);
-	std::vector<glm::mat4> matrixData;
-	matrixData.push_back(viewMat);
-	matrixData.push_back(proj);
-	matrixData.push_back(modelMat);
-	mUniformBuffer.uploadUboData(matrixData, 0);
-
-	glBindVertexArray(mVAO);
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
-}
-
 void Cube::CreateAndUploadVertexBuffer() const
 {
 	glBindVertexArray(mVAO);
@@ -47,4 +29,22 @@ void Cube::CreateAndUploadVertexBuffer() const
 
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+}
+
+void Cube::drawObject(glm::mat4 viewMat, glm::mat4 proj)
+{
+	glm::mat4 modelMat = glm::mat4(1.0f);
+	glm::vec3 posVec = glm::vec3(GetPosition().x, GetPosition().y, GetPosition().z);
+	glm::vec3 scaleVec = glm::vec3(GetScale().x, GetScale().y, GetScale().z);
+	modelMat = glm::translate(modelMat, posVec);
+	modelMat = glm::scale(modelMat, scaleVec);
+	std::vector<glm::mat4> matrixData;
+	matrixData.push_back(viewMat);
+	matrixData.push_back(proj);
+	matrixData.push_back(modelMat);
+	mUniformBuffer.uploadUboData(matrixData, 0);
+
+	glBindVertexArray(mVAO);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
 }
