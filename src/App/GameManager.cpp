@@ -61,7 +61,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     fireballSphere->LoadMesh();
 
     scale = { 0.1f, 0.1f, 0.1f };
-    laserSphere = new Sphere(spherePos, scale, &ammoShader, this, glm::vec3(1.0f, 0.0f, 1.0f));
+    laserSphere = new Sphere(spherePos, scale, &ammoShader, this, glm::vec3(1.0f, 0.3f, 1.0f));
     laserSphere->GenerateSphere(1.0f, 30, 30);
     laserSphere->LoadMesh();
 
@@ -287,6 +287,11 @@ void GameManager::render()
 
 	for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
 		if (shot->GetType() != UNUSED) {
+			ammoShader.use();
+            ammoShader.setVec3("dirLight.direction", dirLight.direction);
+            ammoShader.setVec3("dirLight.ambient", dirLight.ambient);
+            ammoShader.setVec3("dirLight.diffuse", dirLight.diffuse);
+            ammoShader.setVec3("dirLight.specular", dirLight.specular);
 			shot->render(view, projection);
 		}
 	}

@@ -4,8 +4,8 @@
 
 class Sphere : public GameObject {
 public:
-    Sphere(elevate::Vector3 pos, elevate::Vector3 scale, Shader* shdr, GameManager* gameMgr, glm::vec3 color, float yaw = 0.0f)
-		: GameObject(pos, scale, yaw, shdr, gameMgr), color(color)
+    Sphere(elevate::Vector3 pos, elevate::Vector3 scale, Shader* shdr, GameManager* gameMgr, glm::vec3 col, float yaw = 0.0f)
+		: GameObject(pos, scale, yaw, shdr, gameMgr), color(col)
     {}
 
 	void GenerateSphere(float radius, unsigned int sectorCount, unsigned int stackCount);
