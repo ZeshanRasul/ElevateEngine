@@ -21,19 +21,14 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     window->setInputManager(inputManager);
 
     renderer = window->getRenderer();
-
-    /*
-    pistolShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
-    artilleryShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
-    fireballShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
-    laserShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
-    */
+ 
+    ammoShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
 
     cubeShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
 
     camera = new Camera(glm::vec3(0.0f, 2.0f, 0.0f));
 
-    inputManager->setContext(camera, width, height);
+    inputManager->setContext(camera, this, width, height);
 
 	elevate::Vector3 pos = { 0.0f, 0.0f, -10.0f };
 	elevate::Vector3 pos2 = { 0.0f, 0.0f, -20.0f };
@@ -49,18 +44,41 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     cube4 = new Cube(pos4, scale, &cubeShader, this);
     cube4->LoadMesh();
 
-	elevate::Vector3 spherePos = { 0.0f, 5.0f, -10.0f };
-	sphere = new Sphere(spherePos, scale, &cubeShader, this);
-	sphere->GenerateSphere(1.0f, 30, 30);
-	sphere->LoadMesh();
+	scale = { 0.1f, 0.1f, 0.1f };
+	elevate::Vector3 spherePos = { 0.0f, 2.0f, -10.0f };
+	pistolSphere = new Sphere(spherePos, scale, &ammoShader, this, glm::vec3(0.1f, 0.1f, 0.1f));
+    pistolSphere->GenerateSphere(1.0f, 30, 30);
+    pistolSphere->LoadMesh();
 
+    scale = { 0.6f, 0.6f, 0.6f };
+    artillerySphere = new Sphere(spherePos, scale, &ammoShader, this, glm::vec3(0.0f, 1.0f, 0.0f));
+    artillerySphere->GenerateSphere(1.0f, 30, 30);
+    artillerySphere->LoadMesh();
+
+    scale = { 0.3f, 0.3f, 0.3f };
+    fireballSphere = new Sphere(spherePos, scale, &ammoShader, this, glm::vec3(1.0f, 0.0f, 0.0f));
+    fireballSphere->GenerateSphere(1.0f, 30, 30);
+    fireballSphere->LoadMesh();
+
+    scale = { 0.05f, 0.05f, 0.05f };
+    laserSphere = new Sphere(spherePos, scale, &ammoShader, this, glm::vec3(1.0f, 0.0f, 1.0f));
+    laserSphere->GenerateSphere(1.0f, 30, 30);
+    laserSphere->LoadMesh();
 
 	// TODO: Create gameobjects and add to gameObjects vector
     gameObjects.push_back(cube);
     gameObjects.push_back(cube2);
     gameObjects.push_back(cube3);
     gameObjects.push_back(cube4);
-	gameObjects.push_back(sphere);
+
+
+    for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
+        elevate::Particle particle;
+        particle.setPosition(elevate::Vector3(0.0f, 2.0f, -10.0f));
+        shot->SetParticle(particle);
+        shot->SetSphere(pistolSphere);
+        shot->SetType(UNUSED);
+    }
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
@@ -85,6 +103,7 @@ void GameManager::showDebugUI()
 {
     ShowLightControlWindow(dirLight);
     ShowCameraControlWindow(*camera);
+	ShowAmmoWindow();
 }
 
 void GameManager::renderDebugUI()
@@ -105,6 +124,38 @@ void GameManager::ShowLightControlWindow(DirLight& light)
     ImGui::ColorEdit4("Diffuse", (float*)&light.diffuse);
 
     ImGui::ColorEdit4("Specular", (float*)&light.specular);
+
+    ImGui::End();
+}
+
+void GameManager::ShowAmmoWindow()
+{
+    ImGui::Begin("Ammo Details");
+
+    switch (currentShotType)
+    {
+
+    case PISTOL:
+	{
+		ImGui::Text("Pistol");
+        break;
+	}
+    case ARTILLERY:
+    {
+        ImGui::Text("Artillery");
+        break;
+    }
+	case FIREBALL:
+	{
+		ImGui::Text("Fireball");
+        break;
+    }
+	case LASER:
+	{
+		ImGui::Text("Laser");
+        break;
+	}
+	}
 
     ImGui::End();
 }
@@ -149,12 +200,83 @@ void GameManager::ShowCameraControlWindow(Camera& cam)
     ImGui::End();
 }
 
+void GameManager::fireRound()
+{
+	AmmoRound* shot = nullptr;
+
+	for (shot = ammo; shot < ammo + ammoRounds; shot++) {
+		if (shot->GetType() == UNUSED) {
+			break;
+		}
+	}
+    
+	if (shot >= ammo + ammoRounds) {
+		return;
+	}
+
+    switch (currentShotType)
+    {
+    case PISTOL:
+    {
+        shot->SetSphere(pistolSphere);
+        shot->GetParticle().setMass(2.0f);
+        shot->GetParticle().setVelocity(0.0f, 0.0f, 35.0f);
+        shot->GetParticle().setAcceleration(0.0f, -1.0f, 0.0f);
+        shot->GetParticle().setDamping(0.99f);
+        break;
+    }
+
+    case ARTILLERY:
+    {
+        shot->SetSphere(artillerySphere);
+        shot->GetParticle().setMass(200.0f); 
+        shot->GetParticle().setVelocity(0.0f, 30.0f, 40.0f); // 50m/s
+        shot->GetParticle().setAcceleration(0.0f, -20.0f, 0.0f);
+        shot->GetParticle().setDamping(0.99f);
+        break;
+    }
+    case FIREBALL:
+    {
+        shot->SetSphere(fireballSphere);
+        shot->GetParticle().setMass(1.0f); 
+        shot->GetParticle().setVelocity(0.0f, 0.0f, 10.0f); // 5m/s
+        shot->GetParticle().setAcceleration(0.0f, 0.6f, 0.0f); // Floats up
+        shot->GetParticle().setDamping(0.9f);
+        break;
+    }
+    case LASER:
+    {
+        shot->SetSphere(laserSphere);
+        shot->GetParticle().setMass(0.1f); // 0.1kg - almost no weight
+        shot->GetParticle().setVelocity(0.0f, 0.0f, 100.0f); // 100m/s
+        shot->GetParticle().setAcceleration(0.0f, 0.0f, 0.0f); // No gravity
+        shot->GetParticle().setDamping(0.99f);
+        break;
+    }
+    }
+
+	shot->GetParticle().setPosition(elevate::Vector3(0.0f, 5.0f, -1.0f));
+    shot->SetStartTime(glfwGetTime());
+	shot->SetType(currentShotType);
+
+	shot->GetParticle().clearAccumulator();
+}
+
 void GameManager::update(float deltaTime)
 {
     RemoveDestroyedGameObjects();
     inputManager->processInput(window->getWindow(), deltaTime);
 
-    // TODO: Integrate Physics 
+	for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
+		if (shot->GetType() != UNUSED) {
+			shot->GetParticle().integrate(deltaTime);
+
+            if (shot->GetParticle().getPosition().y < 0.0f || glfwGetTime() - shot->GetStartTime() > 5.0f
+                || shot->GetParticle().getPosition().z > 200.0f) {
+				shot->SetType(UNUSED);
+            }
+        }
+	}
 }
 
 void GameManager::render()
@@ -162,4 +284,10 @@ void GameManager::render()
     for (auto obj : gameObjects) {
         renderer->draw(obj, view, projection);
     }
+
+	for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
+		if (shot->GetType() != UNUSED) {
+			shot->render(view, projection);
+		}
+	}
 }

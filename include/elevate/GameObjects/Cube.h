@@ -78,4 +78,6 @@ private:
     GLuint mVAO;
     GLuint mVBO;
     GLuint mEBO;
-};
+
+	glm::vec3 color = glm::vec3(1.0f, 0.4f, 0.6f);
+};                  

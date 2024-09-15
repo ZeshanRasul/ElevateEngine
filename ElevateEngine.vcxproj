@@ -153,6 +153,7 @@
     <ClInclude Include="include\elevate\OpenGL\UniformBuffer.h" />
     <ClInclude Include="include\elevate\OpenGL\VertexBuffer.h" />
     <ClInclude Include="include\elevate\Physics\core.h" />
+    <ClInclude Include="include\elevate\Physics\Demos\AmmoRound.h" />
     <ClInclude Include="include\elevate\Physics\particle.h" />
     <ClInclude Include="include\elevate\Physics\precision.h" />
     <ClInclude Include="include\external\imgui\backend\imgui_impl_glfw.h" />

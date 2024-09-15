@@ -44,6 +44,8 @@ void Cube::drawObject(glm::mat4 viewMat, glm::mat4 proj)
 	matrixData.push_back(modelMat);
 	mUniformBuffer.uploadUboData(matrixData, 0);
 
+	shader->setVec3("objectColor", color);
+
 	glBindVertexArray(mVAO);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);

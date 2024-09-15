@@ -5,6 +5,8 @@
 namespace elevate {
 	class Particle {
 	public:
+		Particle() : damping(1.0f), inverseMass(1.0f), position(Vector3()){};
+
 		void integrate(real duration);
 		
 		void setDamping(const real newDamping);

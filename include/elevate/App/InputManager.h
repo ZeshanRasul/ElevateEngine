@@ -29,10 +29,11 @@ public:
     void processInput(GLFWwindow* window, float deltaTime);
 
 
-    void setContext(Camera* cam, unsigned int width, unsigned int height);
+    void setContext(Camera* cam, class GameManager* gameMgr, unsigned int width, unsigned int height);
 
 private:
     Camera* camera;
+	class GameManager* mGameManager;
     
     float lastX = 0;
     float lastY = 0;

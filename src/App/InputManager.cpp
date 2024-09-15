@@ -3,6 +3,7 @@
 #include "imgui/backend/imgui_impl_opengl3.h"
 
 #include "App/InputManager.h"
+#include "App/GameManager.h"
 
 void InputManager::handleMouseMovement(double xPosIn, double yPosIn)
 {
@@ -78,16 +79,26 @@ void InputManager::processInput(GLFWwindow* window, float deltaTime)
 
     if (leftClickCurrentlyPressed && !leftClickPressed)
     {
-		//TODO: Add shooting logic
+		mGameManager->fireRound();
     }
 
     leftClickPressed = leftClickCurrentlyPressed;
+
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+		mGameManager->setCurrentShotType(ShotType::PISTOL);
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+        mGameManager->setCurrentShotType(ShotType::ARTILLERY);
+    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+        mGameManager->setCurrentShotType(ShotType::FIREBALL);
+    if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+        mGameManager->setCurrentShotType(ShotType::LASER);
 }
 
-void InputManager::setContext(Camera* cam, unsigned int width, unsigned int height)
+void InputManager::setContext(Camera* cam, GameManager* gameMgr, unsigned int width, unsigned int height)
 {
     camera = cam;
-   
+	mGameManager = gameMgr;
+
     lastX = width / 2.0f;
     lastY = height / 2.0f;
 }

@@ -9,6 +9,7 @@
 #include "App/Camera.h"
 #include "GameObjects/Cube.h"
 #include "GameObjects/Sphere.h"
+#include "Physics/Demos/AmmoRound.h"
 
 class GameManager {
 public:
@@ -28,6 +29,12 @@ public:
     void setupCamera(unsigned int width, unsigned int height);
     void setSceneData();
 
+    glm::mat4 getView() const { return view; }
+    glm::mat4 getProjection() const { return projection; }
+
+    void fireRound();
+	void setCurrentShotType(ShotType type) { currentShotType = type; }
+
     void update(float deltaTime);
 
     void render();
@@ -39,6 +46,7 @@ public:
 private:
     void ShowCameraControlWindow(Camera& cam);
     void ShowLightControlWindow(DirLight& light);
+    void ShowAmmoWindow();
 
     void RemoveDestroyedGameObjects();
 
@@ -50,18 +58,22 @@ private:
 
     std::vector<GameObject*> gameObjects;
 
-    Shader pistolShader{};
-    Shader artilleryShader{};
-    Shader fireballShader{};
-	Shader laserShader{};
+    Shader ammoShader{};
 	Shader cubeShader{};
 
     Cube* cube;
     Cube* cube2;
     Cube* cube3;
     Cube* cube4;
-    Sphere* sphere;
+    Sphere* pistolSphere;
+    Sphere* artillerySphere;
+    Sphere* fireballSphere;
+    Sphere* laserSphere;
 
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection = glm::mat4(1.0f);
+
+    const static unsigned ammoRounds = 16;
+    AmmoRound ammo[ammoRounds];
+    ShotType currentShotType = PISTOL;
 };
