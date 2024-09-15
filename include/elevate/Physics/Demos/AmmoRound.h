@@ -21,11 +21,11 @@ public:
 		sphere = sph;
 	}
 
-	void SetParticle(const elevate::Particle& p) {
+	void SetParticle(elevate::Particle* p) {
 		particle = p;
 	}
 
-	elevate::Particle GetParticle() const {
+	elevate::Particle* GetParticle() const {
 		return particle;
 	}
 
@@ -46,13 +46,13 @@ public:
 	}
 
 	void render(glm::mat4 view, glm::mat4 proj) {
-		elevate::Vector3 pos = particle.getPosition();
+		elevate::Vector3 pos = particle->getPosition();
 		sphere->SetPosition(pos);
 		sphere->Draw(view, proj);
 	}
 
 private:
-	elevate::Particle particle;
+	elevate::Particle* particle;
 	ShotType type = UNUSED;
 	double startTime;
 	Sphere* sphere;

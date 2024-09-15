@@ -44,7 +44,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     cube4 = new Cube(pos4, scale, &cubeShader, this);
     cube4->LoadMesh();
 
-	scale = { 0.1f, 0.1f, 0.1f };
+	scale = { 0.2f, 0.2f, 0.2f };
 	elevate::Vector3 spherePos = { 0.0f, 2.0f, -10.0f };
 	pistolSphere = new Sphere(spherePos, scale, &ammoShader, this, glm::vec3(0.1f, 0.1f, 0.1f));
     pistolSphere->GenerateSphere(1.0f, 30, 30);
@@ -60,7 +60,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     fireballSphere->GenerateSphere(1.0f, 30, 30);
     fireballSphere->LoadMesh();
 
-    scale = { 0.05f, 0.05f, 0.05f };
+    scale = { 0.1f, 0.1f, 0.1f };
     laserSphere = new Sphere(spherePos, scale, &ammoShader, this, glm::vec3(1.0f, 0.0f, 1.0f));
     laserSphere->GenerateSphere(1.0f, 30, 30);
     laserSphere->LoadMesh();
@@ -73,8 +73,8 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 
     for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
-        elevate::Particle particle;
-        particle.setPosition(elevate::Vector3(0.0f, 2.0f, -10.0f));
+		elevate::Particle* particle = new elevate::Particle();
+        particle->setPosition(elevate::Vector3(0.0f, 2.0f, -10.0f));
         shot->SetParticle(particle);
         shot->SetSphere(pistolSphere);
         shot->SetType(UNUSED);
@@ -219,47 +219,47 @@ void GameManager::fireRound()
     case PISTOL:
     {
         shot->SetSphere(pistolSphere);
-        shot->GetParticle().setMass(2.0f);
-        shot->GetParticle().setVelocity(0.0f, 0.0f, 35.0f);
-        shot->GetParticle().setAcceleration(0.0f, -1.0f, 0.0f);
-        shot->GetParticle().setDamping(0.99f);
+        shot->GetParticle()->setMass(2.0f);
+        shot->GetParticle()->setVelocity(0.0f, 0.0f, -35.0f);
+        shot->GetParticle()->setAcceleration(0.0f, -1.0f, 0.0f);
+        shot->GetParticle()->setDamping(0.99f);
         break;
     }
 
     case ARTILLERY:
     {
         shot->SetSphere(artillerySphere);
-        shot->GetParticle().setMass(200.0f); 
-        shot->GetParticle().setVelocity(0.0f, 30.0f, 40.0f); // 50m/s
-        shot->GetParticle().setAcceleration(0.0f, -20.0f, 0.0f);
-        shot->GetParticle().setDamping(0.99f);
+        shot->GetParticle()->setMass(200.0f); 
+        shot->GetParticle()->setVelocity(0.0f, 30.0f, -40.0f); // 50m/s
+        shot->GetParticle()->setAcceleration(0.0f, -20.0f, 0.0f);
+        shot->GetParticle()->setDamping(0.99f);
         break;
     }
     case FIREBALL:
     {
         shot->SetSphere(fireballSphere);
-        shot->GetParticle().setMass(1.0f); 
-        shot->GetParticle().setVelocity(0.0f, 0.0f, 10.0f); // 5m/s
-        shot->GetParticle().setAcceleration(0.0f, 0.6f, 0.0f); // Floats up
-        shot->GetParticle().setDamping(0.9f);
+        shot->GetParticle()->setMass(1.0f); 
+        shot->GetParticle()->setVelocity(0.0f, 0.0f, -10.0f); // 5m/s
+        shot->GetParticle()->setAcceleration(0.0f, 0.6f, 0.0f); // Floats up
+        shot->GetParticle()->setDamping(0.9f);
         break;
     }
     case LASER:
     {
         shot->SetSphere(laserSphere);
-        shot->GetParticle().setMass(0.1f); // 0.1kg - almost no weight
-        shot->GetParticle().setVelocity(0.0f, 0.0f, 100.0f); // 100m/s
-        shot->GetParticle().setAcceleration(0.0f, 0.0f, 0.0f); // No gravity
-        shot->GetParticle().setDamping(0.99f);
+        shot->GetParticle()->setMass(0.1f); // 0.1kg - almost no weight
+        shot->GetParticle()->setVelocity(0.0f, 0.0f, -100.0f); // 100m/s
+        shot->GetParticle()->setAcceleration(0.0f, 0.0f, 0.0f); // No gravity
+        shot->GetParticle()->setDamping(0.99f);
         break;
     }
     }
 
-	shot->GetParticle().setPosition(elevate::Vector3(0.0f, 5.0f, -1.0f));
+	shot->GetParticle()->setPosition(elevate::Vector3(0.0f, 2.0f, -1.0f));
     shot->SetStartTime(glfwGetTime());
 	shot->SetType(currentShotType);
 
-	shot->GetParticle().clearAccumulator();
+	shot->GetParticle()->clearAccumulator();
 }
 
 void GameManager::update(float deltaTime)
@@ -269,10 +269,10 @@ void GameManager::update(float deltaTime)
 
 	for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
 		if (shot->GetType() != UNUSED) {
-			shot->GetParticle().integrate(deltaTime);
+			shot->GetParticle()->integrate(deltaTime);
 
-            if (shot->GetParticle().getPosition().y < 0.0f || glfwGetTime() - shot->GetStartTime() > 5.0f
-                || shot->GetParticle().getPosition().z > 200.0f) {
+            if (shot->GetParticle()->getPosition().y < 0.0f || glfwGetTime() - shot->GetStartTime() > 5.0f
+                || shot->GetParticle()->getPosition().z > 200.0f) {
 				shot->SetType(UNUSED);
             }
         }
