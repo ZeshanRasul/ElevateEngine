@@ -29,6 +29,8 @@ namespace elevate {
 
 		void clearAccumulator();
 
+		void addForce(const Vector3& force);
+
 	protected:
 
 		/**

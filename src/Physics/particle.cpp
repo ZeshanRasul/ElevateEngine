@@ -12,6 +12,7 @@ void Particle::integrate(real duration)
 	position.addScaledVector(velocity, duration);
 
 	Vector3 resultingAcc = acceleration;
+	resultingAcc.addScaledVector(forceAccum, inverseMass);
 
 	velocity.addScaledVector(resultingAcc, duration);
 	velocity *= real_pow(damping, duration);
@@ -96,5 +97,10 @@ Vector3 Particle::getAcceleration() const
 void Particle::clearAccumulator()
 {
 	forceAccum.clear();
+}
+
+void elevate::Particle::addForce(const Vector3& force)
+{
+	forceAccum += force;
 }
 
