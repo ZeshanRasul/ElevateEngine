@@ -6,6 +6,7 @@
 namespace elevate {
 	typedef float real;
 
-	#define real_sqrt sqrt
+	#define REAL_MAX FLT_MAX
+	#define real_sqrt sqrtf
 	#define real_pow powf
 }

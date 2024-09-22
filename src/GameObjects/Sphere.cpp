@@ -2,9 +2,8 @@
 
 void Sphere::GenerateSphere(float radius, unsigned int sectorCount, unsigned int stackCount)
 {
-    float x, y, z, xy;                      // vertex position
-    float nx, ny, nz, lengthInv = 1.0f / radius;  // vertex normal
-    float s, t;                             // vertex texCoord
+    float x, y, z, xy;                      
+    float lengthInv = 1.0f / radius;  
 
     float sectorStep = 2 * elevate::PI / sectorCount;
     float stackStep = elevate::PI / stackCount;
@@ -104,6 +103,6 @@ void Sphere::drawObject(glm::mat4 viewMat, glm::mat4 proj)
 	shader->setVec3("objectColor", color);
 
     glBindVertexArray(mVAO);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

@@ -33,3 +33,18 @@ void ParticleForceRegistry::updateForces(real duration)
 		i->forceGen->updateForce(i->particle, duration);
 	}
 }
+
+ParticleGravity::ParticleGravity(const Vector3& gravity)
+	: gravity(gravity)
+{}
+
+void ParticleGravity::updateForce(Particle * particle, real duration)
+{
+	if (!particle->hasFiniteMass()) return;
+
+	particle->addForce(gravity * particle->getMass());
+}
+
+ParticleDrag::ParticleDrag(real k1, real k2)
+	: k1(k1), k2(k2)
+{}

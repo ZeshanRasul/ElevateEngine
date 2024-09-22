@@ -14,6 +14,9 @@ namespace elevate {
 
 		void setMass(const real mass);
 		void setInverseMass(const real invMass);
+		real getMass() const;
+
+		bool hasFiniteMass() const;
 
 		void setPosition(const Vector3& pos);
 		void setPosition(const real x, const real y, const real z);

@@ -43,6 +43,22 @@ void Particle::setInverseMass(const real invMass) {
 	inverseMass = invMass;
 }
 
+real Particle::getMass() const
+{
+	if (inverseMass == 0) {
+		return REAL_MAX;
+	}
+	else
+	{
+		return ((real)1.0) / inverseMass;
+	}
+}
+
+bool Particle::hasFiniteMass() const
+{
+	return inverseMass >= 0.0f;
+}
+
 void Particle::setPosition(const Vector3& pos)
 {
 	position = pos;

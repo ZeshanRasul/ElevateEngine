@@ -155,6 +155,7 @@
     <ClInclude Include="include\elevate\Physics\core.h" />
     <ClInclude Include="include\elevate\Physics\Demos\AmmoRound.h" />
     <ClInclude Include="include\elevate\Physics\particle.h" />
+    <ClInclude Include="include\elevate\Physics\pfgen.h" />
     <ClInclude Include="include\elevate\Physics\precision.h" />
     <ClInclude Include="include\external\imgui\backend\imgui_impl_glfw.h" />
     <ClInclude Include="include\external\imgui\backend\imgui_impl_opengl3.h" />
@@ -195,6 +196,7 @@
     <ClCompile Include="src\OpenGL\VertexBuffer.cpp" />
     <ClCompile Include="src\Physics\core.cpp" />
     <ClCompile Include="src\Physics\particle.cpp" />
+    <ClCompile Include="src\Physics\pfgen.cpp" />
     <ClCompile Include="src\Tools\Logger.cpp" />
     <ClCompile Include="src\Window\Window.cpp" />
   </ItemGroup>
