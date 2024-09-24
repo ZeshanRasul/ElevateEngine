@@ -9,4 +9,5 @@ namespace elevate {
 	#define REAL_MAX FLT_MAX
 	#define real_sqrt sqrtf
 	#define real_pow powf
+	#define real_abs fabsf
 }
