@@ -46,7 +46,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	scale = { 0.2f, 0.2f, 0.2f };
 	elevate::Vector3 spherePos = { 0.0f, 2.0f, -10.0f };
-	pistolSphere = new Sphere(spherePos, scale, &ammoShader, this, glm::vec3(0.1f, 0.1f, 0.1f));
+	pistolSphere = new Sphere(spherePos, scale, &ammoShader, this, glm::vec3(0.3f, 0.3f, 0.3f));
     pistolSphere->GenerateSphere(1.0f, 30, 30);
     pistolSphere->LoadMesh();
 
