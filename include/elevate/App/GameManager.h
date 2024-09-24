@@ -68,6 +68,8 @@ private:
     Cube* cube2;
     Cube* cube3;
     Cube* cube4;
+    Cube* waterCubeTop;
+    Cube* waterCubeBottom;
     Sphere* pistolSphere;
     Sphere* artillerySphere;
     Sphere* fireballSphere;
@@ -85,5 +87,9 @@ private:
 	elevate::ParticleForceRegistry registry;
 	elevate::ParticleBuoyancy* buoyancyFG;
     elevate::ParticleGravity* gravityFG;
+	float floatingSphereMass = 2.0f;
 	float waterHeight = 10.0f;
+	float maxDepth = 5.0f;
+	float floatingSphereVolume = 0.1f;
+	float waterDensity = 1000.0f;
 };
