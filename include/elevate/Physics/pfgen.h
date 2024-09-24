@@ -105,6 +105,8 @@ namespace elevate {
 	public:
 		ParticleBuoyancy(real maxDepth, real volume, real waterHeight, real liquidDensity = 1000.0f);
 
+		void setWaterHeight(real height) { waterHeight = height; }
+
 		virtual void updateForce(Particle* particle, real duration);
 	};
 

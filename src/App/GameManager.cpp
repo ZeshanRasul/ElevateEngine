@@ -65,6 +65,12 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     laserSphere->GenerateSphere(1.0f, 30, 30);
     laserSphere->LoadMesh();
 
+    scale = { 0.6f, 0.6f, 0.6f };
+    spherePos = { 0.0f, 2.0f, -10.0f };
+    waterSphere = new Sphere(spherePos, scale, &ammoShader, this, glm::vec3(0.0f, 0.0f, 1.0f));
+    waterSphere->GenerateSphere(1.0f, 30, 30);
+    waterSphere->LoadMesh();
+
 	// TODO: Create gameobjects and add to gameObjects vector
     gameObjects.push_back(cube);
     gameObjects.push_back(cube2);
@@ -79,6 +85,15 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
         shot->SetSphere(pistolSphere);
         shot->SetType(UNUSED);
     }
+
+
+	floatingSphere = new FloatingSphere();
+	floatingSphere->SetParticle(new elevate::Particle());
+	floatingSphere->GetParticle()->setPosition(elevate::Vector3(0.0f, 2.0f, -10.0f));
+	floatingSphere->GetParticle()->setMass(2.0f);
+    floatingSphere->SetSphere(waterSphere);
+	buoyancyFG = new elevate::ParticleBuoyancy(5.0f, 0.001f, waterHeight, 1000.0f);
+	registry.add(floatingSphere->GetParticle(), buoyancyFG);
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
@@ -104,6 +119,7 @@ void GameManager::showDebugUI()
     ShowLightControlWindow(dirLight);
     ShowCameraControlWindow(*camera);
 	ShowAmmoWindow();
+    ShowBuoyancyWindow();
 }
 
 void GameManager::renderDebugUI()
@@ -117,12 +133,10 @@ void GameManager::ShowLightControlWindow(DirLight& light)
     ImGui::Begin("Directional Light Control");
 
     ImGui::Text("Light Direction");
+
     ImGui::DragFloat3("Direction", (float*)&light.direction, dirLight.direction.x, dirLight.direction.y, dirLight.direction.z);
-
     ImGui::ColorEdit4("Ambient", (float*)&light.ambient);
-
     ImGui::ColorEdit4("Diffuse", (float*)&light.diffuse);
-
     ImGui::ColorEdit4("Specular", (float*)&light.specular);
 
     ImGui::End();
@@ -157,6 +171,13 @@ void GameManager::ShowAmmoWindow()
 	}
 	}
 
+    ImGui::End();
+}
+
+void GameManager::ShowBuoyancyWindow()
+{
+    ImGui::Begin("Water Height");
+    ImGui::DragFloat("Height", &waterHeight, 0.1f, 0.0f, 100.0f);
     ImGui::End();
 }
 
@@ -277,6 +298,9 @@ void GameManager::update(float deltaTime)
             }
         }
 	}
+    buoyancyFG->setWaterHeight(waterHeight);
+	registry.updateForces(deltaTime);
+	floatingSphere->GetParticle()->integrate(deltaTime);
 }
 
 void GameManager::render()
@@ -285,14 +309,17 @@ void GameManager::render()
         renderer->draw(obj, view, projection);
     }
 
-	for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
+	ammoShader.use();
+    ammoShader.setVec3("dirLight.direction", dirLight.direction);
+    ammoShader.setVec3("dirLight.ambient", dirLight.ambient);
+    ammoShader.setVec3("dirLight.diffuse", dirLight.diffuse);
+    ammoShader.setVec3("dirLight.specular", dirLight.specular);
+	
+    for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
 		if (shot->GetType() != UNUSED) {
-			ammoShader.use();
-            ammoShader.setVec3("dirLight.direction", dirLight.direction);
-            ammoShader.setVec3("dirLight.ambient", dirLight.ambient);
-            ammoShader.setVec3("dirLight.diffuse", dirLight.diffuse);
-            ammoShader.setVec3("dirLight.specular", dirLight.specular);
 			shot->render(view, projection);
 		}
 	}
+
+	floatingSphere->render(view, projection);
 }

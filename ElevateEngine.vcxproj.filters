@@ -114,6 +114,9 @@
     <ClInclude Include="include\elevate\Physics\pfgen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\elevate\Physics\Demos\FloatingSphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Physics\particle.cpp">

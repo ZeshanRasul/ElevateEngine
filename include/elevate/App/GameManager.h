@@ -10,6 +10,8 @@
 #include "GameObjects/Cube.h"
 #include "GameObjects/Sphere.h"
 #include "Physics/Demos/AmmoRound.h"
+#include "Physics/Demos/FloatingSphere.h"
+#include "Physics/pfgen.h"
 
 class GameManager {
 public:
@@ -47,6 +49,7 @@ private:
     void ShowCameraControlWindow(Camera& cam);
     void ShowLightControlWindow(DirLight& light);
     void ShowAmmoWindow();
+	void ShowBuoyancyWindow();
 
     void RemoveDestroyedGameObjects();
 
@@ -69,6 +72,7 @@ private:
     Sphere* artillerySphere;
     Sphere* fireballSphere;
     Sphere* laserSphere;
+    Sphere* waterSphere;
 
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection = glm::mat4(1.0f);
@@ -76,4 +80,10 @@ private:
     const static unsigned ammoRounds = 16;
     AmmoRound ammo[ammoRounds];
     ShotType currentShotType = PISTOL;
+
+	FloatingSphere* floatingSphere;
+	elevate::ParticleForceRegistry registry;
+	elevate::ParticleBuoyancy* buoyancyFG;
+    elevate::ParticleGravity* gravityFG;
+	float waterHeight = 10.0f;
 };

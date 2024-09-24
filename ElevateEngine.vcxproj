@@ -154,6 +154,7 @@
     <ClInclude Include="include\elevate\OpenGL\VertexBuffer.h" />
     <ClInclude Include="include\elevate\Physics\core.h" />
     <ClInclude Include="include\elevate\Physics\Demos\AmmoRound.h" />
+    <ClInclude Include="include\elevate\Physics\Demos\FloatingSphere.h" />
     <ClInclude Include="include\elevate\Physics\particle.h" />
     <ClInclude Include="include\elevate\Physics\pfgen.h" />
     <ClInclude Include="include\elevate\Physics\precision.h" />
