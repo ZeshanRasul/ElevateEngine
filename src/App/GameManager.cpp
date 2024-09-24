@@ -85,8 +85,12 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     gameObjects.push_back(cube2);
     gameObjects.push_back(cube3);
     gameObjects.push_back(cube4);
-	gameObjects.push_back(waterCubeTop);
-	gameObjects.push_back(waterCubeBottom);
+
+    if (showBuoyanceDemo)
+    {
+	    gameObjects.push_back(waterCubeTop);
+	    gameObjects.push_back(waterCubeBottom);
+    }
 
     for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
 		elevate::Particle* particle = new elevate::Particle();
@@ -130,7 +134,9 @@ void GameManager::showDebugUI()
     ShowLightControlWindow(dirLight);
     ShowCameraControlWindow(*camera);
 	ShowAmmoWindow();
-    ShowBuoyancyWindow();
+
+	if (showBuoyanceDemo)
+        ShowBuoyancyWindow();
 }
 
 void GameManager::renderDebugUI()
@@ -338,5 +344,6 @@ void GameManager::render()
 		}
 	}
 
-	floatingSphere->render(view, projection);
+    if (showBuoyanceDemo)
+	    floatingSphere->render(view, projection);
 }
