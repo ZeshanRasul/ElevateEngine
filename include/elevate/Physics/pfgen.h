@@ -107,4 +107,16 @@ namespace elevate {
 
 		virtual void updateForce(Particle* particle, real duration);
 	};
+
+	class ParticleFakeSpring : public ParticleForceGenerator {
+	private:
+		Vector3* anchor;
+		real springConstant;
+		real damping;
+
+	public:
+		ParticleFakeSpring(Vector3* anchor, real springConstant, real damping);
+
+		virtual void updateForce(Particle* particle, real duration);
+	};
 };

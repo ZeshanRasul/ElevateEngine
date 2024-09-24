@@ -38,7 +38,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal)
 
 	// combine results
 	vec3 ambient = light.ambient * objectColor;
-	vec3 diffuse = light.diffuse * objectColor;
+	vec3 diffuse = light.diffuse * diff * objectColor;
 
 	return (ambient + diffuse);
 }
