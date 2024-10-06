@@ -54,6 +54,11 @@ real Particle::getMass() const
 	}
 }
 
+real Particle::getInverseMass() const
+{
+	return inverseMass;
+}
+
 bool Particle::hasFiniteMass() const
 {
 	return inverseMass >= 0.0f;

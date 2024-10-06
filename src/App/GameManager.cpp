@@ -80,11 +80,13 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     waterSphere->GenerateSphere(1.0f, 30, 30);
     waterSphere->LoadMesh();
 
-	// TODO: Create gameobjects and add to gameObjects vector
-    gameObjects.push_back(cube);
-    gameObjects.push_back(cube2);
-    gameObjects.push_back(cube3);
-    gameObjects.push_back(cube4);
+    if (!showBuoyanceDemo)
+    {
+        gameObjects.push_back(cube);
+        gameObjects.push_back(cube2);
+        gameObjects.push_back(cube3);
+        gameObjects.push_back(cube4);
+    }
 
     if (showBuoyanceDemo)
     {
@@ -133,7 +135,9 @@ void GameManager::showDebugUI()
 {
     ShowLightControlWindow(dirLight);
     ShowCameraControlWindow(*camera);
-	ShowAmmoWindow();
+
+    if (!showBuoyanceDemo)
+	    ShowAmmoWindow();
 
 	if (showBuoyanceDemo)
         ShowBuoyancyWindow();

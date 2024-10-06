@@ -15,6 +15,7 @@ namespace elevate {
 		void setMass(const real mass);
 		void setInverseMass(const real invMass);
 		real getMass() const;
+		real getInverseMass() const;
 
 		bool hasFiniteMass() const;
 

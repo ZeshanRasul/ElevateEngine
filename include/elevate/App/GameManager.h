@@ -93,5 +93,5 @@ private:
 	float floatingSphereVolume = 0.1f;
 	float waterDensity = 1000.0f;
 
-    bool showBuoyanceDemo = false;
+    bool showBuoyanceDemo = true;
 };
