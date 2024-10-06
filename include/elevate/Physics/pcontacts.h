@@ -40,4 +40,10 @@ namespace elevate {
 		void setIterations(unsigned iterations);
 		void resolveContacts(ParticleContact* contactArray, unsigned numContacts, real duration);
 	};
+
+	class ParticleContactGenerator
+	{
+	public:
+		virtual unsigned addContact(ParticleContact* contact, unsigned limit) const = 0;
+	};
 }
