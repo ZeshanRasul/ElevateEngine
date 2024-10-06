@@ -129,6 +129,11 @@ void ParticleContactResolver::setIterations(unsigned iterations)
 	ParticleContactResolver::iterations = iterations;
 }
 
+unsigned ParticleContactResolver::getIterations() const
+{
+	return iterations;
+}
+
 void ParticleContactResolver::resolveContacts(ParticleContact* contactArray, unsigned numContacts, real duration)
 {
 	unsigned i;

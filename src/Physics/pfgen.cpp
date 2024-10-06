@@ -49,6 +49,18 @@ ParticleDrag::ParticleDrag(real k1, real k2)
 	: k1(k1), k2(k2)
 {}
 
+ParticleWindForce::ParticleWindForce(const Vector3& direction)
+	: windDirection(direction)
+{}
+
+void ParticleWindForce::updateForce(Particle * particle, real duration)
+{
+	if (!particle->hasFiniteMass()) return;
+
+	Vector3 force = windDirection;
+	particle->addForce(force);
+}
+
 void ParticleDrag::updateForce(Particle * particle, real duration)
 {
 	Vector3	force = particle->getVelocity();

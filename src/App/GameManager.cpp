@@ -80,7 +80,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     waterSphere->GenerateSphere(1.0f, 30, 30);
     waterSphere->LoadMesh();
 
-    if (!showBuoyanceDemo)
+    if (showAmmoDemo)
     {
         gameObjects.push_back(cube);
         gameObjects.push_back(cube2);
@@ -88,7 +88,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
         gameObjects.push_back(cube4);
     }
 
-    if (showBuoyanceDemo)
+    if (showBuoyancyDemo)
     {
 	    gameObjects.push_back(waterCubeTop);
 	    gameObjects.push_back(waterCubeBottom);
@@ -111,6 +111,24 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     floatingSphere->SetSphere(waterSphere);
 	buoyancyFG = new elevate::ParticleBuoyancy(maxDepth, 0.001f, waterHeight, 1000.0f);
 	registry.add(floatingSphere->GetParticle(), buoyancyFG);
+
+    if (showClothDemo)
+    {
+        cloth = new Cloth();
+		physicsWorld = new elevate::ParticleWorld(cloth->getParticles().size() + cloth->getFixedParticles().size());
+		gravityFG = new elevate::ParticleGravity(elevate::Vector3(0.0f, -9.81f, 0.0f));
+		windFG = new elevate::ParticleWindForce(elevate::Vector3(0.0f, 0.0f, -6.0f));
+		clothContactGen = new elevate::ParticleClothContactGenerator(cloth->getParticles(), minClothContactDist);
+
+
+		for (auto particle : cloth->getParticles()) {
+			physicsWorld->getParticles().push_back(particle);
+			registry.add(particle, gravityFG);
+			registry.add(particle, windFG);
+		}
+
+		physicsWorld->getContactGenerators().push_back(clothContactGen);
+    }
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
@@ -136,10 +154,10 @@ void GameManager::showDebugUI()
     ShowLightControlWindow(dirLight);
     ShowCameraControlWindow(*camera);
 
-    if (!showBuoyanceDemo)
+    if (showAmmoDemo)
 	    ShowAmmoWindow();
 
-	if (showBuoyanceDemo)
+	if (showBuoyancyDemo)
         ShowBuoyancyWindow();
 }
 
@@ -328,6 +346,24 @@ void GameManager::update(float deltaTime)
 	waterCubeBottom->SetPosition(elevate::Vector3(0.0f, (0.0f - maxDepth), 0.0f));
 	registry.updateForces(deltaTime);
 	floatingSphere->GetParticle()->integrate(deltaTime);
+
+    physicsWorld->startFrame();
+
+    registry.updateForces(deltaTime);
+    physicsWorld->integrate(deltaTime);
+
+	const int constraintsSize = cloth->getConstraintsSize();
+    elevate::ParticleContactResolver resolver(physicsWorld->getResolver().getIterations());
+	std::vector<elevate::ParticleContact> contacts(constraintsSize);
+    elevate::ParticleContact* contactArray = contacts.data();
+
+    int usedContacts = physicsWorld->generateContacts();
+
+	if (usedContacts)
+	{
+		resolver.setIterations(usedContacts * 2);
+		resolver.resolveContacts(contactArray, usedContacts, deltaTime);
+	}
 }
 
 void GameManager::render()
@@ -336,18 +372,21 @@ void GameManager::render()
         renderer->draw(obj, view, projection);
     }
 
-	ammoShader.use();
-    ammoShader.setVec3("dirLight.direction", dirLight.direction);
-    ammoShader.setVec3("dirLight.ambient", dirLight.ambient);
-    ammoShader.setVec3("dirLight.diffuse", dirLight.diffuse);
-    ammoShader.setVec3("dirLight.specular", dirLight.specular);
-	
-    for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
-		if (shot->GetType() != UNUSED) {
-			shot->render(view, projection);
-		}
-	}
+    if (showAmmoDemo)
+    {
+	    ammoShader.use();
+        ammoShader.setVec3("dirLight.direction", dirLight.direction);
+        ammoShader.setVec3("dirLight.ambient", dirLight.ambient);
+        ammoShader.setVec3("dirLight.diffuse", dirLight.diffuse);
+        ammoShader.setVec3("dirLight.specular", dirLight.specular);
+	    
+        for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
+	    	if (shot->GetType() != UNUSED) {
+	    		shot->render(view, projection);
+	    	}
+	    }
+    }
 
-    if (showBuoyanceDemo)
+    if (showBuoyancyDemo)
 	    floatingSphere->render(view, projection);
 }

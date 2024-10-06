@@ -38,6 +38,7 @@ namespace elevate {
 		ParticleContactResolver(unsigned iterations);
 		
 		void setIterations(unsigned iterations);
+		unsigned getIterations() const;
 		void resolveContacts(ParticleContact* contactArray, unsigned numContacts, real duration);
 	};
 

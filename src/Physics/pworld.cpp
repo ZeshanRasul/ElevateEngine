@@ -80,3 +80,48 @@ ParticleForceRegistry& ParticleWorld::getForceRegistry()
 {
 	return registry;
 }
+
+ParticleContactResolver& ParticleWorld::getResolver()
+{
+	return resolver;
+}
+
+ParticleClothContactGenerator::ParticleClothContactGenerator(std::vector<Particle*>& particles, float minDist)
+	: 
+	particles(particles), minDistance(minDist)
+{}
+
+unsigned ParticleClothContactGenerator::addContact(ParticleContact* contact, unsigned limit) const
+{
+	unsigned numContacts = 0;
+
+	// Loop through all particles and detect proximity-based contacts
+	for (size_t i = 0; i < particles.size(); ++i) {
+		for (size_t j = i + 1; j < particles.size(); ++j) {
+			elevate::Particle* p1 = particles[i];
+			elevate::Particle* p2 = particles[j];
+
+			// Check distance between particles
+			elevate::Vector3 diff = p1->getPosition() - p2->getPosition();
+			float dist = diff.magnitude();
+
+			if (dist < minDistance && numContacts < limit) {
+				// Fill the contact structure
+				contact->particle[0] = p1;
+				contact->particle[1] = p2;
+				diff.normalize();
+				contact->contactNormal = diff;
+				contact->penetration = minDistance - dist;
+				contact->restitution = 0.2f;  // Some restitution for bounce effect
+
+				// Move to the next contact
+				contact++;
+				numContacts++;
+			}
+		}
+	}
+
+	return numContacts;
+}
+
+

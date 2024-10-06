@@ -36,5 +36,17 @@ namespace elevate {
 		Particles& getParticles();
 		ContactGenerators& getContactGenerators();
 		ParticleForceRegistry& getForceRegistry();
+		ParticleContactResolver& getResolver();
+	};
+
+	class ParticleClothContactGenerator : public ParticleContactGenerator
+	{
+	private:
+		std::vector<Particle*> particles;
+		float minDistance;
+
+	public:
+		ParticleClothContactGenerator(std::vector<Particle*>& particles, float minDist);
+		virtual unsigned addContact(ParticleContact* contact, unsigned limit) const;
 	};
 }

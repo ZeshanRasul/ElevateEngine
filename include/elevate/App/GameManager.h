@@ -11,7 +11,9 @@
 #include "GameObjects/Sphere.h"
 #include "Physics/Demos/AmmoRound.h"
 #include "Physics/Demos/FloatingSphere.h"
+#include "Physics/Demos/Cloth.h"
 #include "Physics/pfgen.h"
+#include "Physics/pworld.h"
 
 class GameManager {
 public:
@@ -86,12 +88,20 @@ private:
 	FloatingSphere* floatingSphere;
 	elevate::ParticleForceRegistry registry;
 	elevate::ParticleBuoyancy* buoyancyFG;
-    elevate::ParticleGravity* gravityFG;
 	float floatingSphereMass = 2.0f;
 	float waterHeight = 10.0f;
 	float maxDepth = 5.0f;
 	float floatingSphereVolume = 0.1f;
 	float waterDensity = 1000.0f;
 
-    bool showBuoyanceDemo = true;
+    bool showBuoyancyDemo = false;
+	bool showAmmoDemo = false;
+    bool showClothDemo = true;
+
+	elevate::ParticleWorld* physicsWorld;
+	elevate::ParticleClothContactGenerator* clothContactGen;
+	float minClothContactDist = 0.05f;
+    elevate::ParticleGravity* gravityFG;
+	elevate::ParticleWindForce* windFG;
+	Cloth* cloth;
 };

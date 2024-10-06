@@ -42,6 +42,15 @@ namespace elevate {
 		virtual void updateForce(Particle* particle, real duration);
 	};
 	
+	class ParticleWindForce : public ParticleForceGenerator {
+	private:
+		Vector3 windDirection;
+
+	public:
+		ParticleWindForce(const Vector3& direction);
+
+		virtual void updateForce(Particle* particle, real duration);
+	};
 
 	class ParticleDrag : public ParticleForceGenerator {
 	private:
