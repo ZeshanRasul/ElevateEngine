@@ -25,8 +25,9 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     ammoShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
 
     cubeShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
+    lineShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/line_vert.glsl", "C:/dev/ElevateEngine/src/Shaders/line_frag.glsl");
 
-    camera = new Camera(glm::vec3(0.0f, 2.0f, 10.0f));
+    camera = new Camera(glm::vec3(0.0f, 0.0f, 40.0f));
 
     inputManager->setContext(camera, this, width, height);
 
@@ -109,6 +110,8 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     Sphere0->GetParticle()->setMass(5.7f);
     Sphere0->GetParticle()->setDamping(0.68f);
     Sphere0->SetSphere(fireballSphere);
+    spheres.push_back(Sphere0);
+
     spherePos = { 0.0f, 2.0f, -10.0f };
     Sphere1 = new FloatingSphere();
     Sphere1->SetParticle(new elevate::Particle());
@@ -116,6 +119,8 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     Sphere1->GetParticle()->setMass(8.0f);
     Sphere1->GetParticle()->setDamping(0.68f);
     Sphere1->SetSphere(artillerySphere);
+    spheres.push_back(Sphere1);
+
 
     Sphere2 = new FloatingSphere();
     Sphere2->SetParticle(new elevate::Particle());
@@ -123,11 +128,27 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     Sphere2->GetParticle()->setMass(13.9f);
     Sphere2->GetParticle()->setDamping(0.68f);  
     Sphere2->SetSphere(waterSphere);
+    spheres.push_back(Sphere2);
+
+    lineab = new Line(Sphere0->GetParticle()->getPosition(), elevate::Vector3(1.0f, 1.0f, 1.0f), &lineShader, this, glm::vec3(1.0f, 0.0f, 0.0f));
+    lineab->LoadMesh();
+    lineab->CreateAndUploadVertexBuffer();
+    linebc = new Line(Sphere1->GetParticle()->getPosition(), elevate::Vector3(1.0f, 1.0f, 1.0f), &lineShader, this, glm::vec3(1.0f, 0.0f, 0.0f));
+    linebc->LoadMesh();
+    linebc->CreateAndUploadVertexBuffer();
+
+    //lines.push_back(lineab);
+    //lines.push_back(linebc);
 
     spherePos = { 0.0f, 0.0f, -10.0f };
     
     springFG = new elevate::ParticleAnchoredSpring(elevate::Vector3(0.0f, 6.0f, -10.0f), 60.0f, 2.0f);
     registry.add(Sphere0->GetParticle(), springFG);
+
+    anchorPos = glm::vec3(0.0f, 6.0f, -10.0f);
+    linecd = new Line(elevate::Vector3(anchorPos.x, anchorPos.y, anchorPos.z), elevate::Vector3(1.0f, 1.0f, 1.0f), &lineShader, this, glm::vec3(1.0f, 0.0f, 0.0f));
+    linecd->LoadMesh();
+    linecd->CreateAndUploadVertexBuffer();
 
     gravityFG = new elevate::ParticleGravity(elevate::Vector3(0.0f, -9.81f, 0.0f));
     registry.add(Sphere0->GetParticle(), gravityFG);
@@ -360,6 +381,16 @@ void GameManager::update(float deltaTime)
     Sphere0->GetParticle()->integrate(deltaTime);
     Sphere1->GetParticle()->integrate(deltaTime);
     Sphere2->GetParticle()->integrate(deltaTime);
+    elevate::Particle particle0 = *Sphere0->GetParticle();
+    float abX = particle0.getPosition().x;
+    float abY = particle0.getPosition().x;
+    float abZ = particle0.getPosition().x;
+    glm::vec3 abStart = glm::vec3(Sphere0->GetParticle()->getPosition().x, Sphere0->GetParticle()->getPosition().y, Sphere0->GetParticle()->getPosition().z);
+    glm::vec3 bcStart = glm::vec3(Sphere1->GetParticle()->getPosition().x, Sphere1->GetParticle()->getPosition().y, Sphere1->GetParticle()->getPosition().z);
+    glm::vec3 cdStart = glm::vec3(Sphere2->GetParticle()->getPosition().x, Sphere2->GetParticle()->getPosition().y, Sphere2->GetParticle()->getPosition().z);
+    lineab->UpdateVertexBuffer(abStart, bcStart);
+    linebc->UpdateVertexBuffer(bcStart, cdStart);
+    linecd->UpdateVertexBuffer(anchorPos, abStart);
 }
 
 void GameManager::render()
@@ -385,5 +416,8 @@ void GameManager::render()
         Sphere0->render(view, projection);
         Sphere1->render(view, projection);
         Sphere2->render(view, projection);
+        lineab->DrawLine(view, projection, glm::vec3(1.0f, 0.0f, 0.0f));
+        linebc->DrawLine(view, projection, glm::vec3(0.0f, 1.0f, 0.0f));
+        linecd->DrawLine(view, projection, glm::vec3(0.0f, 0.0f, 1.0f));
     }
 }

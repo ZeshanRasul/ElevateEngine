@@ -126,6 +126,9 @@
     <ClInclude Include="include\elevate\Physics\pworld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\elevate\GameObjects\Line.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Physics\particle.cpp">
@@ -218,9 +221,14 @@
     <ClCompile Include="src\Physics\pworld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GameObjects\Line.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Shaders\fragment.glsl" />
     <None Include="src\Shaders\vertex.glsl" />
+    <None Include="src\Shaders\line_frag.glsl" />
+    <None Include="src\Shaders\line_vert.glsl" />
   </ItemGroup>
 </Project>

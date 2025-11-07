@@ -172,6 +172,7 @@
     <ClInclude Include="include\external\imgui\imstb_truetype.h" />
     <ClInclude Include="include\external\stb_image.h" />
     <ClInclude Include="include\external\stb_image_write.h" />
+    <ClInclude Include="include\elevate\GameObjects\Line.h" />
     <ClInclude Include="src\Tools\Logger.h" />
     <ClInclude Include="src\Window\Window.h" />
   </ItemGroup>
@@ -188,6 +189,7 @@
     <ClCompile Include="src\App\GameManager.cpp" />
     <ClCompile Include="src\App\InputManager.cpp" />
     <ClCompile Include="src\GameObjects\Cube.cpp" />
+    <ClCompile Include="src\GameObjects\Line.cpp" />
     <ClCompile Include="src\GameObjects\Sphere.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\main.cpp" />
@@ -209,6 +211,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Shaders\fragment.glsl" />
+    <None Include="src\Shaders\line_frag.glsl" />
+    <None Include="src\Shaders\line_vert.glsl" />
     <None Include="src\Shaders\vertex.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

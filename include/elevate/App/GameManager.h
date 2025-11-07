@@ -9,6 +9,7 @@
 #include "App/Camera.h"
 #include "GameObjects/Cube.h"
 #include "GameObjects/Sphere.h"
+#include "GameObjects/Line.h"
 #include "Physics/Demos/AmmoRound.h"
 #include "Physics/Demos/FloatingSphere.h"
 #include "Physics/pfgen.h"
@@ -63,6 +64,7 @@ private:
 
     Shader ammoShader{};
 	Shader cubeShader{};
+	Shader lineShader{};
 
     Cube* cube;
     Cube* cube2;
@@ -89,11 +91,19 @@ private:
 	FloatingSphere* Sphere0;
 	FloatingSphere* Sphere1;
 	FloatingSphere* Sphere2;
+    std::vector<FloatingSphere*> spheres;
 	elevate::ParticleForceRegistry registry;
 	elevate::ParticleAnchoredSpring* springFG;
 	elevate::ParticleSpring* bungeeFG;
 	elevate::ParticleSpring* bungeeFG1;
+
     elevate::ParticleGravity* gravityFG;
+    Line* lineab;
+    Line* linebc;
+    Line* linecd;
+    glm::vec3 anchorPos = glm::vec3(0.0f);
+    std::vector<Line*> lines;
+
 	float floatingSphereMass = 2.0f;
 	float waterHeight = 10.0f;
 	float maxDepth = 5.0f;
