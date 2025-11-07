@@ -91,7 +91,8 @@ private:
 	FloatingSphere* Sphere2;
 	elevate::ParticleForceRegistry registry;
 	elevate::ParticleAnchoredSpring* springFG;
-	elevate::ParticleAnchoredBungee* bungeeFG;
+	elevate::ParticleSpring* bungeeFG;
+	elevate::ParticleSpring* bungeeFG1;
     elevate::ParticleGravity* gravityFG;
 	float floatingSphereMass = 2.0f;
 	float waterHeight = 10.0f;

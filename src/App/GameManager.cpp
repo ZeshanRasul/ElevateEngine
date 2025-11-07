@@ -106,27 +106,40 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     Sphere0 = new FloatingSphere();
     Sphere0->SetParticle(new elevate::Particle());
     Sphere0->GetParticle()->setPosition(elevate::Vector3(0.0f, 4.0f, -10.0f));
-    Sphere0->GetParticle()->setMass(2.0f);
-    Sphere0->GetParticle()->setDamping(0.98f);
+    Sphere0->GetParticle()->setMass(5.7f);
+    Sphere0->GetParticle()->setDamping(0.68f);
     Sphere0->SetSphere(fireballSphere);
     spherePos = { 0.0f, 2.0f, -10.0f };
     Sphere1 = new FloatingSphere();
     Sphere1->SetParticle(new elevate::Particle());
     Sphere1->GetParticle()->setPosition(elevate::Vector3(0.0f, 2.0f, -10.0f));
-    Sphere1->GetParticle()->setMass(2.0f);
-    Sphere1->GetParticle()->setDamping(0.98f);
+    Sphere1->GetParticle()->setMass(8.0f);
+    Sphere1->GetParticle()->setDamping(0.68f);
+    Sphere1->SetSphere(artillerySphere);
+
     Sphere2 = new FloatingSphere();
     Sphere2->SetParticle(new elevate::Particle());
     Sphere2->GetParticle()->setPosition(elevate::Vector3(0.0f, 0.0f, -10.0f));
-    Sphere2->GetParticle()->setMass(2.0f);
-    Sphere2->GetParticle()->setDamping(0.98f);  
+    Sphere2->GetParticle()->setMass(13.9f);
+    Sphere2->GetParticle()->setDamping(0.68f);  
+    Sphere2->SetSphere(waterSphere);
+
     spherePos = { 0.0f, 0.0f, -10.0f };
     
-    springFG = new elevate::ParticleAnchoredSpring(elevate::Vector3(0.0f, 6.0f, -10.0f), 1.0f, 2.0f);
+    springFG = new elevate::ParticleAnchoredSpring(elevate::Vector3(0.0f, 6.0f, -10.0f), 60.0f, 2.0f);
     registry.add(Sphere0->GetParticle(), springFG);
 
-    gravityFG = new elevate::ParticleGravity(elevate::Vector3(0.0f, -1.81f, 0.0f));
+    gravityFG = new elevate::ParticleGravity(elevate::Vector3(0.0f, -9.81f, 0.0f));
     registry.add(Sphere0->GetParticle(), gravityFG);
+
+    bungeeFG = new elevate::ParticleSpring(Sphere0->GetParticle(), 40.0f, 2.0f);
+    registry.add(Sphere1->GetParticle(), bungeeFG);
+    registry.add(Sphere1->GetParticle(), gravityFG);
+    bungeeFG1 = new elevate::ParticleSpring(Sphere1->GetParticle(), 20.0f, 2.0f);
+    registry.add(Sphere2->GetParticle(), bungeeFG1);
+
+    registry.add(Sphere2->GetParticle(), gravityFG);
+
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
@@ -345,6 +358,8 @@ void GameManager::update(float deltaTime)
 	registry.updateForces(deltaTime);
 	//floatingSphere->GetParticle()->integrate(deltaTime);
     Sphere0->GetParticle()->integrate(deltaTime);
+    Sphere1->GetParticle()->integrate(deltaTime);
+    Sphere2->GetParticle()->integrate(deltaTime);
 }
 
 void GameManager::render()
@@ -368,5 +383,7 @@ void GameManager::render()
     if (showBuoyanceDemo)
     {
         Sphere0->render(view, projection);
+        Sphere1->render(view, projection);
+        Sphere2->render(view, projection);
     }
 }
