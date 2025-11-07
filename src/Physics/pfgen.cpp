@@ -83,14 +83,14 @@ void ParticleSpring::updateForce(Particle * particle, real duration)
 	particle->addForce(force);
 }
 
-ParticleAnchoredSpring::ParticleAnchoredSpring(Vector3* anchor, real springConstant, real restLength)
+ParticleAnchoredSpring::ParticleAnchoredSpring(Vector3 anchor, real springConstant, real restLength)
 	: anchor(anchor), springConstant(springConstant), restLength(restLength)
 {}
 
 void ParticleAnchoredSpring::updateForce(Particle * particle, real duration)
 {
 	Vector3 force = particle->getPosition();
-	force -= *anchor;
+	force -= anchor;
 
 	// Calculate the magnitude of the force.
 	real magnitude = force.magnitude();
@@ -129,7 +129,7 @@ void ParticleBungee::updateForce(Particle * particle, real duration)
 void ParticleAnchoredBungee::updateForce(Particle* particle, real duration)
 {
 	Vector3 force = particle->getPosition();
-	force -= *anchor;
+	force -= anchor;
 
 	// Calculate the magnitude of the force.
 	real magnitude = force.magnitude();

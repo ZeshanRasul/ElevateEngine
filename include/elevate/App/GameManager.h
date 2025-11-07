@@ -75,6 +75,9 @@ private:
     Sphere* fireballSphere;
     Sphere* laserSphere;
     Sphere* waterSphere;
+    Sphere* springSphere;
+    Sphere* springSphere2;
+    Sphere* springSphere3;
 
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection = glm::mat4(1.0f);
@@ -83,9 +86,12 @@ private:
     AmmoRound ammo[ammoRounds];
     ShotType currentShotType = PISTOL;
 
-	FloatingSphere* floatingSphere;
+	FloatingSphere* Sphere0;
+	FloatingSphere* Sphere1;
+	FloatingSphere* Sphere2;
 	elevate::ParticleForceRegistry registry;
-	elevate::ParticleBuoyancy* buoyancyFG;
+	elevate::ParticleAnchoredSpring* springFG;
+	elevate::ParticleAnchoredBungee* bungeeFG;
     elevate::ParticleGravity* gravityFG;
 	float floatingSphereMass = 2.0f;
 	float waterHeight = 10.0f;

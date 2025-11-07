@@ -26,7 +26,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
     cubeShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
 
-    camera = new Camera(glm::vec3(0.0f, 2.0f, 0.0f));
+    camera = new Camera(glm::vec3(0.0f, 2.0f, 10.0f));
 
     inputManager->setContext(camera, this, width, height);
 
@@ -44,8 +44,8 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     cube4 = new Cube(pos4, scale, &cubeShader, this);
     cube4->LoadMesh();
 
-	pos = { 0.0f, maxDepth, 0.0f };
-	scale = { 100.0f, 0.1f, 100.0f };
+	pos = { 0.0f, 6.0f, -10.0f };
+	scale = { 1.0f, 1.0f, 1.0f };
 	waterCubeTop = new Cube(pos, scale, &cubeShader, this);
 	waterCubeTop->LoadMesh();
 
@@ -102,15 +102,31 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
         shot->SetType(UNUSED);
     }
 
+    spherePos = { 0.0f, 4.0f, -10.0f };
+    Sphere0 = new FloatingSphere();
+    Sphere0->SetParticle(new elevate::Particle());
+    Sphere0->GetParticle()->setPosition(elevate::Vector3(0.0f, 4.0f, -10.0f));
+    Sphere0->GetParticle()->setMass(2.0f);
+    Sphere0->GetParticle()->setDamping(0.98f);
+    Sphere0->SetSphere(fireballSphere);
+    spherePos = { 0.0f, 2.0f, -10.0f };
+    Sphere1 = new FloatingSphere();
+    Sphere1->SetParticle(new elevate::Particle());
+    Sphere1->GetParticle()->setPosition(elevate::Vector3(0.0f, 2.0f, -10.0f));
+    Sphere1->GetParticle()->setMass(2.0f);
+    Sphere1->GetParticle()->setDamping(0.98f);
+    Sphere2 = new FloatingSphere();
+    Sphere2->SetParticle(new elevate::Particle());
+    Sphere2->GetParticle()->setPosition(elevate::Vector3(0.0f, 0.0f, -10.0f));
+    Sphere2->GetParticle()->setMass(2.0f);
+    Sphere2->GetParticle()->setDamping(0.98f);  
+    spherePos = { 0.0f, 0.0f, -10.0f };
+    
+    springFG = new elevate::ParticleAnchoredSpring(elevate::Vector3(0.0f, 6.0f, -10.0f), 1.0f, 2.0f);
+    registry.add(Sphere0->GetParticle(), springFG);
 
-	floatingSphere = new FloatingSphere();
-	floatingSphere->SetParticle(new elevate::Particle());
-	floatingSphere->GetParticle()->setPosition(elevate::Vector3(0.0f, 1.0f, -10.0f));
-	floatingSphere->GetParticle()->setMass(2.0f);
-    floatingSphere->GetParticle()->setDamping(0.98f);
-    floatingSphere->SetSphere(waterSphere);
-	buoyancyFG = new elevate::ParticleBuoyancy(maxDepth, 0.001f, waterHeight, 1000.0f);
-	registry.add(floatingSphere->GetParticle(), buoyancyFG);
+    gravityFG = new elevate::ParticleGravity(elevate::Vector3(0.0f, -1.81f, 0.0f));
+    registry.add(Sphere0->GetParticle(), gravityFG);
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
@@ -197,13 +213,13 @@ void GameManager::ShowAmmoWindow()
 
 void GameManager::ShowBuoyancyWindow()
 {
-    ImGui::Begin("Water Height");
-    ImGui::DragFloat("Height", &waterHeight, 0.1f, 0.0f, 100.0f);
-	ImGui::DragFloat("Max Depth", &maxDepth, 0.1f, 0.0f, 100.0f);
-	ImGui::DragFloat("Sphere Volume", &floatingSphereVolume, 0.1f, 0.0f, 100.0f);
-	ImGui::DragFloat("Water Density", &waterDensity, 0.1f, 0.0f, 100.0f);
-	ImGui::DragFloat("Sphere Mass", &floatingSphereMass, 0.1f, 0.0f, 100.0f);
-    ImGui::End();
+   //ImGui::Begin("Water Height");
+   //ImGui::DragFloat("Height", &waterHeight, 0.1f, 0.0f, 100.0f);
+	//ImGui::DragFloat("Max Depth", &maxDepth, 0.1f, 0.0f, 100.0f);
+	//ImGui::DragFloat("Sphere Volume", &floatingSphereVolume, 0.1f, 0.0f, 100.0f);
+	//ImGui::DragFloat("Water Density", &waterDensity, 0.1f, 0.0f, 100.0f);
+	//ImGui::DragFloat("Sphere Mass", &floatingSphereMass, 0.1f, 0.0f, 100.0f);
+   //ImGui::End();
 }
 
 void GameManager::RemoveDestroyedGameObjects()
@@ -323,11 +339,12 @@ void GameManager::update(float deltaTime)
             }
         }
 	}
-    buoyancyFG->setWaterHeight(waterHeight);
-	waterCubeTop->SetPosition(elevate::Vector3(0.0f, maxDepth, 0.0f));
-	waterCubeBottom->SetPosition(elevate::Vector3(0.0f, (0.0f - maxDepth), 0.0f));
+   // buoyancyFG->setWaterHeight(waterHeight);
+	waterCubeTop->SetPosition(elevate::Vector3(0.0f, 6.0f, -10.0f));
+	waterCubeBottom->SetPosition(elevate::Vector3(0.0f, (0.0f - 10.0f), 0.0f));
 	registry.updateForces(deltaTime);
-	floatingSphere->GetParticle()->integrate(deltaTime);
+	//floatingSphere->GetParticle()->integrate(deltaTime);
+    Sphere0->GetParticle()->integrate(deltaTime);
 }
 
 void GameManager::render()
@@ -349,5 +366,7 @@ void GameManager::render()
 	}
 
     if (showBuoyanceDemo)
-	    floatingSphere->render(view, projection);
+    {
+        Sphere0->render(view, projection);
+    }
 }

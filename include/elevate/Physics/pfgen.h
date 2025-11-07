@@ -68,12 +68,12 @@ namespace elevate {
 
 	class ParticleAnchoredSpring : public ParticleForceGenerator {
 	protected:
-		Vector3* anchor;
+		Vector3 anchor;
 		real springConstant;
 		real restLength;
 		
 	public:
-		ParticleAnchoredSpring(Vector3* anchor, real springConstant, real restLength);
+		ParticleAnchoredSpring(Vector3 anchor, real springConstant, real restLength);
 
 		virtual void updateForce(Particle* particle, real duration);
 	};

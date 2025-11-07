@@ -117,6 +117,15 @@
     <ClInclude Include="include\elevate\Physics\Demos\FloatingSphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\elevate\Physics\pcontacts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\elevate\Physics\plinks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\elevate\Physics\pworld.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Physics\particle.cpp">
@@ -198,6 +207,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Physics\pfgen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\pcontacts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\plinks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\pworld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
