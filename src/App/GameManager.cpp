@@ -182,7 +182,6 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     pWorld->getContactGenerators().push_back(&cable2);
     pWorld->getContactGenerators().push_back(&cable3);
 
-
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
@@ -382,8 +381,23 @@ void GameManager::fireRound()
 
 void GameManager::update(float deltaTime)
 {
+
     RemoveDestroyedGameObjects();
     inputManager->processInput(window->getWindow(), deltaTime);
+
+    if (pushDirX < -3.0f)
+    {
+        pushDirX = -3.0f;
+    } 
+    else if (pushDirX > 3.0f)
+    {
+        pushDirX = 3.0f;
+    }
+
+    pushForce = new elevate::ParticleGravity(elevate::Vector3(pushDirX / Sphere2->GetParticle()->getMass(), 0.0f, 0.0f));
+    pWorld->getForceRegistry().add(Sphere2->GetParticle(), pushForce);
+
+
     pWorld->startFrame();
 
 	for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {

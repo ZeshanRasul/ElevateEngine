@@ -47,6 +47,8 @@ public:
     void showDebugUI();
     void renderDebugUI();
 
+    void setPushDir(float newDir) { pushDirX = newDir; }
+
 private:
     void ShowCameraControlWindow(Camera& cam);
     void ShowLightControlWindow(DirLight& light);
@@ -102,8 +104,11 @@ private:
 	elevate::ParticleAnchoredSpring* springFG;
 	elevate::ParticleSpring* bungeeFG;
 	elevate::ParticleSpring* bungeeFG1;
-
     elevate::ParticleGravity* gravityFG;
+    elevate::ParticleGravity* pushForce;
+
+    float pushDirX = 0;
+
     Line* lineab;
     Line* linebc;
     Line* linecd;

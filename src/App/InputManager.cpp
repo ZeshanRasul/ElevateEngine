@@ -95,6 +95,21 @@ void InputManager::processInput(GLFWwindow* window, float deltaTime)
         mGameManager->setCurrentShotType(ShotType::FIREBALL);
     if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
         mGameManager->setCurrentShotType(ShotType::LASER);
+
+
+    //bool leftArrowCurrentlyPressed = glfwGetMouseButton(window, GLFW_KEY_LEFT) == GLFW_PRESS;
+
+    //if (leftArrowCurrentlyPressed && !leftArrowPressed)
+    //{
+    //    mGameManager->fireRound();
+    //}
+
+    //leftClickPressed = leftClickCurrentlyPressed;
+
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+        mGameManager->setPushDir(-3.0f);
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        mGameManager->setPushDir(3.0f);
 }
 
 void InputManager::setContext(Camera* cam, GameManager* gameMgr, unsigned int width, unsigned int height)
