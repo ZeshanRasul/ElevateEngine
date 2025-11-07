@@ -13,6 +13,7 @@
 #include "Physics/Demos/AmmoRound.h"
 #include "Physics/Demos/FloatingSphere.h"
 #include "Physics/pfgen.h"
+#include "Physics/pworld.h"
 
 class GameManager {
 public:
@@ -80,6 +81,11 @@ private:
     Sphere* springSphere;
     Sphere* springSphere2;
     Sphere* springSphere3;
+
+    elevate::ParticleWorld* pWorld;
+    elevate::ParticleCable cable1;
+    elevate::ParticleCable cable2;
+    elevate::ParticleCable cable3;
 
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection = glm::mat4(1.0f);

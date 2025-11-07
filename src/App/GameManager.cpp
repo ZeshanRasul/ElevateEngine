@@ -137,29 +137,51 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
     linebc->LoadMesh();
     linebc->CreateAndUploadVertexBuffer();
 
-    //lines.push_back(lineab);
-    //lines.push_back(linebc);
-
     spherePos = { 0.0f, 0.0f, -10.0f };
     
+    pWorld = new elevate::ParticleWorld(100, 50);
     springFG = new elevate::ParticleAnchoredSpring(elevate::Vector3(0.0f, 6.0f, -10.0f), 60.0f, 2.0f);
-    registry.add(Sphere0->GetParticle(), springFG);
+    pWorld->getForceRegistry().add(Sphere0->GetParticle(), springFG);
+    pWorld->getParticles().push_back(Sphere0->GetParticle());
+    pWorld->getParticles().push_back(Sphere1->GetParticle());
+    pWorld->getParticles().push_back(Sphere2->GetParticle());
 
     anchorPos = glm::vec3(0.0f, 6.0f, -10.0f);
     linecd = new Line(elevate::Vector3(anchorPos.x, anchorPos.y, anchorPos.z), elevate::Vector3(1.0f, 1.0f, 1.0f), &lineShader, this, glm::vec3(1.0f, 0.0f, 0.0f));
     linecd->LoadMesh();
     linecd->CreateAndUploadVertexBuffer();
 
+
     gravityFG = new elevate::ParticleGravity(elevate::Vector3(0.0f, -9.81f, 0.0f));
-    registry.add(Sphere0->GetParticle(), gravityFG);
+    pWorld->getForceRegistry().add(Sphere0->GetParticle(), gravityFG);
 
     bungeeFG = new elevate::ParticleSpring(Sphere0->GetParticle(), 40.0f, 2.0f);
-    registry.add(Sphere1->GetParticle(), bungeeFG);
-    registry.add(Sphere1->GetParticle(), gravityFG);
+    pWorld->getForceRegistry().add(Sphere1->GetParticle(), bungeeFG);
+    pWorld->getForceRegistry().add(Sphere1->GetParticle(), gravityFG);
     bungeeFG1 = new elevate::ParticleSpring(Sphere1->GetParticle(), 20.0f, 2.0f);
-    registry.add(Sphere2->GetParticle(), bungeeFG1);
+    pWorld->getForceRegistry().add(Sphere2->GetParticle(), bungeeFG1);
 
-    registry.add(Sphere2->GetParticle(), gravityFG);
+    pWorld->getForceRegistry().add(Sphere2->GetParticle(), gravityFG);
+
+    cable1.particle[0] = Sphere0->GetParticle();
+    cable1.particle[1] = Sphere1->GetParticle();
+    cable1.maxLength = 2.0f;
+    cable1.restitution = 0.3f;
+
+    cable2.particle[0] = Sphere1->GetParticle();
+    cable2.particle[1] = Sphere2->GetParticle();
+    cable2.maxLength = 10.0f;
+    cable2.restitution = 0.3f;
+
+    cable3.particle[0] = Sphere0->GetParticle();
+    cable3.particle[1] = Sphere2->GetParticle();
+    cable3.maxLength = 25.0f;
+    cable3.restitution = 0.9f;
+
+    pWorld->getContactGenerators().push_back(&cable1);
+    pWorld->getContactGenerators().push_back(&cable2);
+    pWorld->getContactGenerators().push_back(&cable3);
+
 
 }
 
@@ -362,6 +384,7 @@ void GameManager::update(float deltaTime)
 {
     RemoveDestroyedGameObjects();
     inputManager->processInput(window->getWindow(), deltaTime);
+    pWorld->startFrame();
 
 	for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
 		if (shot->GetType() != UNUSED) {
@@ -376,15 +399,18 @@ void GameManager::update(float deltaTime)
    // buoyancyFG->setWaterHeight(waterHeight);
 	waterCubeTop->SetPosition(elevate::Vector3(0.0f, 6.0f, -10.0f));
 	waterCubeBottom->SetPosition(elevate::Vector3(0.0f, (0.0f - 10.0f), 0.0f));
-	registry.updateForces(deltaTime);
-	//floatingSphere->GetParticle()->integrate(deltaTime);
-    Sphere0->GetParticle()->integrate(deltaTime);
-    Sphere1->GetParticle()->integrate(deltaTime);
-    Sphere2->GetParticle()->integrate(deltaTime);
-    elevate::Particle particle0 = *Sphere0->GetParticle();
-    float abX = particle0.getPosition().x;
-    float abY = particle0.getPosition().x;
-    float abZ = particle0.getPosition().x;
+
+    pWorld->runPhysics(deltaTime);
+
+	//registry.updateForces(deltaTime);
+	////floatingSphere->GetParticle()->integrate(deltaTime);
+    //Sphere0->GetParticle()->integrate(deltaTime);
+    //Sphere1->GetParticle()->integrate(deltaTime);
+    //Sphere2->GetParticle()->integrate(deltaTime);
+    //elevate::Particle particle0 = *Sphere0->GetParticle();
+    //float abX = particle0.getPosition().x;
+    //float abY = particle0.getPosition().x;
+    //float abZ = particle0.getPosition().x;
     glm::vec3 abStart = glm::vec3(Sphere0->GetParticle()->getPosition().x, Sphere0->GetParticle()->getPosition().y, Sphere0->GetParticle()->getPosition().z);
     glm::vec3 bcStart = glm::vec3(Sphere1->GetParticle()->getPosition().x, Sphere1->GetParticle()->getPosition().y, Sphere1->GetParticle()->getPosition().z);
     glm::vec3 cdStart = glm::vec3(Sphere2->GetParticle()->getPosition().x, Sphere2->GetParticle()->getPosition().y, Sphere2->GetParticle()->getPosition().z);
