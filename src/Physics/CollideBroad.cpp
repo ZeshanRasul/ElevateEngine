@@ -3,7 +3,7 @@
 template<class BoundVolumeClass>
 inline elevate::BVHNode<BoundVolumeClass>::BoundingSphere::BoundingSphere(const BoundingSphere& one, const BoundingSphere& two)
 {
-	Vectro3 centerOffset = two.center - one.center;
+	Vector3 centerOffset = two.center - one.center;
 	real distance = centerOffset.squreMagnitude();
 	real radiusDiff = two.radius - one.radius;
 
@@ -32,11 +32,6 @@ inline elevate::BVHNode<BoundVolumeClass>::BoundingSphere::BoundingSphere(const 
 		}
 	}
 
-	bool BoundingSphere::overlaps(const BoundingSphere * other) const
-	{
-		real distanceSquared = (center - other->center).squareMagnitude();
-		return distanceSquared < (radius + other->radius) * (radius + other->radius);
-	}
 }
 
 template<class BoundingVolumeClass>

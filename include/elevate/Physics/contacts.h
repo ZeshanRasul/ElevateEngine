@@ -32,8 +32,6 @@ namespace elevate {
 
 		real desiredDeltaVelocity;
 
-		Vector3 relativeContactPosition[2];
-
 	protected:
 
 		void calculateInternals(real duration);

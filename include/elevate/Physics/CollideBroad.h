@@ -26,16 +26,7 @@ namespace elevate {
 			return body != NULL;
 		}
 
-		unsigned getPotentialContacts(PotentialContact* contacts, unsigned limit) const;
-
-		template<class BoundingVolumeClass>
-		bool BVHNode<BoundingVolumeClass>::overlaps(const BVHNode<BoundingVolumeClass>* other) const
-		{
-			return volume->overlaps(other->volume);
-		}
-
-		template<class BoundingVolumeClass>
-		unsigned BVHNode<BoundingVolumeClass>::getPotentialContacts(PotentialContact* contacts, unsigned limit) const
+		unsigned getPotentialContacts(PotentialContact* contacts, unsigned limit) const
 		{
 			if (isLeaf() || limit == 0) return 0;
 
@@ -43,7 +34,16 @@ namespace elevate {
 		}
 
 		template<class BoundingVolumeClass>
-		inline void BVHNode<BoundingVolumeClass>::insert(RigidBody* body, const BoundingVolumeClass& volume)
+		void recalculateBoundingVolume(bool recurse)
+		{
+			if (isLeaf()) return;
+
+			volume = BoundingVolumeClass(children[0]->volume, children[1]->volume);
+
+			if (parent) parent->recalculateBoundingVolume(true);
+		}
+
+		inline void insert(RigidBody* newBody, const BoundingVolumeClass& newVolume)
 		{
 			if (isLeaf())
 			{
@@ -69,7 +69,7 @@ namespace elevate {
 		}
 
 		template<class BoundingVolumeClass>
-		unsigned BVHNode<BoundingVolumeClass>::getPotentialContactsWith(const BVHNode<BoundingVolumeClass>* other, PotentialContact* contacts, unsigned limit) const
+		unsigned getPotentialContactsWith(const BVHNode<BoundingVolumeClass>* other, PotentialContact* contacts, unsigned limit) const
 		{
 			if (!overlaps(other) || limit == 0) return 0;
 
@@ -108,11 +108,14 @@ namespace elevate {
 			}
 		}
 
-		void insert(RigidBody* body, const BoundingVolumeClass& volume);
-
 		struct BoundingSphere
 		{
 			Vector3 center;
+
+			inline bool overlaps(const BVHNode<BoundingVolumeClass>* other) const
+            {
+                return volume.overlaps(&other->volume);
+            }
 			real radius;
 
 		public:
@@ -124,7 +127,13 @@ namespace elevate {
 
 			BoundingSphere(const BoundingSphere& one, const BoundingSphere& two);
 
-			bool overlaps(const BoundingSphere* other) const;
+			bool overlaps(const BoundingSphere* other) const
+			{
+				real distanceSquared = (center - other->center).squareMagnitude();
+				return distanceSquared < (radius + other->radius) * (radius + other->radius);
+			}
+
 		};
 	};
+
 }
