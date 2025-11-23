@@ -51,12 +51,13 @@ void Renderer::draw(GameObject* gameObj, glm::mat4 viewMat, glm::mat4 proj)
 	shader->setVec3("dirLight.diffuse", sun.diffuse);
 	shader->setVec3("dirLight.specular", sun.specular);
 
+
 	gameObj->Draw(viewMat, proj);
 }
 
 void Renderer::clear()
 {
-	glClearColor(0.2f, 0.3f, 0.1f, 1.0f);
+	glClearColor(0.1f, 0.3f, 0.6f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

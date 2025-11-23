@@ -120,7 +120,7 @@ void Particle::clearAccumulator()
 	forceAccum.clear();
 }
 
-void elevate::Particle::addForce(const Vector3& force)
+void Particle::addForce(const Vector3& force)
 {
 	forceAccum += force;
 }

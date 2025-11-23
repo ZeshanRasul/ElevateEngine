@@ -14,6 +14,8 @@
 #include "Physics/Demos/FloatingSphere.h"
 #include "Physics/pfgen.h"
 #include "Physics/pworld.h"
+#include "Physics/body.h"
+#include "Physics/World.h"
 
 class GameManager {
 public:
@@ -122,4 +124,9 @@ private:
 	float waterDensity = 1000.0f;
 
     bool showBuoyanceDemo = true;
+
+	elevate::RigidBody* testBody = nullptr;
+    World* rbWorld;
+	ForceRegistry rbRegistry;
+	Gravity* rbGravity;
 };

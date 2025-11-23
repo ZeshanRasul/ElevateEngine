@@ -13,4 +13,6 @@ namespace elevate {
 	#define real_sin sinf
 	#define real_cos cosf
 	#define real_exp expf
+
+#define real_epsilon FLT_EPSILON
 }

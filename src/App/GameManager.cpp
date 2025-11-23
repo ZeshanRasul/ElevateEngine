@@ -6,315 +6,177 @@
 #include "imgui/backend/imgui_impl_opengl3.h"
 
 DirLight dirLight = {
-        glm::vec3(-0.2f, -1.0f, -0.3f),
+		glm::vec3(-0.2f, -1.0f, -0.3f),
 
-        glm::vec3(0.15f, 0.15f, 0.15f),
-        glm::vec3(0.4f),
-        glm::vec3(0.1f, 0.1f, 0.1f)
+		glm::vec3(0.15f, 0.15f, 0.15f),
+		glm::vec3(0.4f),
+		glm::vec3(0.1f, 0.1f, 0.1f)
 };
 
 GameManager::GameManager(Window* window, unsigned int width, unsigned int height)
-    : window(window)
+	: window(window)
 {
-    inputManager = new InputManager();
+	inputManager = new InputManager();
 
-    window->setInputManager(inputManager);
+	window->setInputManager(inputManager);
 
-    renderer = window->getRenderer();
- 
-    ammoShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
+	renderer = window->getRenderer();
 
-    cubeShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
-    lineShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/line_vert.glsl", "C:/dev/ElevateEngine/src/Shaders/line_frag.glsl");
+	ammoShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
 
-    camera = new Camera(glm::vec3(0.0f, 0.0f, 40.0f));
+	cubeShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
+	lineShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/line_vert.glsl", "C:/dev/ElevateEngine/src/Shaders/line_frag.glsl");
 
-    inputManager->setContext(camera, this, width, height);
+	camera = new Camera(glm::vec3(0.0f, 0.0f, 40.0f));
 
-	elevate::Vector3 pos = { 0.0f, 0.0f, -10.0f };
-	elevate::Vector3 pos2 = { 0.0f, 0.0f, -20.0f };
-	elevate::Vector3 pos3 = { 0.0f, 0.0f, -30.0f };
-	elevate::Vector3 pos4 = { 0.0f, 0.0f, -40.0f };
-	elevate::Vector3 scale = { 1.0f, 1.0f, 1.0f };
-    cube = new Cube(pos, scale, &cubeShader, this);
-    cube->LoadMesh();
-    cube2 = new Cube(pos2, scale, &cubeShader, this);
-    cube2->LoadMesh();
-    cube3 = new Cube(pos3, scale, &cubeShader, this);
-    cube3->LoadMesh();
-    cube4 = new Cube(pos4, scale, &cubeShader, this);
-    cube4->LoadMesh();
+	inputManager->setContext(camera, this, width, height);
 
-	pos = { 0.0f, 6.0f, -10.0f };
-	scale = { 1.0f, 1.0f, 1.0f };
-	waterCubeTop = new Cube(pos, scale, &cubeShader, this);
-	waterCubeTop->LoadMesh();
-
-	pos = { 0.0f, (0.0f - maxDepth), 0.0f };
-	waterCubeBottom = new Cube(pos, scale, &cubeShader, this);
-	waterCubeBottom->LoadMesh();
-
-	scale = { 0.2f, 0.2f, 0.2f };
-	elevate::Vector3 spherePos = { 0.0f, 2.0f, -10.0f };
-	pistolSphere = new Sphere(spherePos, scale, &ammoShader, this, glm::vec3(0.3f, 0.3f, 0.3f));
-    pistolSphere->GenerateSphere(1.0f, 30, 30);
-    pistolSphere->LoadMesh();
-
-    scale = { 0.6f, 0.6f, 0.6f };
-    artillerySphere = new Sphere(spherePos, scale, &ammoShader, this, glm::vec3(0.0f, 1.0f, 0.0f));
-    artillerySphere->GenerateSphere(1.0f, 30, 30);
-    artillerySphere->LoadMesh();
-
-    scale = { 0.3f, 0.3f, 0.3f };
-    fireballSphere = new Sphere(spherePos, scale, &ammoShader, this, glm::vec3(1.0f, 0.0f, 0.0f));
-    fireballSphere->GenerateSphere(1.0f, 30, 30);
-    fireballSphere->LoadMesh();
-
-    scale = { 0.1f, 0.1f, 0.1f };
-    laserSphere = new Sphere(spherePos, scale, &ammoShader, this, glm::vec3(1.0f, 0.3f, 1.0f));
-    laserSphere->GenerateSphere(1.0f, 30, 30);
-    laserSphere->LoadMesh();
-
-    scale = { 0.6f, 0.6f, 0.6f };
-    spherePos = { 0.0f, 2.0f, -10.0f };
-    waterSphere = new Sphere(spherePos, scale, &ammoShader, this, glm::vec3(0.0f, 0.0f, 1.0f));
-    waterSphere->GenerateSphere(1.0f, 30, 30);
-    waterSphere->LoadMesh();
-
-    if (!showBuoyanceDemo)
-    {
-        gameObjects.push_back(cube);
-        gameObjects.push_back(cube2);
-        gameObjects.push_back(cube3);
-        gameObjects.push_back(cube4);
-    }
-
-    if (showBuoyanceDemo)
-    {
-	    gameObjects.push_back(waterCubeTop);
-	    gameObjects.push_back(waterCubeBottom);
-    }
-
-    for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
-		elevate::Particle* particle = new elevate::Particle();
-        particle->setPosition(elevate::Vector3(0.0f, 2.0f, -10.0f));
-        shot->SetParticle(particle);
-        shot->SetSphere(pistolSphere);
-        shot->SetType(UNUSED);
-    }
-
-    spherePos = { 0.0f, 4.0f, -10.0f };
-    Sphere0 = new FloatingSphere();
-    Sphere0->SetParticle(new elevate::Particle());
-    Sphere0->GetParticle()->setPosition(elevate::Vector3(0.0f, 4.0f, -10.0f));
-    Sphere0->GetParticle()->setMass(5.7f);
-    Sphere0->GetParticle()->setDamping(0.68f);
-    Sphere0->SetSphere(fireballSphere);
-    spheres.push_back(Sphere0);
-
-    spherePos = { 0.0f, 2.0f, -10.0f };
-    Sphere1 = new FloatingSphere();
-    Sphere1->SetParticle(new elevate::Particle());
-    Sphere1->GetParticle()->setPosition(elevate::Vector3(0.0f, 2.0f, -10.0f));
-    Sphere1->GetParticle()->setMass(8.0f);
-    Sphere1->GetParticle()->setDamping(0.68f);
-    Sphere1->SetSphere(artillerySphere);
-    spheres.push_back(Sphere1);
-
-
-    Sphere2 = new FloatingSphere();
-    Sphere2->SetParticle(new elevate::Particle());
-    Sphere2->GetParticle()->setPosition(elevate::Vector3(0.0f, 0.0f, -10.0f));
-    Sphere2->GetParticle()->setMass(13.9f);
-    Sphere2->GetParticle()->setDamping(0.68f);  
-    Sphere2->SetSphere(waterSphere);
-    spheres.push_back(Sphere2);
-
-    lineab = new Line(Sphere0->GetParticle()->getPosition(), elevate::Vector3(1.0f, 1.0f, 1.0f), &lineShader, this, glm::vec3(1.0f, 0.0f, 0.0f));
-    lineab->LoadMesh();
-    lineab->CreateAndUploadVertexBuffer();
-    linebc = new Line(Sphere1->GetParticle()->getPosition(), elevate::Vector3(1.0f, 1.0f, 1.0f), &lineShader, this, glm::vec3(1.0f, 0.0f, 0.0f));
-    linebc->LoadMesh();
-    linebc->CreateAndUploadVertexBuffer();
-
-    spherePos = { 0.0f, 0.0f, -10.0f };
-    
-    pWorld = new elevate::ParticleWorld(100, 50);
-    springFG = new elevate::ParticleAnchoredSpring(elevate::Vector3(0.0f, 6.0f, -10.0f), 60.0f, 2.0f);
-    pWorld->getForceRegistry().add(Sphere0->GetParticle(), springFG);
-    pWorld->getParticles().push_back(Sphere0->GetParticle());
-    pWorld->getParticles().push_back(Sphere1->GetParticle());
-    pWorld->getParticles().push_back(Sphere2->GetParticle());
-
-    anchorPos = glm::vec3(0.0f, 6.0f, -10.0f);
-    linecd = new Line(elevate::Vector3(anchorPos.x, anchorPos.y, anchorPos.z), elevate::Vector3(1.0f, 1.0f, 1.0f), &lineShader, this, glm::vec3(1.0f, 0.0f, 0.0f));
-    linecd->LoadMesh();
-    linecd->CreateAndUploadVertexBuffer();
-
-
-    gravityFG = new elevate::ParticleGravity(elevate::Vector3(0.0f, -9.81f, 0.0f));
-    pWorld->getForceRegistry().add(Sphere0->GetParticle(), gravityFG);
-
-    bungeeFG = new elevate::ParticleSpring(Sphere0->GetParticle(), 40.0f, 2.0f);
-    pWorld->getForceRegistry().add(Sphere1->GetParticle(), bungeeFG);
-    pWorld->getForceRegistry().add(Sphere1->GetParticle(), gravityFG);
-    bungeeFG1 = new elevate::ParticleSpring(Sphere1->GetParticle(), 20.0f, 2.0f);
-    pWorld->getForceRegistry().add(Sphere2->GetParticle(), bungeeFG1);
-
-    pWorld->getForceRegistry().add(Sphere2->GetParticle(), gravityFG);
-
-    cable1.particle[0] = Sphere0->GetParticle();
-    cable1.particle[1] = Sphere1->GetParticle();
-    cable1.maxLength = 2.0f;
-    cable1.restitution = 0.3f;
-
-    cable2.particle[0] = Sphere1->GetParticle();
-    cable2.particle[1] = Sphere2->GetParticle();
-    cable2.maxLength = 10.0f;
-    cable2.restitution = 0.3f;
-
-    cable3.particle[0] = Sphere0->GetParticle();
-    cable3.particle[1] = Sphere2->GetParticle();
-    cable3.maxLength = 25.0f;
-    cable3.restitution = 0.9f;
-
-    pWorld->getContactGenerators().push_back(&cable1);
-    pWorld->getContactGenerators().push_back(&cable2);
-    pWorld->getContactGenerators().push_back(&cable3);
-
+	elevate::Vector3 pos = { 0.0f, 10.0f, 0.0f };
+	elevate::Vector3 scale = { 3.0f, 3.0f, 3.0f };
+	cube = new Cube(pos, scale, &cubeShader, this);
+	cube->LoadMesh();
+	testBody = new RigidBody();	
+	testBody->setPosition(elevate::Vector3(0.0f, 30.0f, 0.0f));
+	testBody->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+	testBody->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+	testBody->setMass(2.0f);
+	gameObjects.push_back(cube);
+	rbWorld = new World(100, 50);
+	rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f * 0.15f, 0.0f));
+	rbWorld->getForceRegistry().add(testBody, rbGravity);
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
 {
-    view = camera->GetViewMatrix();
-    projection = glm::perspective(glm::radians(camera->Zoom), (float)width / (float)height, 0.1f, 500.0f);
+	view = camera->GetViewMatrix();
+	projection = glm::perspective(glm::radians(camera->Zoom), (float)width / (float)height, 0.1f, 500.0f);
 }
 
 void GameManager::setSceneData()
 {
-    renderer->setScene(view, projection, dirLight);
+	renderer->setScene(view, projection, dirLight);
 }
 
 void GameManager::setUpDebugUI()
 {
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
 }
 
 void GameManager::showDebugUI()
 {
-    ShowLightControlWindow(dirLight);
-    ShowCameraControlWindow(*camera);
+	ShowLightControlWindow(dirLight);
+	ShowCameraControlWindow(*camera);
 
-    if (!showBuoyanceDemo)
-	    ShowAmmoWindow();
+	if (!showBuoyanceDemo)
+		ShowAmmoWindow();
 
 	if (showBuoyanceDemo)
-        ShowBuoyancyWindow();
+		ShowBuoyancyWindow();
 }
 
 void GameManager::renderDebugUI()
 {
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void GameManager::ShowLightControlWindow(DirLight& light)
 {
-    ImGui::Begin("Directional Light Control");
+	ImGui::Begin("Directional Light Control");
 
-    ImGui::Text("Light Direction");
+	ImGui::Text("Light Direction");
 
-    ImGui::DragFloat3("Direction", (float*)&light.direction, dirLight.direction.x, dirLight.direction.y, dirLight.direction.z);
-    ImGui::ColorEdit4("Ambient", (float*)&light.ambient);
-    ImGui::ColorEdit4("Diffuse", (float*)&light.diffuse);
-    ImGui::ColorEdit4("Specular", (float*)&light.specular);
+	ImGui::DragFloat3("Direction", (float*)&light.direction, dirLight.direction.x, dirLight.direction.y, dirLight.direction.z);
+	ImGui::ColorEdit4("Ambient", (float*)&light.ambient);
+	ImGui::ColorEdit4("Diffuse", (float*)&light.diffuse);
+	ImGui::ColorEdit4("Specular", (float*)&light.specular);
 
-    ImGui::End();
+	ImGui::End();
 }
 
 void GameManager::ShowAmmoWindow()
 {
-    ImGui::Begin("Ammo Details");
+	ImGui::Begin("Ammo Details");
 
-    switch (currentShotType)
-    {
+	switch (currentShotType)
+	{
 
-    case PISTOL:
+	case PISTOL:
 	{
 		ImGui::Text("Pistol");
-        break;
+		break;
 	}
-    case ARTILLERY:
-    {
-        ImGui::Text("Artillery");
-        break;
-    }
+	case ARTILLERY:
+	{
+		ImGui::Text("Artillery");
+		break;
+	}
 	case FIREBALL:
 	{
 		ImGui::Text("Fireball");
-        break;
-    }
+		break;
+	}
 	case LASER:
 	{
 		ImGui::Text("Laser");
-        break;
+		break;
 	}
 	}
 
-    ImGui::End();
+	ImGui::End();
 }
 
 void GameManager::ShowBuoyancyWindow()
 {
-   //ImGui::Begin("Water Height");
-   //ImGui::DragFloat("Height", &waterHeight, 0.1f, 0.0f, 100.0f);
-	//ImGui::DragFloat("Max Depth", &maxDepth, 0.1f, 0.0f, 100.0f);
-	//ImGui::DragFloat("Sphere Volume", &floatingSphereVolume, 0.1f, 0.0f, 100.0f);
-	//ImGui::DragFloat("Water Density", &waterDensity, 0.1f, 0.0f, 100.0f);
-	//ImGui::DragFloat("Sphere Mass", &floatingSphereMass, 0.1f, 0.0f, 100.0f);
-   //ImGui::End();
+	//ImGui::Begin("Water Height");
+	//ImGui::DragFloat("Height", &waterHeight, 0.1f, 0.0f, 100.0f);
+	 //ImGui::DragFloat("Max Depth", &maxDepth, 0.1f, 0.0f, 100.0f);
+	 //ImGui::DragFloat("Sphere Volume", &floatingSphereVolume, 0.1f, 0.0f, 100.0f);
+	 //ImGui::DragFloat("Water Density", &waterDensity, 0.1f, 0.0f, 100.0f);
+	 //ImGui::DragFloat("Sphere Mass", &floatingSphereMass, 0.1f, 0.0f, 100.0f);
+	//ImGui::End();
 }
 
 void GameManager::RemoveDestroyedGameObjects()
 {
-    for (auto it = gameObjects.begin(); it != gameObjects.end(); ) {
-        if ((*it)->isDestroyed) {
-            delete* it;
-            *it = nullptr;
-            it = gameObjects.erase(it);
-        }
-        else {
-            ++it;
-        }
-    }
+	for (auto it = gameObjects.begin(); it != gameObjects.end(); ) {
+		if ((*it)->isDestroyed) {
+			delete* it;
+			*it = nullptr;
+			it = gameObjects.erase(it);
+		}
+		else {
+			++it;
+		}
+	}
 
 }
 
 void GameManager::ShowCameraControlWindow(Camera& cam)
 {
-    ImGui::Begin("Camera Control");
+	ImGui::Begin("Camera Control");
 
-    std::string modeText = "";
+	std::string modeText = "";
 
-    if (cam.Mode == FLY)
-    {
-        modeText = "Flycam";
+	if (cam.Mode == FLY)
+	{
+		modeText = "Flycam";
 
 
-        cam.UpdateCameraVectors();
-    }
-     
-    ImGui::Text(modeText.c_str());
+		cam.UpdateCameraVectors();
+	}
 
-    ImGui::InputFloat3("Position", (float*)&cam.Position);
+	ImGui::Text(modeText.c_str());
 
-    ImGui::InputFloat("Pitch", (float*)&cam.Pitch);
-    ImGui::InputFloat("Yaw", (float*)&cam.Yaw);
-    ImGui::InputFloat("Zoom", (float*)&cam.Zoom);
+	ImGui::InputFloat3("Position", (float*)&cam.Position);
 
-    ImGui::End();
+	ImGui::InputFloat("Pitch", (float*)&cam.Pitch);
+	ImGui::InputFloat("Yaw", (float*)&cam.Yaw);
+	ImGui::InputFloat("Zoom", (float*)&cam.Zoom);
+
+	ImGui::End();
 }
 
 void GameManager::fireRound()
@@ -326,54 +188,54 @@ void GameManager::fireRound()
 			break;
 		}
 	}
-    
+
 	if (shot >= ammo + ammoRounds) {
 		return;
 	}
 
-    switch (currentShotType)
-    {
-    case PISTOL:
-    {
-        shot->SetSphere(pistolSphere);
-        shot->GetParticle()->setMass(2.0f);
-        shot->GetParticle()->setVelocity(0.0f, 0.0f, -35.0f);
-        shot->GetParticle()->setAcceleration(0.0f, -1.0f, 0.0f);
-        shot->GetParticle()->setDamping(0.99f);
-        break;
-    }
+	switch (currentShotType)
+	{
+	case PISTOL:
+	{
+		shot->SetSphere(pistolSphere);
+		shot->GetParticle()->setMass(2.0f);
+		shot->GetParticle()->setVelocity(0.0f, 0.0f, -35.0f);
+		shot->GetParticle()->setAcceleration(0.0f, -1.0f, 0.0f);
+		shot->GetParticle()->setDamping(0.99f);
+		break;
+	}
 
-    case ARTILLERY:
-    {
-        shot->SetSphere(artillerySphere);
-        shot->GetParticle()->setMass(200.0f); 
-        shot->GetParticle()->setVelocity(0.0f, 30.0f, -40.0f); // 50m/s
-        shot->GetParticle()->setAcceleration(0.0f, -20.0f, 0.0f);
-        shot->GetParticle()->setDamping(0.99f);
-        break;
-    }
-    case FIREBALL:
-    {
-        shot->SetSphere(fireballSphere);
-        shot->GetParticle()->setMass(1.0f); 
-        shot->GetParticle()->setVelocity(0.0f, 0.0f, -10.0f); // 5m/s
-        shot->GetParticle()->setAcceleration(0.0f, 0.6f, 0.0f); // Floats up
-        shot->GetParticle()->setDamping(0.9f);
-        break;
-    }
-    case LASER:
-    {
-        shot->SetSphere(laserSphere);
-        shot->GetParticle()->setMass(0.1f); // 0.1kg - almost no weight
-        shot->GetParticle()->setVelocity(0.0f, 0.0f, -100.0f); // 100m/s
-        shot->GetParticle()->setAcceleration(0.0f, 0.0f, 0.0f); // No gravity
-        shot->GetParticle()->setDamping(0.99f);
-        break;
-    }
-    }
+	case ARTILLERY:
+	{
+		shot->SetSphere(artillerySphere);
+		shot->GetParticle()->setMass(200.0f);
+		shot->GetParticle()->setVelocity(0.0f, 30.0f, -40.0f); // 50m/s
+		shot->GetParticle()->setAcceleration(0.0f, -20.0f, 0.0f);
+		shot->GetParticle()->setDamping(0.99f);
+		break;
+	}
+	case FIREBALL:
+	{
+		shot->SetSphere(fireballSphere);
+		shot->GetParticle()->setMass(1.0f);
+		shot->GetParticle()->setVelocity(0.0f, 0.0f, -10.0f); // 5m/s
+		shot->GetParticle()->setAcceleration(0.0f, 0.6f, 0.0f); // Floats up
+		shot->GetParticle()->setDamping(0.9f);
+		break;
+	}
+	case LASER:
+	{
+		shot->SetSphere(laserSphere);
+		shot->GetParticle()->setMass(0.1f); // 0.1kg - almost no weight
+		shot->GetParticle()->setVelocity(0.0f, 0.0f, -100.0f); // 100m/s
+		shot->GetParticle()->setAcceleration(0.0f, 0.0f, 0.0f); // No gravity
+		shot->GetParticle()->setDamping(0.99f);
+		break;
+	}
+	}
 
 	shot->GetParticle()->setPosition(elevate::Vector3(0.0f, 2.0f, -1.0f));
-    shot->SetStartTime(glfwGetTime());
+	shot->SetStartTime(glfwGetTime());
 	shot->SetType(currentShotType);
 
 	shot->GetParticle()->clearAccumulator();
@@ -382,82 +244,89 @@ void GameManager::fireRound()
 void GameManager::update(float deltaTime)
 {
 
-    RemoveDestroyedGameObjects();
-    inputManager->processInput(window->getWindow(), deltaTime);
+	RemoveDestroyedGameObjects();
+	inputManager->processInput(window->getWindow(), deltaTime);
 
-    if (pushDirX < -3.0f)
-    {
-        pushDirX = -3.0f;
-    } 
-    else if (pushDirX > 3.0f)
-    {
-        pushDirX = 3.0f;
-    }
-
-    pushForce = new elevate::ParticleGravity(elevate::Vector3(pushDirX / Sphere2->GetParticle()->getMass(), 0.0f, 0.0f));
-    pWorld->getForceRegistry().add(Sphere2->GetParticle(), pushForce);
+	rbWorld->startFrame();
+	rbWorld->runPhysics(deltaTime);
+	rbRegistry.updateForces(deltaTime);
+	testBody->integrate(deltaTime);
+	cube->SetPosition(testBody->getPosition());
 
 
-    pWorld->startFrame();
+	//if (pushDirX < -3.0f)
+	//{
+	//	pushDirX = -3.0f;
+	//}
+	//else if (pushDirX > 3.0f)
+	//{
+	//	pushDirX = 3.0f;
+	//}
 
-	for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
-		if (shot->GetType() != UNUSED) {
-			shot->GetParticle()->integrate(deltaTime);
+	//pushForce = new elevate::ParticleGravity(elevate::Vector3(pushDirX / Sphere2->GetParticle()->getMass(), 0.0f, 0.0f));
+	//pWorld->getForceRegistry().add(Sphere2->GetParticle(), pushForce);
 
-            if (shot->GetParticle()->getPosition().y < 0.0f || glfwGetTime() - shot->GetStartTime() > 5.0f
-                || shot->GetParticle()->getPosition().z > 200.0f) {
-				shot->SetType(UNUSED);
-            }
-        }
-	}
-   // buoyancyFG->setWaterHeight(waterHeight);
-	waterCubeTop->SetPosition(elevate::Vector3(0.0f, 6.0f, -10.0f));
-	waterCubeBottom->SetPosition(elevate::Vector3(0.0f, (0.0f - 10.0f), 0.0f));
 
-    pWorld->runPhysics(deltaTime);
+	//pWorld->startFrame();
 
-	//registry.updateForces(deltaTime);
-	////floatingSphere->GetParticle()->integrate(deltaTime);
-    //Sphere0->GetParticle()->integrate(deltaTime);
-    //Sphere1->GetParticle()->integrate(deltaTime);
-    //Sphere2->GetParticle()->integrate(deltaTime);
-    //elevate::Particle particle0 = *Sphere0->GetParticle();
-    //float abX = particle0.getPosition().x;
-    //float abY = particle0.getPosition().x;
-    //float abZ = particle0.getPosition().x;
-    glm::vec3 abStart = glm::vec3(Sphere0->GetParticle()->getPosition().x, Sphere0->GetParticle()->getPosition().y, Sphere0->GetParticle()->getPosition().z);
-    glm::vec3 bcStart = glm::vec3(Sphere1->GetParticle()->getPosition().x, Sphere1->GetParticle()->getPosition().y, Sphere1->GetParticle()->getPosition().z);
-    glm::vec3 cdStart = glm::vec3(Sphere2->GetParticle()->getPosition().x, Sphere2->GetParticle()->getPosition().y, Sphere2->GetParticle()->getPosition().z);
-    lineab->UpdateVertexBuffer(abStart, bcStart);
-    linebc->UpdateVertexBuffer(bcStart, cdStart);
-    linecd->UpdateVertexBuffer(anchorPos, abStart);
+	//for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
+	//	if (shot->GetType() != UNUSED) {
+	//		shot->GetParticle()->integrate(deltaTime);
+
+	//		if (shot->GetParticle()->getPosition().y < 0.0f || glfwGetTime() - shot->GetStartTime() > 5.0f
+	//			|| shot->GetParticle()->getPosition().z > 200.0f) {
+	//			shot->SetType(UNUSED);
+	//		}
+	//	}
+	//}
+	//// buoyancyFG->setWaterHeight(waterHeight);
+	//waterCubeTop->SetPosition(elevate::Vector3(0.0f, 6.0f, -10.0f));
+	//waterCubeBottom->SetPosition(elevate::Vector3(0.0f, (0.0f - 10.0f), 0.0f));
+
+	//pWorld->runPhysics(deltaTime);
+
+	////registry.updateForces(deltaTime);
+	//////floatingSphere->GetParticle()->integrate(deltaTime);
+	////Sphere0->GetParticle()->integrate(deltaTime);
+	////Sphere1->GetParticle()->integrate(deltaTime);
+	////Sphere2->GetParticle()->integrate(deltaTime);
+	////elevate::Particle particle0 = *Sphere0->GetParticle();
+	////float abX = particle0.getPosition().x;
+	////float abY = particle0.getPosition().x;
+	////float abZ = particle0.getPosition().x;
+	//glm::vec3 abStart = glm::vec3(Sphere0->GetParticle()->getPosition().x, Sphere0->GetParticle()->getPosition().y, Sphere0->GetParticle()->getPosition().z);
+	//glm::vec3 bcStart = glm::vec3(Sphere1->GetParticle()->getPosition().x, Sphere1->GetParticle()->getPosition().y, Sphere1->GetParticle()->getPosition().z);
+	//glm::vec3 cdStart = glm::vec3(Sphere2->GetParticle()->getPosition().x, Sphere2->GetParticle()->getPosition().y, Sphere2->GetParticle()->getPosition().z);
+	//lineab->UpdateVertexBuffer(abStart, bcStart);
+	//linebc->UpdateVertexBuffer(bcStart, cdStart);
+	//linecd->UpdateVertexBuffer(anchorPos, abStart);
 }
 
 void GameManager::render()
 {
-    for (auto obj : gameObjects) {
-        renderer->draw(obj, view, projection);
-    }
-
-	ammoShader.use();
-    ammoShader.setVec3("dirLight.direction", dirLight.direction);
-    ammoShader.setVec3("dirLight.ambient", dirLight.ambient);
-    ammoShader.setVec3("dirLight.diffuse", dirLight.diffuse);
-    ammoShader.setVec3("dirLight.specular", dirLight.specular);
-	
-    for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
-		if (shot->GetType() != UNUSED) {
-			shot->render(view, projection);
-		}
+	for (auto obj : gameObjects) {
+		renderer->draw(obj, view, projection);
 	}
-
-    if (showBuoyanceDemo)
-    {
-        Sphere0->render(view, projection);
-        Sphere1->render(view, projection);
-        Sphere2->render(view, projection);
-        lineab->DrawLine(view, projection, glm::vec3(1.0f, 0.0f, 0.0f));
-        linebc->DrawLine(view, projection, glm::vec3(0.0f, 1.0f, 0.0f));
-        linecd->DrawLine(view, projection, glm::vec3(0.0f, 0.0f, 1.0f));
-    }
 }
+//	ammoShader.use();
+//	ammoShader.setVec3("dirLight.direction", dirLight.direction);
+//	ammoShader.setVec3("dirLight.ambient", dirLight.ambient);
+//	ammoShader.setVec3("dirLight.diffuse", dirLight.diffuse);
+//	ammoShader.setVec3("dirLight.specular", dirLight.specular);
+//
+//	for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
+//		if (shot->GetType() != UNUSED) {
+//			shot->render(view, projection);
+//		}
+//	}
+//
+//	if (showBuoyanceDemo)
+//	{
+//		Sphere0->render(view, projection);
+//		Sphere1->render(view, projection);
+//		Sphere2->render(view, projection);
+//		lineab->DrawLine(view, projection, glm::vec3(1.0f, 0.0f, 0.0f));
+//		linebc->DrawLine(view, projection, glm::vec3(0.0f, 1.0f, 0.0f));
+//		linecd->DrawLine(view, projection, glm::vec3(0.0f, 0.0f, 1.0f));
+//	}
+//}
