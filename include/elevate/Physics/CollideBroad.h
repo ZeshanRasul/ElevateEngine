@@ -15,9 +15,9 @@ namespace elevate {
 		BVHNode* children[2];
 		BVHNode* parent;
 
-		BoundVolumeClass volume;
+		BoundingVolumeClass volume;
 
-		Rigidbody* body;
+		elevate::RigidBody* body;
 
 		~BVHNode();
 

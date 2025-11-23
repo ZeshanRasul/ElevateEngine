@@ -48,6 +48,11 @@ namespace elevate {
 		Matrix3 getInverseInertiaTensor() const;
 		void setInverseInertiaTensor(const Matrix3& tensor);
 
+		void getInverseInertiaTensorWorld(Matrix3* inverseInertiaTensor) const
+		{
+			*inverseInertiaTensor = inverseInertiaTensorWorld;
+		};
+
 		Vector3 getPointinWorldSpace(const Vector3& point) const;
 
 		Vector3 getLastFrameAcceleration() const { return lastFrameAcceleration; }
@@ -61,6 +66,7 @@ namespace elevate {
 		Matrix4 getTransformMatrix() const { return transformMatrix; }
 
 		void setAwake(const bool awake) { isAwake = awake; }
+		bool getAwake() const { return isAwake; }
 	protected:
 		real linearDamping;
 		real angularDamping;
