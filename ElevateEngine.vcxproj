@@ -152,6 +152,7 @@
     <ClInclude Include="include\elevate\OpenGL\Texture.h" />
     <ClInclude Include="include\elevate\OpenGL\UniformBuffer.h" />
     <ClInclude Include="include\elevate\OpenGL\VertexBuffer.h" />
+    <ClInclude Include="include\elevate\Physics\CollideBroad.h" />
     <ClInclude Include="include\elevate\Physics\core.h" />
     <ClInclude Include="include\elevate\Physics\Demos\AmmoRound.h" />
     <ClInclude Include="include\elevate\Physics\Demos\FloatingSphere.h" />
@@ -204,6 +205,7 @@
     <ClCompile Include="src\OpenGL\UniformBuffer.cpp" />
     <ClCompile Include="src\OpenGL\VertexBuffer.cpp" />
     <ClCompile Include="src\Physics\body.cpp" />
+    <ClCompile Include="src\Physics\CollideBroad.cpp" />
     <ClCompile Include="src\Physics\core.cpp" />
     <ClCompile Include="src\Physics\fgen.cpp" />
     <ClCompile Include="src\Physics\particle.cpp" />
