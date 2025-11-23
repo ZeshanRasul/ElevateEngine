@@ -8,15 +8,18 @@ namespace elevate {
 		elevate::RigidBody* body[2];
 	};
 
-	template<class BoundVolumeClass>
+	template<class BoundingVolumeClass>
 	class BVHNode
 	{
 	public:
 		BVHNode* children[2];
+		BVHNode* parent;
 
 		BoundVolumeClass volume;
 
 		Rigidbody* body;
+
+		~BVHNode();
 
 		bool isLeaf() const
 		{
@@ -40,7 +43,33 @@ namespace elevate {
 		}
 
 		template<class BoundingVolumeClass>
-		unsigned BVHNode<BoundVolumeClass>::getPotentialContactsWith(const BVHNode<BoundingVolumeClass>* other, PotentialContact* contacts, unsigned limit) const
+		inline void BVHNode<BoundingVolumeClass>::insert(RigidBody* body, const BoundingVolumeClass& volume)
+		{
+			if (isLeaf())
+			{
+				children[0] = new BVHNode<BoundingVolumeClass>(this, volume, body);
+
+				children[1] = new BVHNode<BoundingVolumeClass>(this, newVolume, newBody);
+
+				this->body = NULL;
+
+				recalculateBoundingVolume();
+			}
+			else
+			{
+				if (children[0]->volume.getGrowth(newVolume) < children[1]->volume.getGrowth(newVolume))
+				{
+					children[0]->insert(newBody, newVolume);
+				}
+				else
+				{
+					children[1]->insert(newBody, newVolume);
+				}
+			}
+		}
+
+		template<class BoundingVolumeClass>
+		unsigned BVHNode<BoundingVolumeClass>::getPotentialContactsWith(const BVHNode<BoundingVolumeClass>* other, PotentialContact* contacts, unsigned limit) const
 		{
 			if (!overlaps(other) || limit == 0) return 0;
 
@@ -78,6 +107,8 @@ namespace elevate {
 				}
 			}
 		}
+
+		void insert(RigidBody* body, const BoundingVolumeClass& volume);
 
 		struct BoundingSphere
 		{
