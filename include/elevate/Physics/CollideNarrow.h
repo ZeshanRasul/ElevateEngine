@@ -141,7 +141,7 @@ namespace elevate {
 		return true;
 	}
 
-	void fillPointFaceBoxBox(
+	static void fillPointFaceBoxBox(
 		CollisionBox& one,
 		CollisionBox& two,
 		const Vector3& toCentre,
@@ -215,133 +215,132 @@ namespace elevate {
 
 			return cOne * 0.5 + cTwo * 0.5;
 		}
-
-		class CollisionDetector
+	}
+	class CollisionDetector
+	{
+	public:
+		static unsigned sphereAndSphere(CollisionSphere& one, CollisionSphere& two, CollisionData* data)
 		{
-		public:
-			static unsigned sphereAndSphere(CollisionSphere& one, CollisionSphere& two, CollisionData* data)
+
+			if (data->contactsLeft <= 0) return 0;
+
+			Vector3 positionOne = one.body->getPosition();
+			Vector3 positionTwo = two.body->getPosition();
+
+			Vector3 midline = positionOne - positionTwo;
+			real size = midline.magnitude();
+
+			if (size <= 0.0f || size > one.radius + two.radius)
 			{
+				return 0;
+			}
 
-				if (data->contactsLeft <= 0) return 0;
+			Vector3 normal = midline * (((real)1.0) / size);
 
-				Vector3 positionOne = one.body->getPosition();
-				Vector3 positionTwo = two.body->getPosition();
+			Contact* contact = data->contacts;
+			contact->contactNormal = normal;
+			contact->contactPoint = positionOne + midline * (real)0.5;
+			contact->penetration = (one.radius + two.radius - size);
+			contact->setBodyData(one.body, two.body, data->friction, data->restitution);
 
-				Vector3 midline = positionOne - positionTwo;
-				real size = midline.magnitude();
+			data->addContacts(1);
+			data->contacts[data->contactCount - 1] = *contact;
+			data->contactArray[data->contactCount - 1] = *contact;
 
-				if (size <= 0.0f || size > one.radius + two.radius)
-				{
-					return 0;
-				}
+			return 1;
 
-				Vector3 normal = midline * (((real)1.0) / size);
-
-				Contact* contact = data->contacts;
-				contact->contactNormal = normal;
-				contact->contactPoint = positionOne + midline * (real)0.5;
-				contact->penetration = (one.radius + two.radius - size);
-				contact->setBodyData(one.body, two.body, data->friction, data->restitution);
-
-				data->addContacts(1);
-				data->contacts[data->contactCount - 1] = *contact;
-				data->contactArray[data->contactCount - 1] = *contact;
-
-				return 1;
-
-			};
+		};
 
 
 #define CHECK_OVERLAP(axis, index) \
     if (!tryAxis(one, two, (axis), toCentre, (index), pen, best)) return 0;
 
-			static unsigned boxAndBox(CollisionBox& one, CollisionBox& two, CollisionData* data)
+		static unsigned boxAndBox(CollisionBox& one, CollisionBox& two, CollisionData* data)
+		{
+			Vector3 toCentre = two.getAxis(3) - one.getAxis(3);
+
+			real pen = REAL_MAX;
+			unsigned best = 0xffffff;
+
+			CHECK_OVERLAP(one.getAxis(0), 0);
+			CHECK_OVERLAP(one.getAxis(1), 1);
+			CHECK_OVERLAP(one.getAxis(2), 2);
+
+			CHECK_OVERLAP(two.getAxis(0), 3);
+			CHECK_OVERLAP(two.getAxis(1), 4);
+			CHECK_OVERLAP(two.getAxis(2), 5);
+
+			unsigned bestSingleAxis = best;
+
+			CHECK_OVERLAP(one.getAxis(0) % two.getAxis(0), 6);
+			CHECK_OVERLAP(one.getAxis(0) % two.getAxis(1), 7);
+			CHECK_OVERLAP(one.getAxis(0) % two.getAxis(2), 8);
+			CHECK_OVERLAP(one.getAxis(1) % two.getAxis(0), 9);
+			CHECK_OVERLAP(one.getAxis(1) % two.getAxis(1), 10);
+			CHECK_OVERLAP(one.getAxis(1) % two.getAxis(2), 11);
+			CHECK_OVERLAP(one.getAxis(2) % two.getAxis(0), 12);
+			CHECK_OVERLAP(one.getAxis(2) % two.getAxis(1), 13);
+			CHECK_OVERLAP(one.getAxis(2) % two.getAxis(2), 14);
+
+			assert(best != 0xffffff);
+
+			if (best < 3)
 			{
-				Vector3 toCentre = two.getAxis(3) - one.getAxis(3);
-
-				real pen = REAL_MAX;
-				unsigned best = 0xffffff;
-
-				CHECK_OVERLAP(one.getAxis(0), 0);
-				CHECK_OVERLAP(one.getAxis(1), 1);
-				CHECK_OVERLAP(one.getAxis(2), 2);
-
-				CHECK_OVERLAP(two.getAxis(0), 3);
-				CHECK_OVERLAP(two.getAxis(1), 4);
-				CHECK_OVERLAP(two.getAxis(2), 5);
-
-				unsigned bestSingleAxis = best;
-
-				CHECK_OVERLAP(one.getAxis(0) % two.getAxis(0), 6);
-				CHECK_OVERLAP(one.getAxis(0) % two.getAxis(1), 7);
-				CHECK_OVERLAP(one.getAxis(0) % two.getAxis(2), 8);
-				CHECK_OVERLAP(one.getAxis(1) % two.getAxis(0), 9);
-				CHECK_OVERLAP(one.getAxis(1) % two.getAxis(1), 10);
-				CHECK_OVERLAP(one.getAxis(1) % two.getAxis(2), 11);
-				CHECK_OVERLAP(one.getAxis(2) % two.getAxis(0), 12);
-				CHECK_OVERLAP(one.getAxis(2) % two.getAxis(1), 13);
-				CHECK_OVERLAP(one.getAxis(2) % two.getAxis(2), 14);
-
-				assert(best != 0xffffff);
-
-				if (best < 3)
-				{
-					fillPointFaceBoxBox(one, two, toCentre, data, best, pen);
-					data->addContacts(1);
-					return 1;
-				}
-				else if (best < 6)
-				{
-					fillPointFaceBoxBox(two, one, toCentre * -1.0f, data, best - 3, pen);
-					data->addContacts(1);
-					return 1;
-				}
-				else
-				{
-					best -= 6;
-					unsigned oneAxisIndex = best / 3;
-					unsigned twoAxisIndex = best % 3;
-					Vector3 oneAxis = one.getAxis(oneAxisIndex);
-					Vector3 twoAxis = two.getAxis(twoAxisIndex);
-					Vector3 axis = oneAxis % twoAxis;
-					axis.normalize();
-
-					if (axis * toCentre > 0) axis = axis * -1.0f;
-
-					Vector3 ptOnOneEdge = one.halfSize;
-					Vector3 ptOnTwoEdge = two.halfSize;
-					for (unsigned i = 0; i < 3; i++)
-					{
-						if (i == oneAxisIndex) ptOnOneEdge[i] = 0;
-						else if (one.getAxis(i) * axis > 0) ptOnOneEdge[i] = -ptOnOneEdge[i];
-
-						if (i == twoAxisIndex) ptOnTwoEdge[i] = 0;
-						else if (two.getAxis(i) * axis < 0) ptOnTwoEdge[i] = -ptOnTwoEdge[i];
-					}
-
-					ptOnOneEdge = one.getTransform() * ptOnOneEdge;
-					ptOnTwoEdge = two.getTransform() * ptOnTwoEdge;
-
-					Vector3 vertex = contactPoint(
-						ptOnOneEdge, oneAxis, one.halfSize[oneAxisIndex],
-						ptOnTwoEdge, twoAxis, two.halfSize[twoAxisIndex],
-						bestSingleAxis > 2
-					);
-
-					Contact* contact = data->contacts;
-
-					contact->penetration = pen;
-					contact->contactNormal = axis;
-					contact->contactPoint = vertex;
-					contact->setBodyData(one.body, two.body,
-						data->friction, data->restitution);
-					data->addContacts(1);
-					return 1;
-				}
-				return 0;
+				fillPointFaceBoxBox(one, two, toCentre, data, best, pen);
+				data->addContacts(1);
+				return 1;
 			}
-		};
+			else if (best < 6)
+			{
+				fillPointFaceBoxBox(two, one, toCentre * -1.0f, data, best - 3, pen);
+				data->addContacts(1);
+				return 1;
+			}
+			else
+			{
+				best -= 6;
+				unsigned oneAxisIndex = best / 3;
+				unsigned twoAxisIndex = best % 3;
+				Vector3 oneAxis = one.getAxis(oneAxisIndex);
+				Vector3 twoAxis = two.getAxis(twoAxisIndex);
+				Vector3 axis = oneAxis % twoAxis;
+				axis.normalize();
+
+				if (axis * toCentre > 0) axis = axis * -1.0f;
+
+				Vector3 ptOnOneEdge = one.halfSize;
+				Vector3 ptOnTwoEdge = two.halfSize;
+				for (unsigned i = 0; i < 3; i++)
+				{
+					if (i == oneAxisIndex) ptOnOneEdge[i] = 0;
+					else if (one.getAxis(i) * axis > 0) ptOnOneEdge[i] = -ptOnOneEdge[i];
+
+					if (i == twoAxisIndex) ptOnTwoEdge[i] = 0;
+					else if (two.getAxis(i) * axis < 0) ptOnTwoEdge[i] = -ptOnTwoEdge[i];
+				}
+
+				ptOnOneEdge = one.getTransform() * ptOnOneEdge;
+				ptOnTwoEdge = two.getTransform() * ptOnTwoEdge;
+
+				Vector3 vertex = contactPoint(
+					ptOnOneEdge, oneAxis, one.halfSize[oneAxisIndex],
+					ptOnTwoEdge, twoAxis, two.halfSize[twoAxisIndex],
+					bestSingleAxis > 2
+				);
+
+				Contact* contact = data->contacts;
+
+				contact->penetration = pen;
+				contact->contactNormal = axis;
+				contact->contactPoint = vertex;
+				contact->setBodyData(one.body, two.body,
+					data->friction, data->restitution);
+				data->addContacts(1);
+				return 1;
+			}
+			return 0;
+		}
+	};
 #undef CHECK_OVERLAP
 
-	}
 }

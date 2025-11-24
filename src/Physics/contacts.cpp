@@ -5,8 +5,8 @@ void Contact::setBodyData(RigidBody* one, RigidBody* two, real friction, real re
 {
 	body[0] = one;
 	body[1] = two;
-	friction = friction;
-	restitution = restitution;
+	this->friction = friction;
+	this->restitution = restitution;
 }
 
 void elevate::Contact::calculateDesiredDeltaVelocity(real duration)

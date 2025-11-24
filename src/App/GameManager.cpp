@@ -79,7 +79,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		sphereBody2->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 		sphereBody2->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 		sphereBody2->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		sphereBody2->setMass(100.0f);
+		sphereBody2->setMass(10.0f);
 		tensor;
 		coeff = 0.4f * sphereBody2->getMass() * 0.5f * 0.5f;
 		tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
@@ -313,11 +313,6 @@ void GameManager::update(float deltaTime)
 	rbWorld->runPhysics(deltaTime);
 	rbRegistry.updateForces(deltaTime);
 
-
-	generateContacts();
-	resolver.resolveContacts(cData.contacts, cData.contactCount, deltaTime);
-
-
 	if (cubeDemo)
 	{
 		testBody->integrate(deltaTime);
@@ -347,6 +342,9 @@ void GameManager::update(float deltaTime)
 		sphere->SetPosition(newPos);
 	}
 
+	generateContacts();
+	resolver.resolveContacts(cData.contacts, cData.contactCount, deltaTime);
+
 
 	//rbWorld->generateContacts();
 
@@ -356,15 +354,14 @@ void GameManager::generateContacts()
 {
 	cData.contactArray = contacts;
 	cData.reset(256);
-	cData.friction = (real)0.4;
+	cData.friction = (real)0.1;
 	cData.restitution = (real)0.9;
-	cData.tolerance = (real)0.9;
+	cData.tolerance = (real)0.1;
 	cData.contacts = contacts;
 
 
-	collisionsphereAndSphere(*cSphere0, *cSphere1, &cData);
-};
-
+	elevate::CollisionDetector::sphereAndSphere(*cSpheres[0], *cSpheres[1], &cData);
+}
 
 void GameManager::render()
 {

@@ -83,11 +83,11 @@ namespace elevate {
 
 		unsigned velocityIterationsUsed = 0;
 		unsigned velocityIterations = 50;
-		real velocityEpsilon = 0.01f;
+		real velocityEpsilon = 0.1f;
 
 		unsigned positionIterationsUsed = 0;
 		unsigned positionIterations = 50;
-		real positionEpsilon = 0.01f;
+		real positionEpsilon = 0.1f;
 	};
 
 	class ContactGenerator
