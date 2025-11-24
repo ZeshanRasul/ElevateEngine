@@ -76,6 +76,11 @@ namespace elevate {
 		Matrix3 getInverseInertiaTensor() const;
 		void setInverseInertiaTensor(const Matrix3& tensor);
 
+		void setInertiaTensor(const Matrix3& inertiaTensor)
+		{
+			inverseInertiaTensor.setInverse(inertiaTensor);
+		}
+
 		void getInverseInertiaTensorWorld(Matrix3* inverseInertiaTensor) const
 		{
 			*inverseInertiaTensor = inverseInertiaTensorWorld;

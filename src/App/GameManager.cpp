@@ -62,6 +62,10 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		sphereBody->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
 		sphereBody->setMass(5000.0f);
 		sphereBody->setAwake(true);
+		Matrix3 tensor;
+		real coeff = 0.4f * sphereBody->getMass() * 0.5f * 0.5f;
+		tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
+		sphereBody->setInertiaTensor(tensor);
 		gameObjects.push_back(sphere);
 		rbWorld = new World(100, 50);
 		rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f, 0.0f));
@@ -75,6 +79,11 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		sphereBody2->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 		sphereBody2->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 		sphereBody2->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		tensor;
+		coeff = 0.4f * sphereBody2->getMass() * 0.5f * 0.5f;
+		tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
+		sphereBody2->setInertiaTensor(tensor);
+
 		sphereBody2->setMass(100.0f);
 		sphereBody2->setAwake(true);
 		gameObjects.push_back(sphere2);
@@ -96,7 +105,6 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		cSphere0->getTransform();
 		cSphere1->getTransform();
 
-		cData = new elevate::CollisionData();
 	}
 }
 
@@ -317,8 +325,8 @@ void GameManager::update(float deltaTime)
 	if (sphereDemo)
 	{
 	
-		cSpheres[0]->body->integrate(deltaTime);
-		cSpheres[1]->body->integrate(deltaTime);
+		//cSpheres[0]->body->integrate(deltaTime);
+		//cSpheres[1]->body->integrate(deltaTime);
 	//	sphere2->SetPosition(sphereBody2->getPosition());
 		Matrix4 sphere1Mat;
 		//cSphere1.body->getGLTransformMatrix(sphere1Mat);
@@ -334,18 +342,21 @@ void GameManager::update(float deltaTime)
 
 	//rbWorld->generateContacts();
 	generateContacts();
-	resolver.resolveContacts(cData->contacts, cData->contactCount, deltaTime);
+	resolver.resolveContacts(cData.contacts, cData.contactCount, deltaTime);
 
 }
 
 void GameManager::generateContacts()
 {
-	cData->reset(256);
-	cData->friction = (real)0.4;
-	cData->restitution = (real)0.9;
-	cData->tolerance = (real)0.1;
+	cData.contactArray = contacts;
+	cData.reset(256);
+	cData.friction = (real)0.4;
+	cData.restitution = (real)0.9;
+	cData.tolerance = (real)0.1;
+	cData.contacts = contacts;
 
-	CollisionDetector::sphereAndSphere(*cSphere0, *cSphere1, cData);
+
+	CollisionDetector::sphereAndSphere(*cSphere0, *cSphere1, &cData);
 };
 
 

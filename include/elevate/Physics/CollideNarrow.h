@@ -6,9 +6,19 @@ namespace elevate {
 
 	struct CollisionData
 	{
-		Contact* contactArray;
+		CollisionData() : contactArray(nullptr),
+			contacts(nullptr),
+			contactsLeft(0),
+			contactCount(0),
+			friction(0),
+			restitution(1),
+			tolerance(0)
+		{
+		}
 
-		Contact* contacts;
+		Contact* contactArray{};
+
+		Contact* contacts{};
 
 		int contactsLeft;
 
@@ -96,9 +106,12 @@ namespace elevate {
 			contact->contactNormal = normal;
 			contact->contactPoint = positionOne + midline * (real)0.5;
 			contact->penetration = (one.radius + two.radius - size);
-			contact->setBodyData(one.body, two.body, data->friction, data->restitution);
+			contact->setBodyData(*one.body, *two.body, data->friction, data->restitution);
 
 			data->addContacts(1);
+			data->contacts[data->contactCount - 1] = *contact;
+			data->contactArray[data->contactCount - 1] = *contact;
+
 			return 1;
 		
 		};

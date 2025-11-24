@@ -10,7 +10,17 @@ namespace elevate {
 	{
 		friend class ContactResolver;
 	public:
-		RigidBody* body[2];
+		Contact() : body{ nullptr, nullptr },
+			restitution(0),
+			contactPoint(),
+			contactNormal(),
+			friction(0),
+			penetration(0),
+			desiredDeltaVelocity(0)
+		{
+		}
+
+		RigidBody* body[2] = { nullptr, nullptr };
 
 		real restitution;
 
@@ -19,12 +29,11 @@ namespace elevate {
 		Vector3 relativeContactPosition[2];
 
 		real friction;
-		real restition;
 
 
 		real penetration;
 
-		void setBodyData(RigidBody* one, RigidBody* two, real friction, real restitution);
+		void setBodyData(RigidBody& one, RigidBody& two, real friction, real restitution);
 
 		void calculateContactBasis();
 
@@ -72,13 +81,13 @@ namespace elevate {
 
 		void adjustPositions(Contact* contacts, unsigned numContacts, real duration);
 
-		unsigned velocityIterationsUsed;
-		unsigned velocityIterations;
-		real velocityEpsilon;
+		unsigned velocityIterationsUsed = 0;
+		unsigned velocityIterations = 50;
+		real velocityEpsilon = 0.1f;
 
-		unsigned positionIterationsUsed;
-		unsigned positionIterations;
-		real positionEpsilon;
+		unsigned positionIterationsUsed = 0;
+		unsigned positionIterations = 50;
+		real positionEpsilon = 0.1;
 	};
 
 	class ContactGenerator
