@@ -117,11 +117,11 @@ namespace elevate {
 		// Calculate the transform matrix for the body.
 		_calculateTransformMatrix(transformMatrix, position, orientation);
 
-		// Calculate the inertiaTensor in world space.
-	   // _transformInertiaTensor(inverseInertiaTensorWorld,
-	   //     orientation,
-	   //     inverseInertiaTensor,
-	   //     transformMatrix);
+//		 Calculate the inertiaTensor in world space.
+	    _transformInertiaTensor(inverseInertiaTensorWorld,
+	        orientation,
+	        inverseInertiaTensor,
+	        transformMatrix);
 
 	}
 

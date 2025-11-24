@@ -157,22 +157,22 @@ namespace elevate {
 		if (one.getAxis(best) * toCentre > 0)
 		{
 			normal = normal * -1.0f;
+
 		}
+			Vector3 vertex = two.halfSize;
+			if (two.getAxis(0) * normal < 0) vertex.x = -vertex.x;
+			if (two.getAxis(1) * normal < 0) vertex.y = -vertex.y;
+			if (two.getAxis(2) * normal < 0) vertex.z = -vertex.z;
 
-		Vector3 vertex = two.halfSize;
-		if (two.getAxis(0) * normal < 0) vertex.x = -vertex.x;
-		if (two.getAxis(1) * normal < 0) vertex.y = -vertex.y;
-		if (two.getAxis(2) * normal < 0) vertex.z = -vertex.z;
+			contact->contactNormal = normal;
+			contact->penetration = pen;
+			contact->contactPoint = two.getTransform() * vertex;
+			contact->setBodyData(one.body, two.body,
+				data->friction, data->restitution);
+			data->addContacts(1);
 
-		contact->contactNormal = normal;
-		contact->penetration = pen;
-		contact->contactPoint = two.getTransform() * vertex;
-		contact->setBodyData(one.body, two.body,
-			data->friction, data->restitution);
-		data->addContacts(1);
-
-		data->contacts[data->contactCount - 1] = *contact;
-		data->contactArray[data->contactCount - 1] = *contact;
+			data->contacts[data->contactCount - 1] = *contact;
+			data->contactArray[data->contactCount - 1] = *contact;
 
 	}
 	static inline Vector3 contactPoint(

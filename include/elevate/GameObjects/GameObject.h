@@ -19,6 +19,9 @@ public:
         size_t uniformMatrixBufferSize = 3 * sizeof(glm::mat4);
         mUniformBuffer.init(uniformMatrixBufferSize);
         Logger::log(1, "%s: matrix uniform buffer (size %i bytes) successfully created\n", __FUNCTION__, uniformMatrixBufferSize);
+
+		rotationAxis = elevate::Vector3(0.0f, 1.0f, 0.0f);
+		angle = 0.0f;
     }
 
     virtual void Draw(glm::mat4 viewMat, glm::mat4 proj) {
@@ -36,6 +39,19 @@ public:
 	elevate::Vector3 GetScale() const { return scale; }
 	void SetScale(elevate::Vector3 scl) { scale = scl; }
 
+	elevate::Vector3 GetRotAxis() const { return rotationAxis; }
+	void SetRotAxis(elevate::Vector3 rotAx) { rotationAxis = rotAx; }
+
+	float GetAngle() const { return angle; }
+	void SetAngle(float ang) { angle = ang; }
+
+	glm::quat GetOrientation() const { return orientation; }
+	void SetOrientation(glm::quat orient) { orientation = orient; }
+
+    void SetRotationMatrix(glm::mat4 rotMat) {
+        orientation = glm::quat_cast(rotMat);
+	}
+
     bool isDestroyed = false;
 
 protected:
@@ -44,6 +60,9 @@ protected:
     float yaw;
     elevate::Vector3 position;
     elevate::Vector3 scale;
+	elevate::Vector3 rotationAxis;
+    float angle;
+	glm::quat orientation;
 
     Shader* shader = nullptr;
     RenderData renderData;
