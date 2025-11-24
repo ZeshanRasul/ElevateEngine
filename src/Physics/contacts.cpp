@@ -1,5 +1,39 @@
 #include "Physics/contacts.h"
 
+void elevate::Contact::setBodyData(RigidBody* one, RigidBody* two, real friction, real restitution)
+{
+	body[0] = one;
+	body[1] = two;
+	//this->friction = friction;
+	this->restitution = restitution;
+}
+
+void elevate::Contact::calculateDesiredDeltaVelocity(real duration)
+{
+	const static real velocityLimit = (real)0.25f;
+
+	real velocityFromAcc = 0;
+
+	if (body[0]->getAwake())
+	{
+		velocityFromAcc += body[0]->getLastFrameAcceleration() * duration * contactNormal;
+	}
+
+	if (body[1] && body[1]->getAwake())
+	{
+		velocityFromAcc -= body[1]->getLastFrameAcceleration() * duration * contactNormal;
+	}
+
+	real thisRestitution = restitution;
+	if (real_abs(contactVelocity.x) < velocityLimit)
+	{
+		thisRestitution = (real)0.0f;
+	}
+
+	desiredDeltaVelocity = -contactVelocity.x - thisRestitution * (contactVelocity.x - velocityFromAcc);
+}
+
+
 void elevate::Contact::calculateContactBasis()
 {
 	Vector3 contactTangent[2];
@@ -31,6 +65,45 @@ void elevate::Contact::calculateContactBasis()
 	);
 }
 
+void elevate::Contact::calculateInternals(real duration)
+{
+	if (!body[0]) swapBodies();
+
+	calculateContactBasis();
+
+	relativeContactPosition[0] = contactPoint - body[0]->getPosition();
+	if (body[1]) {
+		relativeContactPosition[1] = contactPoint - body[1]->getPosition();
+	}
+
+	contactVelocity = calculateLocalVelocity(0, duration);
+	if (body[1]) {
+		contactVelocity -= calculateLocalVelocity(1, duration);
+	}
+
+	calculateDesiredDeltaVelocity(duration);
+}
+
+elevate::Vector3 elevate::Contact::calculateLocalVelocity(unsigned bodyIndex, real duration)
+{
+	RigidBody* thisBody = body[bodyIndex];
+
+	Vector3 velocity = thisBody->getRotation() % relativeContactPosition[bodyIndex];
+	velocity += thisBody->getVelocity();
+
+	Vector3 contactVelocity = contactToWorld.transformTranspose(velocity);
+
+	Vector3 accVelocity = thisBody->getLastFrameAcceleration() * duration;
+
+	accVelocity = contactToWorld.transformTranspose(accVelocity);
+
+	accVelocity.x = 0;
+
+	contactVelocity += accVelocity;
+
+	return contactVelocity;
+}
+
 inline elevate::Vector3 elevate::Contact::calculateFrictionlessImpulse(elevate::Matrix3* inverseInertiaTensor)
 {
 	Vector3 impulseContact;
@@ -59,6 +132,46 @@ inline elevate::Vector3 elevate::Contact::calculateFrictionlessImpulse(elevate::
 	return impulseContact;
 
 
+}
+
+void elevate::Contact::applyVelocityChange(Vector3 velocityChange[2], Vector3 rotationChange[2])
+{
+	Matrix3 inverseInertiaTensor[2];
+	body[0]->getInverseInertiaTensorWorld(&inverseInertiaTensor[0]);
+	if (body[1])
+		body[1]->getInverseInertiaTensorWorld(&inverseInertiaTensor[1]);
+
+	Vector3 impulseContact;
+
+	//if (friction == (real)0.0)
+	//{
+	impulseContact = calculateFrictionlessImpulse(inverseInertiaTensor);
+	//}
+	//else
+	//{
+	//	impulseContact = calculateFrictionImpulse(inverseInertiaTensor);
+	//}
+
+	Vector3 impulse = contactToWorld.transform(impulseContact);
+
+	Vector3 impulsiveTorque = relativeContactPosition[0] % impulse;
+	rotationChange[0] = inverseInertiaTensor[0].transform(impulsiveTorque);
+	velocityChange[0].clear();
+	velocityChange[0].addScaledVector(impulse, body[0]->getInverseMass());
+
+	body[0]->addVelocity(velocityChange[0]);
+	body[0]->addRotation(rotationChange[0]);
+
+	if (body[1])
+	{
+		Vector3 impulsiveTorque = impulse % relativeContactPosition[1];
+		rotationChange[1] = inverseInertiaTensor[1].transform(impulsiveTorque);
+		velocityChange[1].clear();
+		velocityChange[1].addScaledVector(impulse, -body[1]->getInverseMass());
+
+		body[1]->addVelocity(velocityChange[1]);
+		body[1]->addRotation(rotationChange[1]);
+	}
 }
 
 void elevate::Contact::applyPositionChange(Vector3 linearChange[2], Vector3 angularChange[2], real penetration)
@@ -135,14 +248,132 @@ void elevate::Contact::applyPositionChange(Vector3 linearChange[2], Vector3 angu
 			q.addScaledVector(angularChange[i], ((real)1.0));
 			body[i]->setOrientation(q);
 
-			// We need to calculate the derived data for any body that is
-			// asleep, so that the changes are reflected in the object's
-			// data. Otherwise the resolution will not change the position
-			// of the object, and the next collision detection round will
-			// have the same penetration.
 			if (!body[i]->getAwake()) body[i]->calculateDerivedData();
 
 		}
 
 	}
 }
+
+void elevate::Contact::matchAwakeState()
+{
+	if (!body[1]) return;
+
+	bool body0awake = body[0]->getAwake();
+	bool body1awake = body[1]->getAwake();
+
+	if (body0awake ^ body1awake) {
+		if (body0awake) body[1]->setAwake(true);
+		else body[0]->setAwake(true);
+	}
+}
+
+void elevate::ContactResolver::prepareContacts(Contact* contacts, unsigned numContacts, real duration)
+{
+	Contact* lastContact = contacts + numContacts;
+	for (Contact* contact = contacts; contact < lastContact; contact++)
+	{
+		contact->calculateInternals(duration);
+	}
+}
+
+void elevate::ContactResolver::adjustVelocities(Contact* c, unsigned numContacts, real duration)
+{
+	Vector3 velocityChange[2], rotationChange[2];
+	Vector3 deltaVel;
+
+	velocityIterationsUsed = 0;
+	while (velocityIterationsUsed < velocityIterations)
+	{
+		real max = velocityEpsilon;
+		unsigned index = numContacts;
+		for (unsigned i = 0; i < numContacts; i++)
+		{
+			if (c[i].desiredDeltaVelocity > max)
+			{
+				max = c[i].desiredDeltaVelocity;
+				index = i;
+			}
+		}
+		if (index == numContacts) break;
+
+		c[index].matchAwakeState();
+
+		c[index].applyVelocityChange(velocityChange, rotationChange);
+
+		for (unsigned i = 0; i < numContacts; i++)
+		{
+			for (unsigned b = 0; b < 2; b++) if (c[i].body[b])
+			{
+				for (unsigned d = 0; d < 2; d++)
+				{
+					if (c[i].body[b] == c[index].body[d])
+					{
+						deltaVel = velocityChange[d] + rotationChange[d].vectorProduct(c[i].relativeContactPosition[b]);
+
+						c[i].contactVelocity += c[i].contactToWorld.transformTranspose(deltaVel) * (b ? (real)-1 : (real)1);
+						c[i].calculateDesiredDeltaVelocity(duration);
+					}
+				}
+			}
+		}
+		velocityIterationsUsed++;
+	}
+}
+
+void elevate::ContactResolver::adjustPositions(Contact* c, unsigned numContacts, real duration)
+{
+	unsigned i, index;
+	Vector3 linearChange[2], angularChange[2];
+	real max;
+	Vector3 deltaPosition;
+
+	positionIterationsUsed = 0;
+	while (positionIterationsUsed < positionIterations)
+	{
+		max = positionEpsilon;
+		index = numContacts;
+		for (i = 0; i < numContacts; i++)
+		{
+			if (c[i].penetration > max)
+			{
+				max = c[i].penetration;
+				index = i;
+			}
+		}
+		if (index == numContacts) break;
+
+		c[index].matchAwakeState();
+
+		c[index].applyPositionChange(linearChange, angularChange, max);
+
+		for (i = 0; i < numContacts; i++)
+		{
+			for (unsigned b = 0; b < 2; b++) if (c[i].body[b])
+			{
+				for (unsigned d = 0; d < 2; d++)
+				{
+					if (c[i].body[b] == c[index].body[d])
+					{
+						deltaPosition = linearChange[d] + angularChange[d].vectorProduct(c[i].relativeContactPosition[b]);
+
+						c[i].penetration += deltaPosition.scalarProduct(c[i].contactNormal) * (b ? 1 : -1);
+					}
+				}
+			}
+		}
+		positionIterationsUsed++;
+	}
+}
+
+void elevate::ContactResolver::resolveContacts(Contact* contacts, unsigned numContacts, real duration)
+{
+	if (numContacts == 0) return;
+
+	prepareContacts(contacts, numContacts, duration);
+
+	adjustPositions(contacts, numContacts, duration);
+
+	adjustVelocities(contacts, numContacts, duration);
+}
+

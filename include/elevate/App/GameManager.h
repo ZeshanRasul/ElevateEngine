@@ -125,8 +125,25 @@ private:
 
     bool showBuoyanceDemo = true;
 
+	bool cubeDemo = false;
 	elevate::RigidBody* testBody = nullptr;
     World* rbWorld;
 	ForceRegistry rbRegistry;
 	Gravity* rbGravity;
+
+	bool sphereDemo = true;
+	Sphere* sphere = nullptr;
+	Sphere* sphere2 = nullptr;
+	elevate::RigidBody* sphereBody = nullptr;
+	elevate::RigidBody* sphereBody2 = nullptr;
+
+    elevate::Contact contacts[256];
+    elevate::CollisionData cData;
+    elevate::ContactResolver resolver;
+	elevate::CollisionSphere cSpheres[2];
+	elevate::CollisionSphere cSphere0;
+	elevate::CollisionSphere cSphere1;
+
+
+    void generateContacts();
 };

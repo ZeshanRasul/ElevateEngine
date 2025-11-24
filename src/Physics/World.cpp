@@ -1,5 +1,4 @@
 #include "elevate/Physics/World.h"
-
 using namespace elevate;
 
 void World::startFrame()
@@ -9,6 +8,14 @@ void World::startFrame()
 		(*p)->clearAccumulator();
 		(*p)->calculateDerivedData();
 	}
+}
+
+unsigned World::generateContacts()
+{
+	unsigned limit = maxContacts;
+	Contact* nextContact = contacts;
+
+	return maxContacts - limit;
 }
 
 void World::integrate(real duration)

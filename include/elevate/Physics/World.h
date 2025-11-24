@@ -2,6 +2,8 @@
 #include <vector>
 #include "elevate/Physics/body.h"
 #include "elevate/Physics/fgen.h"
+#include "elevate/Physics/contacts.h"
+#include "elevate/Physics/CollideNarrow.h"
 
 class World
 {
@@ -13,12 +15,16 @@ protected:
 
 	bool calculateIterations;
 
+	elevate::CollisionData collisionData;
+	elevate::ContactResolver resolver;
+
 	struct BodyRegistration
 	{
 		elevate::RigidBody* body;
 		BodyRegistration* next;
 	};
 	unsigned maxContacts;
+	Contact* contacts;
 	BodyRegistration* firstBody;
 	ForceRegistry registry;
 

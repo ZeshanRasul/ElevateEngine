@@ -30,17 +30,29 @@ namespace elevate {
 			return 1.0f / inverseMass != 0.0f;
 		}
 
+		Matrix4 getTransform() { return transformMatrix; }
+
 		void setPosition(const Vector3& pos) { position = pos; };
 		void setPosition(const real x, const real y, const real z);
 		Vector3 getPosition() const { return position; }
 
 		void setVelocity(const Vector3& vel) { velocity = vel; }
 		void setVelocity(const real x, const real y, const real z);
-		Vector3 getVelocity() const;
+		Vector3 getVelocity() const { return velocity; }
+		void addVelocity(const Vector3& deltaVel)
+		{
+			velocity += deltaVel;
+		};
 
 		void setAcceleration(const Vector3& acc);
 		void setAcceleration(const real x, const real y, const real z);
 		Vector3 getAcceleration() const { return acceleration; };
+
+		void addRotation(const Vector3& deltaRot)
+		{
+			rotation += deltaRot;
+		};
+		Vector3 getRotation() const { return rotation; }
 
 		Quaternion getOrientation() const { return orientation; }
 		void setOrientation(const Quaternion& orient) { orientation = orient; }

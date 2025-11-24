@@ -183,6 +183,7 @@
     <ClInclude Include="src\Window\Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\elevate\Physics\CollideNarrow.cpp" />
     <ClCompile Include="src\Physics\contacts.cpp" />
     <ClCompile Include="include\external\imgui\backend\imgui_impl_glfw.cpp" />
     <ClCompile Include="include\external\imgui\backend\imgui_impl_opengl3.cpp" />

@@ -27,29 +27,67 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	cubeShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
 	lineShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/line_vert.glsl", "C:/dev/ElevateEngine/src/Shaders/line_frag.glsl");
 
-	camera = new Camera(glm::vec3(0.0f, 0.0f, 40.0f));
+	camera = new Camera(glm::vec3(0.0f, 40.0f, 60.0f));
 
 	inputManager->setContext(camera, this, width, height);
 
-	elevate::Vector3 pos = { 0.0f, 10.0f, 0.0f };
-	elevate::Vector3 scale = { 3.0f, 3.0f, 3.0f };
-	cube = new Cube(pos, scale, &cubeShader, this);
-	cube->LoadMesh();
-	testBody = new RigidBody();	
-	testBody->setPosition(elevate::Vector3(0.0f, 30.0f, 0.0f));
-	testBody->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
-	testBody->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
-	testBody->setMass(2.0f);
-	gameObjects.push_back(cube);
-	rbWorld = new World(100, 50);
-	rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f * 0.15f, 0.0f));
-	rbWorld->getForceRegistry().add(testBody, rbGravity);
+	if (cubeDemo)
+	{
+		elevate::Vector3 pos = { 0.0f, 10.0f, 0.0f };
+		elevate::Vector3 scale = { 3.0f, 3.0f, 3.0f };
+		cube = new Cube(pos, scale, &cubeShader, this);
+		cube->LoadMesh();
+		testBody = new RigidBody();
+		testBody->setPosition(elevate::Vector3(0.0f, 30.0f, 0.0f));
+		testBody->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+		testBody->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		testBody->setMass(2.0f);
+		gameObjects.push_back(cube);
+		rbWorld = new World(100, 50);
+		rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f * 0.15f, 0.0f));
+		rbWorld->getForceRegistry().add(testBody, rbGravity);
+	}
+
+	if (sphereDemo)
+	{
+		elevate::Vector3 pos = { 0.0f, -50.0f, 0.0f };
+		elevate::Vector3 scale = { 20.0f, 20.0f, 20.0f };
+		sphere = new Sphere(pos, scale, &ammoShader, this, {0.0f, 0.8f, 0.3f});
+		sphere->GenerateSphere(15.0f, 32, 32);
+		sphere->LoadMesh();
+		sphereBody = new RigidBody();
+		sphereBody->setPosition(elevate::Vector3(0.0f, -50.0f, 0.0f));
+		sphereBody->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+		sphereBody->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		sphereBody->setMass(5000.0f);
+		gameObjects.push_back(sphere);
+		rbWorld = new World(100, 50);
+		rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f, 0.0f));
+		pos = { 0.0f, 30.0f, 0.0f };
+		scale = { 4.0f, 4.0f, 4.0f };
+		sphere2 = new Sphere(pos, scale, &cubeShader, this, {0.9f, 0.1f, 0.4f});
+		sphere2->GenerateSphere(4.0f, 32, 32);
+		sphere2->LoadMesh();
+		sphereBody2 = new RigidBody();
+		sphereBody2->setPosition(elevate::Vector3(0.0f, 40.0f, 0.0f));
+		sphereBody2->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+		sphereBody2->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		sphereBody2->setMass(12.0f);
+		gameObjects.push_back(sphere2);
+		rbWorld->getForceRegistry().add(sphereBody2, rbGravity);
+		cSphere0.body = sphereBody;
+		cSphere0.radius = 10.0f;
+		cSphere1.body = sphereBody2;
+		cSphere0.radius = 0.5f;
+		cSpheres[0] = cSphere0;
+		cSpheres[1] = cSphere1;
+	}
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
 {
 	view = camera->GetViewMatrix();
-	projection = glm::perspective(glm::radians(camera->Zoom), (float)width / (float)height, 0.1f, 500.0f);
+	projection = glm::perspective(glm::radians(camera->Zoom), (float)width / (float)height, 0.1f, 5000.0f);
 }
 
 void GameManager::setSceneData()
@@ -250,8 +288,23 @@ void GameManager::update(float deltaTime)
 	rbWorld->startFrame();
 	rbWorld->runPhysics(deltaTime);
 	rbRegistry.updateForces(deltaTime);
-	testBody->integrate(deltaTime);
-	cube->SetPosition(testBody->getPosition());
+	generateContacts();
+	resolver.resolveContacts(cData.contacts, cData.contactCount, deltaTime);
+	cSphere0.calculateInternals();
+	cSphere1.calculateInternals();
+
+	if (cubeDemo)
+	{
+		testBody->integrate(deltaTime);
+		cube->SetPosition(testBody->getPosition());
+	}
+
+	if (sphereDemo)
+	{
+	//	sphereBody2->integrate(deltaTime);
+	//	sphere2->SetPosition(sphereBody2->getPosition());
+		sphere2->SetPosition(elevate::Vector3(cSphere1.body->getPosition().x, cSphere1.body->getPosition().y, cSphere1.body->getPosition().z));
+	}
 
 
 	//if (pushDirX < -3.0f)
@@ -301,6 +354,17 @@ void GameManager::update(float deltaTime)
 	//linebc->UpdateVertexBuffer(bcStart, cdStart);
 	//linecd->UpdateVertexBuffer(anchorPos, abStart);
 }
+
+void GameManager::generateContacts()
+{
+	cData.reset(256);
+	cData.friction = (real)0.4;
+	cData.restitution = (real)0.9;
+	cData.tolerance = (real)0.1;
+
+	CollisionDetector::sphereAndSphere(cSpheres[0], cSpheres[1], &cData);
+};
+
 
 void GameManager::render()
 {
