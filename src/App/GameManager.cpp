@@ -151,7 +151,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
 
 		testBody2->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		testBody2->setMass(100000.0f);
+		testBody2->setMass(1000.0f);
 		//tensor;
 		//coeff = 0.4f * testBody2->getMass() * 1.0f * 1.0f;
 		//tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
@@ -466,7 +466,7 @@ void GameManager::generateContacts()
 	cData.contacts = contacts;
 
 
-	elevate::CollisionDetector::sphereAndSphere(*cSpheres[0], *cSpheres[1], &cData);
+	elevate::CollisionDetector::sphereAndSphere(*cSphere0, *cSphere1, &cData);
 
 	if (elevate::boxAndBoxIntersect(*cBox0, *cBox1))
 	{
