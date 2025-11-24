@@ -8,19 +8,19 @@
 class World
 {
 public:
-	typedef std::vector<elevate::RigidBody*> RigidBodies;
+	typedef std::vector<RigidBody*> RigidBodies;
 
 protected:
 	RigidBodies bodies;
 
 	bool calculateIterations;
 
-	elevate::CollisionData collisionData;
-	elevate::ContactResolver resolver;
+	CollisionData collisionData;
+	ContactResolver resolver;
 
 	struct BodyRegistration
 	{
-		elevate::RigidBody* body;
+		RigidBody* body;
 		BodyRegistration* next;
 	};
 	unsigned maxContacts;
@@ -39,7 +39,7 @@ public:
 	void integrate(real duration);
 	void runPhysics(real duration);
 	void startFrame();
-	void addBody(elevate::RigidBody* body)
+	void addBody(RigidBody* body)
 	{
 		BodyRegistration* reg = new BodyRegistration;
 		reg->body = body;

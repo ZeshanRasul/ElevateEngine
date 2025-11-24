@@ -362,7 +362,7 @@ void GameManager::generateContacts()
 	cData.contacts = contacts;
 
 
-	CollisionDetector::sphereAndSphere(*cSphere0, *cSphere1, &cData);
+	collisionsphereAndSphere(*cSphere0, *cSphere1, &cData);
 };
 
 

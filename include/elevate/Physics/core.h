@@ -23,6 +23,20 @@ namespace elevate {
 		const static Vector3 GRAVITY;
 		const static Vector3 HIGH_GRAVITY;
 
+		real operator[](unsigned i) const
+		{
+			if (i == 0) return x;
+			if (i == 1) return y;
+			return z;
+		}
+
+		real& operator[](unsigned i)
+		{
+			if (i == 0) return x;
+			if (i == 1) return y;
+			return z;
+		}
+
 		void operator+= (const Vector3& v) {
 			x += v.x;
 			y += v.y;

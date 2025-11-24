@@ -1,5 +1,4 @@
 #include "elevate/Physics/World.h"
-using namespace elevate;
 
 void World::startFrame()
 {
@@ -54,8 +53,6 @@ void World::runPhysics(real duration)
 		// Get the next registration
 		reg = reg->next;
 	}// Resolve the contacts
-
-//	CollisionDetector::sphereAndSphere(*cSpheres[0], *cSpheres[1], &collisionData);
 
 	unsigned usedContacts = generateContacts();
 

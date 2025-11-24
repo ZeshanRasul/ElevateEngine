@@ -1,12 +1,12 @@
 #include "Physics/contacts.h"
 
 using namespace elevate;
-void Contact::setBodyData(RigidBody& one, RigidBody& two, real friction, real restitution)
+void Contact::setBodyData(RigidBody* one, RigidBody* two, real friction, real restitution)
 {
-	this->body[0] = &one;
-	this->body[1] = &two;
-	this->friction = friction;
-	this->restitution = restitution;
+	body[0] = one;
+	body[1] = two;
+	friction = friction;
+	restitution = restitution;
 }
 
 void elevate::Contact::calculateDesiredDeltaVelocity(real duration)

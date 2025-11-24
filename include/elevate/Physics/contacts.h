@@ -33,7 +33,7 @@ namespace elevate {
 
 		real penetration;
 
-		void setBodyData(RigidBody& one, RigidBody& two, real friction, real restitution);
+		void setBodyData(RigidBody* one, RigidBody* two, real friction, real restitution);
 
 		void calculateContactBasis();
 
@@ -83,11 +83,11 @@ namespace elevate {
 
 		unsigned velocityIterationsUsed = 0;
 		unsigned velocityIterations = 50;
-		real velocityEpsilon = 0.1f;
+		real velocityEpsilon = 0.01f;
 
 		unsigned positionIterationsUsed = 0;
 		unsigned positionIterations = 50;
-		real positionEpsilon = 0.1;
+		real positionEpsilon = 0.01f;
 	};
 
 	class ContactGenerator
@@ -95,4 +95,4 @@ namespace elevate {
 	public:
 		virtual unsigned addContact(Contact* contact, unsigned limit) const = 0;
 	};
-}
+};
