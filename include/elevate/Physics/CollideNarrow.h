@@ -61,7 +61,7 @@ namespace elevate {
 
 		RigidBody* body;
 
-		Matrix4 offset;
+		Matrix4 offset = Matrix4();
 
 		void calculateInternals();
 
@@ -87,6 +87,7 @@ namespace elevate {
 	{
 	public:
 		Vector3 halfSize;
+		bool isOverlapping;
 	};
 
 
@@ -156,22 +157,22 @@ namespace elevate {
 		if (one.getAxis(best) * toCentre > 0)
 		{
 			normal = normal * -1.0f;
-
-			Vector3 vertex = two.halfSize;
-			if (two.getAxis(0) * normal < 0) vertex.x = -vertex.x;
-			if (two.getAxis(1) * normal < 0) vertex.y = -vertex.y;
-			if (two.getAxis(2) * normal < 0) vertex.z = -vertex.z;
-
-			contact->contactNormal = normal;
-			contact->penetration = pen;
-			contact->contactPoint = two.getTransform() * vertex;
-			contact->setBodyData(one.body, two.body,
-				data->friction, data->restitution);
-			data->addContacts(1);
-
-			data->contacts[data->contactCount - 1] = *contact;
-			data->contactArray[data->contactCount - 1] = *contact;
 		}
+
+		Vector3 vertex = two.halfSize;
+		if (two.getAxis(0) * normal < 0) vertex.x = -vertex.x;
+		if (two.getAxis(1) * normal < 0) vertex.y = -vertex.y;
+		if (two.getAxis(2) * normal < 0) vertex.z = -vertex.z;
+
+		contact->contactNormal = normal;
+		contact->penetration = pen;
+		contact->contactPoint = two.getTransform() * vertex;
+		contact->setBodyData(one.body, two.body,
+			data->friction, data->restitution);
+		data->addContacts(1);
+
+		data->contacts[data->contactCount - 1] = *contact;
+		data->contactArray[data->contactCount - 1] = *contact;
 
 	}
 	static inline Vector3 contactPoint(
@@ -348,5 +349,56 @@ namespace elevate {
 		}
 	};
 #undef CHECK_OVERLAP
+	static inline bool overlapOnAxis(
+		const CollisionBox& one,
+		const CollisionBox& two,
+		const Vector3& axis,
+		const Vector3& toCentre
+	)
+	{
+		// Project the half-size of one onto axis
+		real oneProject = transformToAxis(one, axis);
+		real twoProject = transformToAxis(two, axis);
 
+		// Project this onto the axis
+		real distance = real_abs(toCentre * axis);
+
+		// Check for overlap
+		return (distance < oneProject + twoProject);
+	};
+
+#define TEST_OVERLAP(axis) overlapOnAxis(one, two, (axis), toCentre)
+
+	static bool boxAndBoxIntersect(
+		const CollisionBox& one,
+		const CollisionBox& two
+	)
+	{
+		// Find the vector between the two centres
+		Vector3 toCentre = two.getAxis(3) - one.getAxis(3);
+
+		return (
+			// Check on box one's axes first
+			TEST_OVERLAP(one.getAxis(0)) &&
+			TEST_OVERLAP(one.getAxis(1)) &&
+			TEST_OVERLAP(one.getAxis(2)) &&
+
+			// And on two's
+			TEST_OVERLAP(two.getAxis(0)) &&
+			TEST_OVERLAP(two.getAxis(1)) &&
+			TEST_OVERLAP(two.getAxis(2)) &&
+
+			// Now on the cross products
+			TEST_OVERLAP(one.getAxis(0) % two.getAxis(0)) &&
+			TEST_OVERLAP(one.getAxis(0) % two.getAxis(1)) &&
+			TEST_OVERLAP(one.getAxis(0) % two.getAxis(2)) &&
+			TEST_OVERLAP(one.getAxis(1) % two.getAxis(0)) &&
+			TEST_OVERLAP(one.getAxis(1) % two.getAxis(1)) &&
+			TEST_OVERLAP(one.getAxis(1) % two.getAxis(2)) &&
+			TEST_OVERLAP(one.getAxis(2) % two.getAxis(0)) &&
+			TEST_OVERLAP(one.getAxis(2) % two.getAxis(1)) &&
+			TEST_OVERLAP(one.getAxis(2) % two.getAxis(2))
+			);
+	}
+#undef TEST_OVERLAP
 }
