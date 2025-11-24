@@ -18,6 +18,10 @@ namespace elevate {
 		Vector3 contactNormal;
 		Vector3 relativeContactPosition[2];
 
+		real friction;
+		real restition;
+
+
 		real penetration;
 
 		void setBodyData(RigidBody* one, RigidBody* two, real friction, real restitution);
@@ -75,5 +79,11 @@ namespace elevate {
 		unsigned positionIterationsUsed;
 		unsigned positionIterations;
 		real positionEpsilon;
+	};
+
+	class ContactGenerator
+	{
+	public:
+		virtual unsigned addContact(Contact* contact, unsigned limit) const = 0;
 	};
 }

@@ -75,12 +75,12 @@ namespace elevate {
 	class CollisionDetector
 	{
 	public:
-		static unsigned sphereAndSphere(const CollisionSphere& one, const CollisionSphere& two, CollisionData* data)
+		static unsigned sphereAndSphere(CollisionSphere& one, CollisionSphere& two, CollisionData* data)
 		{
 			if (data->contactsLeft <= 0) return 0;
 
-			Vector3 positionOne = one.getAxis(3);
-			Vector3 positionTwo = two.getAxis(3);
+			Vector3 positionOne = one.body->getPosition();
+			Vector3 positionTwo = two.body->getPosition();
 
 			Vector3 midline = positionOne - positionTwo;
 			real size = midline.magnitude();

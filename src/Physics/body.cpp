@@ -116,10 +116,10 @@ void RigidBody::calculateDerivedData()
     _calculateTransformMatrix(transformMatrix, position, orientation);
 
     // Calculate the inertiaTensor in world space.
-    _transformInertiaTensor(inverseInertiaTensorWorld,
-        orientation,
-        inverseInertiaTensor,
-        transformMatrix);
+   // _transformInertiaTensor(inverseInertiaTensorWorld,
+   //     orientation,
+   //     inverseInertiaTensor,
+   //     transformMatrix);
 
 }
 

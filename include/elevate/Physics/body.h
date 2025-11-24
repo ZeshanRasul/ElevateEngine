@@ -5,7 +5,22 @@
 namespace elevate {
 	class RigidBody {
 	public:
-		RigidBody() : linearDamping(1.0f), inverseMass(1.0f) {};
+		RigidBody() : linearDamping(1.0f)
+			, angularDamping(1.0f)
+			, inverseMass(1.0f)
+			, mass(1.0f)
+			, orientation()
+			, position()
+			, velocity()
+			, acceleration()
+			, rotation()
+			, inverseInertiaTensor()
+			, inverseInertiaTensorWorld()
+			, forceAccum()
+			, torqueAccum()
+			, isAwake(true)
+			, lastFrameAcceleration()
+			, transformMatrix(){};
 
 		void integrate(real duration);
 		void calculateDerivedData();
@@ -53,6 +68,7 @@ namespace elevate {
 			rotation += deltaRot;
 		};
 		Vector3 getRotation() const { return rotation; }
+		void setRotation(const Vector3& rot) { rotation = rot; }
 
 		Quaternion getOrientation() const { return orientation; }
 		void setOrientation(const Quaternion& orient) { orientation = orient; }
@@ -76,6 +92,8 @@ namespace elevate {
 
 
 		Matrix4 getTransformMatrix() const { return transformMatrix; }
+		void getGLTransformMatrix(float* mat) { mat = transformMatrix.data; }
+
 
 		void setAwake(const bool awake) { isAwake = awake; }
 		bool getAwake() const { return isAwake; }

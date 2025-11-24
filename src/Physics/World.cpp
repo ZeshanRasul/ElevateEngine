@@ -15,6 +15,22 @@ unsigned World::generateContacts()
 	unsigned limit = maxContacts;
 	Contact* nextContact = contacts;
 
+
+	ContactGenRegistration* reg = firstContactGen;
+	while (reg)
+	{
+		unsigned used = reg->gen->addContact(nextContact, limit);
+		limit -= used;
+		nextContact += used;
+
+		// We've run out of contacts to fill. This means we're missing
+		// contacts.
+		if (limit <= 0) break;
+
+		reg = reg->next;
+	}
+
+	// Return the number of contacts used.
 	return maxContacts - limit;
 }
 
@@ -38,5 +54,11 @@ void World::runPhysics(real duration)
 		// Get the next registration
 		reg = reg->next;
 	}// Resolve the contacts
+
+//	CollisionDetector::sphereAndSphere(*cSpheres[0], *cSpheres[1], &collisionData);
+
+	unsigned usedContacts = generateContacts();
+
+	resolver.resolveContacts(contacts, usedContacts, duration);
 	
 }

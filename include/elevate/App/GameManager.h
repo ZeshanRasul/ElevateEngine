@@ -138,11 +138,11 @@ private:
 	elevate::RigidBody* sphereBody2 = nullptr;
 
     elevate::Contact contacts[256];
-    elevate::CollisionData cData;
+    elevate::CollisionData* cData;
     elevate::ContactResolver resolver;
-	elevate::CollisionSphere cSpheres[2];
-	elevate::CollisionSphere cSphere0;
-	elevate::CollisionSphere cSphere1;
+	elevate::CollisionSphere* cSpheres[2];
+	elevate::CollisionSphere* cSphere0;
+	elevate::CollisionSphere* cSphere1;
 
 
     void generateContacts();

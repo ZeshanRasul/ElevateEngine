@@ -39,8 +39,25 @@ public:
 	void integrate(real duration);
 	void runPhysics(real duration);
 	void startFrame();
+	void addBody(elevate::RigidBody* body)
+	{
+		BodyRegistration* reg = new BodyRegistration;
+		reg->body = body;
+		reg->next = firstBody;
+		firstBody = reg;
+		bodies.push_back(body);
+	};
 
 	ForceRegistry& getForceRegistry() {
 		return	registry;
 	};
+
+	struct ContactGenRegistration
+	{
+		ContactGenerator* gen;
+		ContactGenRegistration* next;
+	};
+
+	ContactGenRegistration* firstContactGen;
+
 };
