@@ -167,6 +167,10 @@ namespace elevate {
 			contact->contactPoint = two.getTransform() * vertex;
 			contact->setBodyData(one.body, two.body,
 				data->friction, data->restitution);
+			data->addContacts(1);
+
+			data->contacts[data->contactCount - 1] = *contact;
+			data->contactArray[data->contactCount - 1] = *contact;
 		}
 
 	}
@@ -287,13 +291,11 @@ namespace elevate {
 			if (best < 3)
 			{
 				fillPointFaceBoxBox(one, two, toCentre, data, best, pen);
-				data->addContacts(1);
 				return 1;
 			}
 			else if (best < 6)
 			{
 				fillPointFaceBoxBox(two, one, toCentre * -1.0f, data, best - 3, pen);
-				data->addContacts(1);
 				return 1;
 			}
 			else
@@ -336,6 +338,10 @@ namespace elevate {
 				contact->setBodyData(one.body, two.body,
 					data->friction, data->restitution);
 				data->addContacts(1);
+
+				data->contacts[data->contactCount - 1] = *contact;
+				data->contactArray[data->contactCount - 1] = *contact;
+
 				return 1;
 			}
 			return 0;

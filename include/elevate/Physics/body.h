@@ -5,22 +5,22 @@
 namespace elevate {
 	class RigidBody {
 	public:
-		RigidBody() : linearDamping(1.0f)
-			, angularDamping(1.0f)
-			, inverseMass(1.0f)
+		RigidBody() : linearDamping(0.99f)               
+			, angularDamping(0.99f)
+			, inverseMass(1.0f)                   
 			, mass(1.0f)
-			, orientation()
-			, position()
-			, velocity()
-			, acceleration()
-			, rotation()
-			, inverseInertiaTensor()
-			, inverseInertiaTensorWorld()
-			, forceAccum()
-			, torqueAccum()
+			, orientation(0, 0, 0, 1)             
+			, position(0.0f, 0.0f, 0.0f)
+			, velocity(0.0f, 0.0f, 0.0f)
+			, acceleration(0.0f, 0.0f, 0.0f)
+			, rotation(0.0f, 0.0f, 0.0f)          
+			, inverseInertiaTensor(Matrix3())         
+			, inverseInertiaTensorWorld(Matrix3())    
+			, forceAccum(0.0f, 0.0f, 0.0f)
+			, torqueAccum(0.0f, 0.0f, 0.0f)
 			, isAwake(true)
-			, lastFrameAcceleration()
-			, transformMatrix(){};
+			, lastFrameAcceleration(0.0f, 0.0f, 0.0f)
+			, transformMatrix(Matrix4()) {};
 
 		void integrate(real duration);
 		void calculateDerivedData();

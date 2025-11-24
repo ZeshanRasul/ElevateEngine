@@ -3,8 +3,8 @@
 using namespace elevate;
 void Contact::setBodyData(RigidBody* one, RigidBody* two, real friction, real restitution)
 {
-	body[0] = one;
-	body[1] = two;
+	this->body[0] = one;
+	this->body[1] = two;
 	this->friction = friction;
 	this->restitution = restitution;
 }

@@ -27,7 +27,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	cubeShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
 	lineShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/line_vert.glsl", "C:/dev/ElevateEngine/src/Shaders/line_frag.glsl");
 
-	camera = new Camera(glm::vec3(0.0f, 40.0f, 60.0f));
+	camera = new Camera(glm::vec3(0.0f, 0.0f, 100.0f));
 
 	inputManager->setContext(camera, this, width, height);
 
@@ -104,6 +104,55 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		rbWorld->addBody(cSpheres[1]->body);
 		cSphere0->getTransform();
 		cSphere1->getTransform();
+
+		pos = { -20.0f, 5.0f, -10.0f };
+		scale = { 2.0f, 2.0f, 2.0f };
+		cube = new Cube(pos, scale, &cubeShader, this);
+		cube->LoadMesh();
+		gameObjects.push_back(cube);
+		testBody = new RigidBody();
+		testBody->setPosition(elevate::Vector3(-20.0f, 5.0f, -10.0f));
+		testBody->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+		testBody->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		testBody->setMass(10.0f);
+		tensor;
+		coeff = 0.4f * testBody->getMass() * 1.0f * 1.0f;
+		tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
+		testBody->setInertiaTensor(tensor);
+		testBody->setAwake(true);
+		rbWorld->getForceRegistry().add(testBody, rbGravity);
+		rbWorld->addBody(testBody);
+		cBox0 = new CollisionBox();
+		cBox0->body = testBody;
+		cBox0->halfSize = elevate::Vector3(1.0f, 1.0f, 1.0f);
+		cBox0->body->calculateDerivedData();
+		cBox0->calculateInternals();
+		cBox0->getTransform();
+
+		pos = { -20.0f, -15.0f, -10.0f };
+		scale = { 10.0f, 2.0f, 10.0f };
+
+		cube2 = new Cube(pos, scale, &cubeShader, this);
+		cube2->LoadMesh();
+		gameObjects.push_back(cube2);
+		testBody2 = new RigidBody();
+		testBody2->setPosition(elevate::Vector3(-20.0f, 5.0f, -10.0f));
+		testBody2->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+		testBody2->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		testBody2->setMass(FLT_MAX);
+		tensor;
+		coeff = 0.4f * testBody2->getMass() * 1.0f * 1.0f;
+		tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
+		testBody2->setInertiaTensor(tensor);
+		testBody2->setAwake(true);
+		rbWorld->addBody(testBody2);
+		cBox1 = new CollisionBox();
+		cBox1->body = testBody2;
+		cBox1->halfSize = elevate::Vector3(5.0f, 1.0f, 5.0f);
+		cBox1->body->calculateDerivedData();
+		cBox1->calculateInternals();
+		cBox1->getTransform();
+
 
 	}
 }
@@ -332,7 +381,20 @@ void GameManager::update(float deltaTime)
 		//cSphere1->body->calculateDerivedData();
 		cSpheres[0]->calculateInternals();
 		cSpheres[1]->calculateInternals();
-	
+		
+		cBox0->calculateInternals();
+		cBox1->calculateInternals();
+
+		Matrix4 box0Mat;
+		Matrix4 box1Mat;
+
+		box0Mat = cBox0->body->getTransform();
+		elevate::Vector3 box0Pos = box0Mat.getAxisVector(3);
+		cube->SetPosition(box0Pos);
+		box1Mat = cBox1->body->getTransform();
+		elevate::Vector3 box1Pos = box1Mat.getAxisVector(3);
+		cube2->SetPosition(box1Pos);
+
 		sphere1Mat = cSphere1->body->getTransform();
 		elevate::Vector3 newPos = sphere1Mat.getAxisVector(3);
 		sphere2->SetPosition(newPos);
@@ -361,6 +423,7 @@ void GameManager::generateContacts()
 
 
 	elevate::CollisionDetector::sphereAndSphere(*cSpheres[0], *cSpheres[1], &cData);
+	elevate::CollisionDetector::boxAndBox(*cBox0, *cBox1, &cData);
 }
 
 void GameManager::render()

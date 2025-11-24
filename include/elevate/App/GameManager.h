@@ -127,6 +127,7 @@ private:
 
 	bool cubeDemo = false;
 	elevate::RigidBody* testBody = nullptr;
+	elevate::RigidBody* testBody2 = nullptr;
     World* rbWorld;
 	ForceRegistry rbRegistry;
 	Gravity* rbGravity;
@@ -143,7 +144,8 @@ private:
 	elevate::CollisionSphere* cSpheres[2];
 	elevate::CollisionSphere* cSphere0;
 	elevate::CollisionSphere* cSphere1;
-
+	elevate::CollisionBox* cBox0;
+	elevate::CollisionBox* cBox1;
 
     void generateContacts();
 };
