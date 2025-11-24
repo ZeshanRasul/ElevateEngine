@@ -60,7 +60,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		sphereBody->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 		sphereBody->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 		sphereBody->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		sphereBody->setMass(5000.0f);
+		sphereBody->setMass(FLT_MAX);
 		sphereBody->setAwake(true);
 		Matrix3 tensor;
 		real coeff = 0.4f * sphereBody->getMass() * 0.5f * 0.5f;
@@ -72,19 +72,19 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		pos = { 0.0f, 30.0f, 0.0f };
 		scale = { 1.0f, 1.0f, 1.0f };
 		sphere2 = new Sphere(pos, scale, &cubeShader, this, {0.9f, 0.1f, 0.4f});
-		sphere2->GenerateSphere(0.5f, 32, 32);
+		sphere2->GenerateSphere(1.5f, 32, 32);
 		sphere2->LoadMesh();
 		sphereBody2 = new RigidBody();
 		sphereBody2->setPosition(elevate::Vector3(0.0f, 30.0f, 0.0f));
 		sphereBody2->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 		sphereBody2->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 		sphereBody2->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		sphereBody2->setMass(100.0f);
 		tensor;
 		coeff = 0.4f * sphereBody2->getMass() * 0.5f * 0.5f;
 		tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
 		sphereBody2->setInertiaTensor(tensor);
 
-		sphereBody2->setMass(100.0f);
 		sphereBody2->setAwake(true);
 		gameObjects.push_back(sphere2);
 		cSphere0 = new CollisionSphere();
@@ -92,7 +92,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		cSphere0->body = sphereBody;
 		cSphere0->radius = 12.5f;
 		cSphere1->body = sphereBody2;
-		cSphere1->radius = 0.5f;
+		cSphere1->radius = 1.5f;
 		cSpheres[0] = cSphere0;
 		cSpheres[1] = cSphere1;
 		cSpheres[0]->body->calculateDerivedData();
@@ -314,6 +314,8 @@ void GameManager::update(float deltaTime)
 	rbRegistry.updateForces(deltaTime);
 
 
+	generateContacts();
+	resolver.resolveContacts(cData.contacts, cData.contactCount, deltaTime);
 
 
 	if (cubeDemo)
@@ -329,20 +331,24 @@ void GameManager::update(float deltaTime)
 		//cSpheres[1]->body->integrate(deltaTime);
 	//	sphere2->SetPosition(sphereBody2->getPosition());
 		Matrix4 sphere1Mat;
+		Matrix4 sphere0Mat;
 		//cSphere1.body->getGLTransformMatrix(sphere1Mat);
 		//cSphere0->body->calculateDerivedData();
 		//cSphere1->body->calculateDerivedData();
 		cSpheres[0]->calculateInternals();
 		cSpheres[1]->calculateInternals();
+	
 		sphere1Mat = cSphere1->body->getTransform();
 		elevate::Vector3 newPos = sphere1Mat.getAxisVector(3);
 		sphere2->SetPosition(newPos);
+	
+		sphere0Mat = cSphere0->body->getTransform();
+		newPos = sphere0Mat.getAxisVector(3);
+		sphere->SetPosition(newPos);
 	}
 
 
 	//rbWorld->generateContacts();
-	generateContacts();
-	resolver.resolveContacts(cData.contacts, cData.contactCount, deltaTime);
 
 }
 
@@ -352,7 +358,7 @@ void GameManager::generateContacts()
 	cData.reset(256);
 	cData.friction = (real)0.4;
 	cData.restitution = (real)0.9;
-	cData.tolerance = (real)0.1;
+	cData.tolerance = (real)0.9;
 	cData.contacts = contacts;
 
 

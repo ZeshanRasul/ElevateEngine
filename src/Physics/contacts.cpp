@@ -178,12 +178,12 @@ void elevate::Contact::applyVelocityChange(Vector3 velocityChange[2], Vector3 ro
 void elevate::Contact::applyPositionChange(Vector3 linearChange[2], Vector3 angularChange[2], real penetration)
 {
 	const real angularLimit = (real)0.2;
-	real angularMove[2];
-	real linearMove[2];
+	real angularMove[2]{};
+	real linearMove[2]{};
 
 	real totalInertia = 0;
-	real linearInertia[2];
-	real angularInertia[2];
+	real linearInertia[2]{};
+	real angularInertia[2]{};
 	for (unsigned i = 0; i < 2; i++)
 	{
 		if (body[i])
