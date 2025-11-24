@@ -50,13 +50,13 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	if (sphereDemo)
 	{
-		elevate::Vector3 pos = { 0.0f, -30.0f, 0.0f };
+		elevate::Vector3 pos = { 30.0f, -30.0f, 0.0f };
 		elevate::Vector3 scale = { 5.0f, 5.0f, 5.0f };
 		sphere = new Sphere(pos, scale, &ammoShader, this, {0.0f, 0.8f, 0.3f});
 		sphere->GenerateSphere(2.5f, 32, 32);
 		sphere->LoadMesh();
 		sphereBody = new RigidBody();
-		sphereBody->setPosition(elevate::Vector3(0.0f, -30.0f, 0.0f));
+		sphereBody->setPosition(elevate::Vector3(30.0f, -30.0f, 0.0f));
 		sphereBody->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 		sphereBody->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 		sphereBody->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
@@ -69,13 +69,13 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		gameObjects.push_back(sphere);
 		rbWorld = new World(100, 50);
 		rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f, 0.0f));
-		pos = { 0.0f, 30.0f, 0.0f };
+		pos = { 30.0f, 30.0f, 0.0f };
 		scale = { 1.0f, 1.0f, 1.0f };
 		sphere2 = new Sphere(pos, scale, &cubeShader, this, {0.9f, 0.1f, 0.4f});
 		sphere2->GenerateSphere(1.5f, 32, 32);
 		sphere2->LoadMesh();
 		sphereBody2 = new RigidBody();
-		sphereBody2->setPosition(elevate::Vector3(0.0f, 30.0f, 0.0f));
+		sphereBody2->setPosition(elevate::Vector3(30.0f, 30.0f, 0.0f));
 		sphereBody2->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 		sphereBody2->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 		sphereBody2->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
@@ -138,7 +138,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		cBox0->getTransform();
 
 		pos = { -20.0f, -35.0f, -10.0f };
-		scale = { 10.0f, 2.0f, 10.0f };
+		scale = { 60.0f, 2.0f, 60.0f };
 
 		cube2 = new Cube(pos, scale, &cubeShader, this);
 		cube2->LoadMesh();
@@ -151,18 +151,18 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
 
 		testBody2->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		testBody2->setMass(1000.0f);
+		testBody2->setMass(100.0f);
 		//tensor;
 		//coeff = 0.4f * testBody2->getMass() * 1.0f * 1.0f;
 		//tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
 		//testBody2->setInertiaTensor(tensor);
 
 		boxInertia;
-		boxInertia.setBlockInertiaTensor(elevate::Vector3(5.0f, 1.0f, 5.0f), testBody2->getMass());
+		boxInertia.setBlockInertiaTensor(elevate::Vector3(30.0f, 1.0f, 30.0f), testBody2->getMass());
 		testBody2->setInertiaTensor(boxInertia);
 
 		cBox1 = new CollisionBox();
-		cBox1->halfSize = elevate::Vector3(5.0f, 1.0f, 5.0f);
+		cBox1->halfSize = elevate::Vector3(30.0f, 1.0f, 30.0f);
 		rbWorld->addBody(testBody2);
 		cBox1->body = testBody2;
 		cBox1->body->calculateDerivedData();
@@ -431,9 +431,10 @@ void GameManager::update(float deltaTime)
 
 		
 		float rotMat1[12] = {
-	box1Mat.data[0], box1Mat.data[1], box1Mat.data[2],
-	box1Mat.data[4], box1Mat.data[5], box1Mat.data[6],
-	box1Mat.data[8], box1Mat.data[9], box1Mat.data[10]
+			box1Mat.data[0], box1Mat.data[1], box1Mat.data[2],
+	
+			box1Mat.data[4], box1Mat.data[5], box1Mat.data[6],
+			box1Mat.data[8], box1Mat.data[9], box1Mat.data[10]
 		};
 		glm::mat3 rot1 = glm::make_mat3(rotMat1);
 		cube2->SetOrientation(glm::quat(
@@ -459,8 +460,8 @@ void GameManager::update(float deltaTime)
 void GameManager::generateContacts()
 {
 	cData.reset(256);
-	cData.friction = (real)0.1;
-	cData.restitution = (real)0.9;
+	cData.friction = (real)0.2;
+	cData.restitution = (real)0.6;
 	cData.tolerance = (real)0.1;
 	cData.contactArray = contacts;
 	cData.contacts = contacts;
@@ -482,25 +483,3 @@ void GameManager::render()
 		renderer->draw(obj, view, projection);
 	}
 }
-//	ammoShader.use();
-//	ammoShader.setVec3("dirLight.direction", dirLight.direction);
-//	ammoShader.setVec3("dirLight.ambient", dirLight.ambient);
-//	ammoShader.setVec3("dirLight.diffuse", dirLight.diffuse);
-//	ammoShader.setVec3("dirLight.specular", dirLight.specular);
-//
-//	for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; shot++) {
-//		if (shot->GetType() != UNUSED) {
-//			shot->render(view, projection);
-//		}
-//	}
-//
-//	if (showBuoyanceDemo)
-//	{
-//		Sphere0->render(view, projection);
-//		Sphere1->render(view, projection);
-//		Sphere2->render(view, projection);
-//		lineab->DrawLine(view, projection, glm::vec3(1.0f, 0.0f, 0.0f));
-//		linebc->DrawLine(view, projection, glm::vec3(0.0f, 1.0f, 0.0f));
-//		linecd->DrawLine(view, projection, glm::vec3(0.0f, 0.0f, 1.0f));
-//	}
-//}

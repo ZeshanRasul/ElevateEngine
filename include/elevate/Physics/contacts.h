@@ -50,6 +50,7 @@ namespace elevate {
 		Vector3 calculateLocalVelocity(unsigned bodyIndex, real duration);
 
 		inline Vector3 calculateFrictionlessImpulse(Matrix3* inverseInertiaTensor);
+		inline Vector3 calculateFrictionImpulse(Matrix3* inverseInertiaTensor);
 
 		void applyVelocityChange(Vector3 velocityChange[2],
 			Vector3 rotationChange[2]);
