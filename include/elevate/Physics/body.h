@@ -6,7 +6,7 @@ namespace elevate {
 	class RigidBody {
 	public:
 		RigidBody() : linearDamping(0.99f)               
-			, angularDamping(0.8f)
+			, angularDamping(0.95f)
 			, inverseMass(1.0f)                   
 			, mass(1.0f)
 			, orientation(0, 0, 0, 1)             

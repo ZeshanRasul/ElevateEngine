@@ -256,7 +256,63 @@ namespace elevate {
 
 		};
 
+		static unsigned boxAndSphere(
+			const CollisionBox& box,
+			const CollisionSphere& sphere,
+			CollisionData* data
+		)
+		{
+			// Transform the centre of the sphere into box coordinates
+			Vector3 centre = sphere.getAxis(3);
+			Vector3 relCentre = box.getTransform().transformInverse(centre);
 
+			// Early out check to see if we can exclude the contact
+			if (real_abs(relCentre.x) - sphere.radius > box.halfSize.x ||
+				real_abs(relCentre.y) - sphere.radius > box.halfSize.y ||
+				real_abs(relCentre.z) - sphere.radius > box.halfSize.z)
+			{
+				return 0;
+			}
+
+			Vector3 closestPt(0, 0, 0);
+			real dist;
+
+			// Clamp each coordinate to the box.
+			dist = relCentre.x;
+			if (dist > box.halfSize.x) dist = box.halfSize.x;
+			if (dist < -box.halfSize.x) dist = -box.halfSize.x;
+			closestPt.x = dist;
+
+			dist = relCentre.y;
+			if (dist > box.halfSize.y) dist = box.halfSize.y;
+			if (dist < -box.halfSize.y) dist = -box.halfSize.y;
+			closestPt.y = dist;
+
+			dist = relCentre.z;
+			if (dist > box.halfSize.z) dist = box.halfSize.z;
+			if (dist < -box.halfSize.z) dist = -box.halfSize.z;
+			closestPt.z = dist;
+
+			// Check we're in contact
+			dist = (closestPt - relCentre).squareMagnitude();
+			if (dist > sphere.radius * sphere.radius) return 0;
+
+			// Compile the contact
+			Vector3 closestPtWorld = box.getTransform().transform(closestPt);
+
+			Contact* contact = data->contacts;
+			contact->contactNormal = (closestPtWorld - centre);
+			contact->contactNormal.normalize();
+			contact->contactPoint = closestPtWorld;
+			contact->penetration = sphere.radius - real_sqrt(dist);
+			contact->setBodyData(box.body, sphere.body,
+				data->friction, data->restitution);
+
+			data->addContacts(1);
+			data->contacts[data->contactCount - 1] = *contact;
+			data->contactArray[data->contactCount - 1] = *contact;
+			return 1;
+		}
 #define CHECK_OVERLAP(axis, index) \
     if (!tryAxis(one, two, (axis), toCentre, (index), pen, best)) return 0;
 
@@ -399,6 +455,7 @@ namespace elevate {
 			TEST_OVERLAP(one.getAxis(2) % two.getAxis(1)) &&
 			TEST_OVERLAP(one.getAxis(2) % two.getAxis(2))
 			);
-	}
 #undef TEST_OVERLAP
+
+	}
 }

@@ -50,6 +50,9 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	if (sphereDemo)
 	{
+		rbWorld = new World(100, 50);
+		rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f, 0.0f));
+
 		elevate::Vector3 pos = { 30.0f, -30.0f, 0.0f };
 		elevate::Vector3 scale = { 5.0f, 5.0f, 5.0f };
 		sphere = new Sphere(pos, scale, &ammoShader, this, {0.0f, 0.8f, 0.3f});
@@ -60,22 +63,22 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		sphereBody->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 		sphereBody->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 		sphereBody->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		sphereBody->setMass(100000.0f);
+		sphereBody->setMass(1000.0f);
 		sphereBody->setAwake(true);
 		Matrix3 tensor;
 		real coeff = 0.4f * sphereBody->getMass() * 0.5f * 0.5f;
 		tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
 		sphereBody->setInertiaTensor(tensor);
 		gameObjects.push_back(sphere);
-		rbWorld = new World(100, 50);
-		rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f, 0.0f));
-		pos = { 30.0f, 30.0f, 0.0f };
+
+
+		pos = { -20.0f, 5.0f, -10.0f };
 		scale = { 1.0f, 1.0f, 1.0f };
 		sphere2 = new Sphere(pos, scale, &cubeShader, this, {0.9f, 0.1f, 0.4f});
 		sphere2->GenerateSphere(1.5f, 32, 32);
 		sphere2->LoadMesh();
 		sphereBody2 = new RigidBody();
-		sphereBody2->setPosition(elevate::Vector3(30.0f, 30.0f, 0.0f));
+		sphereBody2->setPosition(elevate::Vector3(-20.0f, 5.0f, -10.0f));
 		sphereBody2->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 		sphereBody2->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 		sphereBody2->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
@@ -105,7 +108,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		cSphere0->getTransform();
 		cSphere1->getTransform();
 
-		pos = { -20.0f, 5.0f, -10.0f };
+		pos = { 30.0f, 30.0f, 0.0f };
 		scale = { 2.0f, 2.0f, 2.0f };
 		cube = new Cube(pos, scale, &cubeShader, this);
 		cube->SetOrientation(glm::quat(0.2706f, 0.2706f, 0.0f, 0.9239f));
@@ -113,7 +116,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		gameObjects.push_back(cube);
 		testBody = new RigidBody();
 		testBody->setAwake(true);
-		testBody->setPosition(elevate::Vector3(-20.0f, 5.0f, -10.0f));
+		testBody->setPosition(elevate::Vector3(30.0f, 30.0f, 0.0f));
 		testBody->setOrientation(elevate::Quaternion(0.2706f, 0.2706f, 0.0f, 0.9239f));
 		cube->SetAngle(45.0f);
 		cube->SetRotAxis(Vector3(0.7071f, 0.7071f, 0.0f));
@@ -306,68 +309,6 @@ void GameManager::ShowCameraControlWindow(Camera& cam)
 	ImGui::End();
 }
 
-void GameManager::fireRound()
-{
-	AmmoRound* shot = nullptr;
-
-	for (shot = ammo; shot < ammo + ammoRounds; shot++) {
-		if (shot->GetType() == UNUSED) {
-			break;
-		}
-	}
-
-	if (shot >= ammo + ammoRounds) {
-		return;
-	}
-
-	switch (currentShotType)
-	{
-	case PISTOL:
-	{
-		shot->SetSphere(pistolSphere);
-		shot->GetParticle()->setMass(2.0f);
-		shot->GetParticle()->setVelocity(0.0f, 0.0f, -35.0f);
-		shot->GetParticle()->setAcceleration(0.0f, -1.0f, 0.0f);
-		shot->GetParticle()->setDamping(0.99f);
-		break;
-	}
-
-	case ARTILLERY:
-	{
-		shot->SetSphere(artillerySphere);
-		shot->GetParticle()->setMass(200.0f);
-		shot->GetParticle()->setVelocity(0.0f, 30.0f, -40.0f); // 50m/s
-		shot->GetParticle()->setAcceleration(0.0f, -20.0f, 0.0f);
-		shot->GetParticle()->setDamping(0.99f);
-		break;
-	}
-	case FIREBALL:
-	{
-		shot->SetSphere(fireballSphere);
-		shot->GetParticle()->setMass(1.0f);
-		shot->GetParticle()->setVelocity(0.0f, 0.0f, -10.0f); // 5m/s
-		shot->GetParticle()->setAcceleration(0.0f, 0.6f, 0.0f); // Floats up
-		shot->GetParticle()->setDamping(0.9f);
-		break;
-	}
-	case LASER:
-	{
-		shot->SetSphere(laserSphere);
-		shot->GetParticle()->setMass(0.1f); // 0.1kg - almost no weight
-		shot->GetParticle()->setVelocity(0.0f, 0.0f, -100.0f); // 100m/s
-		shot->GetParticle()->setAcceleration(0.0f, 0.0f, 0.0f); // No gravity
-		shot->GetParticle()->setDamping(0.99f);
-		break;
-	}
-	}
-
-	shot->GetParticle()->setPosition(elevate::Vector3(0.0f, 2.0f, -1.0f));
-	shot->SetStartTime(glfwGetTime());
-	shot->SetType(currentShotType);
-
-	shot->GetParticle()->clearAccumulator();
-}
-
 void GameManager::update(float deltaTime)
 {
 
@@ -469,12 +410,15 @@ void GameManager::generateContacts()
 
 	elevate::CollisionDetector::sphereAndSphere(*cSphere0, *cSphere1, &cData);
 
+	elevate::CollisionDetector::boxAndBox(*cBox0, *cBox1, &cData);
 	if (elevate::boxAndBoxIntersect(*cBox0, *cBox1))
 	{
 		cBox0->isOverlapping = true;
 		cBox1->isOverlapping = true;
 	}
-	elevate::CollisionDetector::boxAndBox(*cBox0, *cBox1, &cData);
+
+	elevate::CollisionDetector::boxAndSphere(*cBox0, *cSphere0, &cData);
+	elevate::CollisionDetector::boxAndSphere(*cBox1, *cSphere1, &cData);
 }
 
 void GameManager::render()

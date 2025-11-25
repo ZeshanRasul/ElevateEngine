@@ -38,7 +38,7 @@ public:
     glm::mat4 getView() const { return view; }
     glm::mat4 getProjection() const { return projection; }
 
-    void fireRound();
+    void fireRound() {};
 	void setCurrentShotType(ShotType type) { currentShotType = type; }
 
     void update(float deltaTime);
