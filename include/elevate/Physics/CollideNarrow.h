@@ -91,7 +91,13 @@ namespace elevate {
 	};
 
 
+	class CollisionPlane
+	{
+	public:
+		Vector3 direction;
 
+		real offset;
+	};
 
 
 	static inline real transformToAxis(const CollisionBox& box, const Vector3& axis)
@@ -221,9 +227,67 @@ namespace elevate {
 			return cOne * 0.5 + cTwo * 0.5;
 		}
 	}
+
+	static bool boxAndHalfSpaceIntersect(const CollisionBox& box, const CollisionPlane& plane)
+	{
+		real projectedRadius = transformToAxis(box, plane.direction);
+
+		real boxDistance = plane.direction * box.getAxis(3) - projectedRadius;
+
+		return boxDistance <= plane.offset;
+	}
+
 	class CollisionDetector
 	{
 	public:
+		static unsigned boxAndHalfSpace(
+			const CollisionBox& box,
+			const CollisionPlane& plane,
+			CollisionData* data
+		)
+		{
+			if (data->contactsLeft <= 0) return 0;
+
+			if (!boxAndHalfSpaceIntersect(box, plane))
+			{
+				return 0;
+			}
+
+			static real mults[8][3] = { {1,1,1},{-1,1,1},{1,-1,1},{-1,-1,1},
+						   {1,1,-1},{-1,1,-1},{1,-1,-1},{-1,-1,-1} };
+
+			Contact* contact = data->contacts;
+			unsigned contactsUsed = 0;
+			for (unsigned i = 0; i < 8; i++) {
+
+				Vector3 vertexPos(mults[i][0], mults[i][1], mults[i][2]);
+				vertexPos.componentProductUpdate(box.halfSize);
+				vertexPos = box.transform.transform(vertexPos);
+
+				real vertexDistance = vertexPos * plane.direction;
+
+				if (vertexDistance <= plane.offset)
+				{
+					contact->contactPoint = plane.direction;
+					contact->contactPoint *= (vertexDistance - plane.offset);
+					contact->contactPoint += vertexPos;
+					contact->contactNormal = plane.direction;
+					contact->penetration = plane.offset - vertexDistance;
+
+					contact->setBodyData(box.body, NULL,
+						data->friction, data->restitution);
+
+					data->addContacts(1);
+					data->contacts[data->contactCount - 1] = *contact;
+					data->contactArray[data->contactCount - 1] = *contact;
+
+					contact++;
+					contactsUsed++;
+					if (contactsUsed == (unsigned)data->contactsLeft) return contactsUsed;
+				}
+			}
+		};
+
 		static unsigned sphereAndSphere(CollisionSphere& one, CollisionSphere& two, CollisionData* data)
 		{
 

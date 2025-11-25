@@ -10,6 +10,7 @@
 #include "GameObjects/Cube.h"
 #include "GameObjects/Sphere.h"
 #include "GameObjects/Line.h"
+#include "GameObjects/Plane.h"
 #include "Physics/Demos/AmmoRound.h"
 #include "Physics/Demos/FloatingSphere.h"
 #include "Physics/pfgen.h"
@@ -85,6 +86,7 @@ private:
     Sphere* springSphere;
     Sphere* springSphere2;
     Sphere* springSphere3;
+    Plane* plane;
 
     elevate::ParticleWorld* pWorld;
     elevate::ParticleCable cable1;
@@ -138,6 +140,8 @@ private:
 	elevate::RigidBody* sphereBody = nullptr;
 	elevate::RigidBody* sphereBody2 = nullptr;
 
+    elevate::RigidBody* planeBody = nullptr;
+
     elevate::Contact contacts[256];
     elevate::CollisionData cData;
     elevate::ContactResolver resolver;
@@ -146,6 +150,7 @@ private:
 	elevate::CollisionSphere* cSphere1;
 	elevate::CollisionBox* cBox0;
 	elevate::CollisionBox* cBox1;
+    elevate::CollisionPlane* cPlane;
 
     void generateContacts();
 };

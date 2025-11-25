@@ -147,6 +147,9 @@
     <ClInclude Include="include\elevate\Physics\CollideNarrow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\elevate\GameObjects\Plane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Physics\particle.cpp">
@@ -258,6 +261,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Physics\CollideNarrow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameObjects\Plane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

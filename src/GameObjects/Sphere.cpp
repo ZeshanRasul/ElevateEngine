@@ -93,6 +93,7 @@ void Sphere::drawObject(glm::mat4 viewMat, glm::mat4 proj)
     glm::vec3 posVec = glm::vec3(GetPosition().x, GetPosition().y, GetPosition().z);
     glm::vec3 scaleVec = glm::vec3(GetScale().x, GetScale().y, GetScale().z);
     modelMat = glm::translate(modelMat, posVec);
+  //  modelMat *= glm::mat4_cast(orientation);
     modelMat = glm::scale(modelMat, scaleVec);
     std::vector<glm::mat4> matrixData;
     matrixData.push_back(viewMat);
@@ -100,7 +101,7 @@ void Sphere::drawObject(glm::mat4 viewMat, glm::mat4 proj)
     matrixData.push_back(modelMat);
     mUniformBuffer.uploadUboData(matrixData, 0);
 
-	shader->setVec3("objectColor", color);
+    shader->setVec3("objectColor", color);
 
     glBindVertexArray(mVAO);
     glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);

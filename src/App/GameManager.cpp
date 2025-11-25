@@ -27,7 +27,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	cubeShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
 	lineShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/line_vert.glsl", "C:/dev/ElevateEngine/src/Shaders/line_frag.glsl");
 
-	camera = new Camera(glm::vec3(0.0f, 0.0f, 100.0f));
+	camera = new Camera(glm::vec3(0.0f, 5.0f, 100.0f));
 
 	inputManager->setContext(camera, this, width, height);
 
@@ -145,13 +145,13 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 		cube2 = new Cube(pos, scale, &cubeShader, this);
 		cube2->LoadMesh();
+		cube2->SetAngle(0.0f);
+		cube2->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
 		gameObjects.push_back(cube2);
 		testBody2 = new RigidBody();
 		testBody2->setAwake(true);
 		testBody2->setPosition(elevate::Vector3(-20.0f, -35.0f, -10.0f));
 		testBody2->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
-		cube->SetAngle(0.0f);
-		cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
 
 		testBody2->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 		testBody2->setMass(100.0f);
@@ -160,7 +160,6 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		//tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
 		//testBody2->setInertiaTensor(tensor);
 
-		boxInertia;
 		boxInertia.setBlockInertiaTensor(elevate::Vector3(30.0f, 1.0f, 30.0f), testBody2->getMass());
 		testBody2->setInertiaTensor(boxInertia);
 
@@ -172,7 +171,27 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		cBox1->calculateInternals();
 		cBox1->getTransform();
 
-
+		pos = { 0.0f, 0.0f, 0.0f };
+		scale = { 50.0f, 1.0f, 50.0f };
+		plane = new Plane(pos, scale, &cubeShader, this);
+		plane->LoadMesh();
+		plane->SetAngle(0.0f);
+		plane->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
+		gameObjects.push_back(plane);
+		//planeBody = new RigidBody();
+		//planeBody->setAwake(true);
+		//planeBody->setPosition(elevate::Vector3(0.0f, -25.0f, 0.0f));
+		//planeBody->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+		//planeBody->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		//planeBody->setMass(100.0f); 
+		//
+		//rbWorld->addBody(planeBody);
+		//Matrix3 planeInertia;
+		//planeInertia.setBlockInertiaTensor(elevate::Vector3(25.0f, 1.0f, 25.0f), planeBody->getMass());
+		//planeBody->setInertiaTensor(planeInertia);
+		cPlane = new CollisionPlane();
+		cPlane->direction = elevate::Vector3(0.0f, 1.0f, 0.0f);
+		cPlane->offset = 0.0f;
 	}
 }
 
@@ -228,34 +247,7 @@ void GameManager::ShowLightControlWindow(DirLight& light)
 
 void GameManager::ShowAmmoWindow()
 {
-	ImGui::Begin("Ammo Details");
 
-	switch (currentShotType)
-	{
-
-	case PISTOL:
-	{
-		ImGui::Text("Pistol");
-		break;
-	}
-	case ARTILLERY:
-	{
-		ImGui::Text("Artillery");
-		break;
-	}
-	case FIREBALL:
-	{
-		ImGui::Text("Fireball");
-		break;
-	}
-	case LASER:
-	{
-		ImGui::Text("Laser");
-		break;
-	}
-	}
-
-	ImGui::End();
 }
 
 void GameManager::ShowBuoyancyWindow()
@@ -318,9 +310,10 @@ void GameManager::update(float deltaTime)
 	rbWorld->startFrame();
 	rbWorld->runPhysics(deltaTime);
 	rbRegistry.updateForces(deltaTime);
-
+	
 	generateContacts();
 	resolver.resolveContacts(cData.contacts, cData.contactCount, deltaTime);
+
 
 	if (cubeDemo)
 	{
@@ -419,6 +412,8 @@ void GameManager::generateContacts()
 
 	elevate::CollisionDetector::boxAndSphere(*cBox0, *cSphere0, &cData);
 	elevate::CollisionDetector::boxAndSphere(*cBox1, *cSphere1, &cData);
+
+	elevate::CollisionDetector::boxAndHalfSpace(*cBox0, *cPlane, &cData);
 }
 
 void GameManager::render()

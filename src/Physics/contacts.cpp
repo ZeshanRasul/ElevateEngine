@@ -70,6 +70,8 @@ void elevate::Contact::calculateInternals(real duration)
 {
 	if (!body[0]) swapBodies();
 
+	if (!body[0]) return;
+
 	calculateContactBasis();
 
 	relativeContactPosition[0] = contactPoint - body[0]->getPosition();
