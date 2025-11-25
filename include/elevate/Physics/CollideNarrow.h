@@ -165,20 +165,20 @@ namespace elevate {
 			normal = normal * -1.0f;
 
 		}
-			Vector3 vertex = two.halfSize;
-			if (two.getAxis(0) * normal < 0) vertex.x = -vertex.x;
-			if (two.getAxis(1) * normal < 0) vertex.y = -vertex.y;
-			if (two.getAxis(2) * normal < 0) vertex.z = -vertex.z;
+		Vector3 vertex = two.halfSize;
+		if (two.getAxis(0) * normal < 0) vertex.x = -vertex.x;
+		if (two.getAxis(1) * normal < 0) vertex.y = -vertex.y;
+		if (two.getAxis(2) * normal < 0) vertex.z = -vertex.z;
 
-			contact->contactNormal = normal;
-			contact->penetration = pen;
-			contact->contactPoint = two.getTransform() * vertex;
-			contact->setBodyData(one.body, two.body,
-				data->friction, data->restitution);
-			data->addContacts(1);
+		contact->contactNormal = normal;
+		contact->penetration = pen;
+		contact->contactPoint = two.getTransform() * vertex;
+		contact->setBodyData(one.body, two.body,
+			data->friction, data->restitution);
+		data->addContacts(1);
 
-			data->contacts[data->contactCount - 1] = *contact;
-			data->contactArray[data->contactCount - 1] = *contact;
+		data->contacts[data->contactCount - 1] = *contact;
+		data->contactArray[data->contactCount - 1] = *contact;
 
 	}
 	static inline Vector3 contactPoint(
@@ -281,12 +281,12 @@ namespace elevate {
 			for (unsigned i = 0; i < 8; i++) {
 
 				Vector3 vertexPos(mults[i][0], mults[i][1], mults[i][2]);
-				
-				
-				
-				
+
+
+
+
 				vertexPos.componentProductUpdate(box.halfSize);
-				vertexPos = box.transform.transform(vertexPos);
+				vertexPos = box.getTransform().transform(vertexPos);
 
 				real vertexDistance = vertexPos * n;
 
@@ -296,12 +296,13 @@ namespace elevate {
 					real penetration = plane.offset - vertexDistance;
 
 					if (penetration < (real)0) continue;
-					{
-						contact->contactNormal = n * -1.0f;
-						contact->penetration = penetration;
+
+					contact->contactNormal = n * -1.0f;
+					contact->penetration = penetration;
 
 					if (penetration <= 0) continue;
-					}
+
+
 
 					contact->contactNormal = n;
 					contact->penetration = penetration;
@@ -310,7 +311,7 @@ namespace elevate {
 					contact->contactPoint.addScaledVector(n, penetration);
 					//contact->contactPoint *= (vertexDistance - plane.offset);
 					//contact->contactPoint += vertexPos;
-					
+
 
 
 					contact->setBodyData(box.body, NULL,
@@ -323,13 +324,18 @@ namespace elevate {
 					contact++;
 					contactsUsed++;
 					if (contactsUsed == (unsigned)data->contactsLeft) return contactsUsed;
+
 				}
+				data->addContacts(1);
+				data->contacts[data->contactCount - 1] = *contact;
+				data->contactArray[data->contactCount - 1] = *contact;
 			}
 			data->addContacts(1);
 			data->contacts[data->contactCount - 1] = *contact;
 			data->contactArray[data->contactCount - 1] = *contact;
 			return contactsUsed;
 		};
+
 		static unsigned sphereAndHalfSpace(
 			const CollisionSphere& sphere,
 			const CollisionPlane& plane,
