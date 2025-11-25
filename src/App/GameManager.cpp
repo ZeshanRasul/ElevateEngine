@@ -90,13 +90,13 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		gameObjects.push_back(sphere);
 
 
-		pos = { -20.0f, 35.0f, -10.0f };
+		pos = { -20.0f, 35.0f, 20.0f };
 		scale = { 1.0f, 1.0f, 1.0f };
 		sphere2 = new Sphere(pos, scale, &cubeShader, this, {0.9f, 0.1f, 0.4f});
 		sphere2->GenerateSphere(1.5f, 32, 32);
 		sphere2->LoadMesh();
 		sphereBody2 = new RigidBody();
-		sphereBody2->setPosition(elevate::Vector3(-20.0f, 35.0f, -10.0f));
+		sphereBody2->setPosition(elevate::Vector3(-20.0f, 35.0f, 20.0f));
 		sphereBody2->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 		sphereBody2->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 		sphereBody2->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
@@ -126,7 +126,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		cSphere0->getTransform();
 		cSphere1->getTransform();
 
-		pos = { 30.0f, 30.0f, 0.0f };
+		pos = { -20.0f, 30.0f, -10.0f };
 		scale = { 4.0f, 4.0f, 4.0f };
 		cube = new Cube(pos, scale, &cubeShader, this);
 		cube->SetOrientation(glm::quat(0.9239f, 0.2706f, 0.2706f, 0.0f));
@@ -134,18 +134,17 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		gameObjects.push_back(cube);
 		testBody = new RigidBody();
 		testBody->setAwake(true);
-		testBody->setPosition(elevate::Vector3(30.0f, 30.0f, 0.0f));
+		testBody->setPosition(elevate::Vector3(-20.0f, 30.0f, -10.0f));
 		testBody->setOrientation(elevate::Quaternion(0.9239f, 0.2706f, 0.2706f, 0.0f));
-		testBody->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		testBody->setMass(1.0f);
+		testBody->setMass(10.0f);
 		tensor;
 		coeff = 0.4f * testBody->getMass() * 1.0f * 1.0f;
-		//tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
-		//testBody->setInertiaTensor(tensor);
+		tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
+		testBody->setInertiaTensor(tensor);
 
 		Matrix3 boxInertia;
-		boxInertia.setBlockInertiaTensor(elevate::Vector3(2.0f, 2.0f, 2.0f), testBody->getMass());
-		testBody->setInertiaTensor(boxInertia);
+		//boxInertia.setBlockInertiaTensor(elevate::Vector3(2.0f, 2.0f, 2.0f), testBody->getMass());
+		//testBody->setInertiaTensor(boxInertia);
 
 		cBox0 = new CollisionBox();
 		rbWorld->getForceRegistry().add(testBody, rbGravity);
@@ -168,14 +167,14 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		testBody2->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 
 		testBody2->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		testBody2->setMass(100.0f);
-		//tensor;
-		//coeff = 0.4f * testBody2->getMass() * 1.0f * 1.0f;
-		//tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
-		//testBody2->setInertiaTensor(tensor);
+		testBody2->setMass(100000.0f);
+		tensor;
+		coeff = 0.4f * testBody2->getMass() * 1.0f * 1.0f;
+		tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
+		testBody2->setInertiaTensor(tensor);
 
-		boxInertia.setBlockInertiaTensor(elevate::Vector3(30.0f, 1.0f, 30.0f), testBody2->getMass());
-		testBody2->setInertiaTensor(boxInertia);
+		//boxInertia.setBlockInertiaTensor(elevate::Vector3(30.0f, 1.0f, 30.0f), testBody2->getMass());
+		//testBody2->setInertiaTensor(boxInertia);
 
 		cBox1 = new CollisionBox();
 		cBox1->halfSize = elevate::Vector3(30.0f, 1.0f, 30.0f);
@@ -355,8 +354,7 @@ void GameManager::update(float deltaTime)
 
 		cBox0->calculateInternals();
 		cBox1->calculateInternals();
-		cBox0->isOverlapping = false;
-		cBox1->isOverlapping = false;
+		//cBox1->isOverlapping = false;
 
 		Matrix4 box0Mat;
 		Matrix4 box1Mat;
@@ -411,28 +409,28 @@ void GameManager::update(float deltaTime)
 
 void GameManager::generateContacts()
 {
-	cData.contactArray = contacts;
 	cData.reset(256);
-	cData.friction = (real)0.2;
-	cData.restitution = (real)0.5;
-	cData.tolerance = (real)0.1;
+	cData.friction = (real)0.1;
+	cData.restitution = (real)0.9;
+	cData.tolerance = (real)0.01;
+	cData.contactArray = contacts;
 	cData.contacts = contacts;
 
-	//elevate::CollisionDetector::sphereAndSphere(*cSphere0, *cSphere1, &cData);
-	//
-	//elevate::CollisionDetector::boxAndBox(*cBox0, *cBox1, &cData);
-	//if (elevate::boxAndBoxIntersect(*cBox0, *cBox1))
-	//{
-	//	cBox0->isOverlapping = true;
-	//	cBox1->isOverlapping = true;
-	//}
+	elevate::CollisionDetector::sphereAndSphere(*cSphere0, *cSphere1, &cData);
+	
+	elevate::CollisionDetector::boxAndBox(*cBox0, *cBox1, &cData);
+	if (elevate::boxAndBoxIntersect(*cBox0, *cBox1))
+	{
+		cBox0->isOverlapping = true;
+		cBox1->isOverlapping = true;
+	}
 
-	//elevate::CollisionDetector::boxAndSphere(*cBox0, *cSphere0, &cData);
-	//elevate::CollisionDetector::boxAndSphere(*cBox1, *cSphere1, &cData);
+	elevate::CollisionDetector::boxAndSphere(*cBox0, *cSphere0, &cData);
+	elevate::CollisionDetector::boxAndSphere(*cBox1, *cSphere1, &cData);
 
 	
-	elevate::CollisionDetector::boxAndHalfSpace(*cBox0, *cPlane, &cData);
-	elevate::CollisionDetector::sphereAndHalfSpace(*cSphere1, *cPlane, &cData);
+	//elevate::CollisionDetector::boxAndHalfSpace(*cBox0, *cPlane, &cData);
+	//elevate::CollisionDetector::sphereAndHalfSpace(*cSphere1, *cPlane, &cData);
 
 	buildContactDebugLines();
 

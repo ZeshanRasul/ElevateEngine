@@ -19,6 +19,9 @@ namespace elevate {
 			, forceAccum(0.0f, 0.0f, 0.0f)
 			, torqueAccum(0.0f, 0.0f, 0.0f)
 			, isAwake(true)
+			, motion(0.0f)
+			, canSleep(true)
+			, sleepEpsilon(0.3f)
 			, lastFrameAcceleration(0.0f, 0.0f, 0.0f)
 			, transformMatrix(Matrix4()) {};
 
