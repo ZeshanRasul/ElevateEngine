@@ -27,7 +27,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	cubeShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
 	lineShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/line_vert.glsl", "C:/dev/ElevateEngine/src/Shaders/line_frag.glsl");
 
-	camera = new Camera(glm::vec3(0.0f, 5.0f, 100.0f));
+	camera = new Camera(glm::vec3(18.0f, 5.0f, 18.0f), glm::vec3(0.0f, 1.0f, 0.0f), -138.0f);
 
 	inputManager->setContext(camera, this, width, height);
 
@@ -48,165 +48,97 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-
-	if (cubeDemo)
+	if (fpsSandboxDemo)
 	{
-		elevate::Vector3 pos = { 0.0f, 10.0f, 0.0f };
-		elevate::Vector3 scale = { 3.0f, 3.0f, 3.0f };
-		cube = new Cube(pos, scale, &cubeShader, this);
-		cube->LoadMesh();
-		testBody = new RigidBody();
-		testBody->setPosition(elevate::Vector3(0.0f, 30.0f, 0.0f));
-		testBody->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
-		testBody->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		testBody->setMass(2.0f);
-		gameObjects.push_back(cube);
-		rbWorld = new World(100, 50);
-		rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f * 0.15f, 0.0f));
-		rbWorld->getForceRegistry().add(testBody, rbGravity);
-	}
+		// If you want this instead of the sphere/cube demo:
+		cubeDemo = false;
+		sphereDemo = false;
 
-	if (sphereDemo)
-	{
-		rbWorld = new World(100, 50);
+		rbWorld = new World(200, 100);
 		rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f, 0.0f));
 
-		elevate::Vector3 pos = { 30.0f, -30.0f, 0.0f };
-		elevate::Vector3 scale = { 5.0f, 5.0f, 5.0f };
-		sphere = new Sphere(pos, scale, &ammoShader, this, {0.0f, 0.8f, 0.3f});
-		sphere->GenerateSphere(2.5f, 32, 32);
-		sphere->LoadMesh();
-		sphereBody = new RigidBody();
-		sphereBody->setPosition(elevate::Vector3(30.0f, -30.0f, 0.0f));
-		sphereBody->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
-		sphereBody->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		sphereBody->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		sphereBody->setMass(1000.0f);
-		sphereBody->setAwake(true);
-		Matrix3 tensor;
-		real coeff = 0.4f * sphereBody->getMass() * 0.5f * 0.5f;
-		tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
-		sphereBody->setInertiaTensor(tensor);
-		gameObjects.push_back(sphere);
+		numEnvBoxes = 0;
+
+		// Convenience: a lambda to create a static box in the environment
+		auto addEnvBox = [&](const elevate::Vector3& pos,
+			const elevate::Vector3& scale)
+			{
+				if (numEnvBoxes >= MaxEnvBoxes) return;
+
+				Cube* cube = new Cube(pos, scale, &cubeShader, this);
+				cube->LoadMesh();
+				cube->SetAngle(0.0f);
+				cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
+				gameObjects.push_back(cube);
+
+				elevate::RigidBody* body = new elevate::RigidBody();
+				body->setAwake(false);
+				body->setPosition(pos);
+				body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+				body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+				body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+
+				body->setMass(0.0f);
+				rbWorld->addBody(body);
+
+				elevate::CollisionBox* cbox = new elevate::CollisionBox();
+				cbox->body = body;
+
+				cbox->halfSize = elevate::Vector3(
+					scale.x * 0.5f,
+					scale.y * 0.5f,
+					scale.z * 0.5f
+				);
+				cbox->isOverlapping = false;
+
+				body->calculateDerivedData();
+				cbox->calculateInternals();
+
+				envBodies[numEnvBoxes] = body;
+				envBoxes[numEnvBoxes] = cbox;
+				envCubes[numEnvBoxes] = cube;
+
+				++numEnvBoxes;
+			};
+
+		addEnvBox(
+			elevate::Vector3(0.0f, -1.0f, 0.0f),  
+			elevate::Vector3(50.0f, 1.0f, 50.0f)  
+		);
 
 
-		pos = { -20.0f, 35.0f, 20.0f };
-		scale = { 1.0f, 1.0f, 1.0f };
-		sphere2 = new Sphere(pos, scale, &cubeShader, this, {0.9f, 0.1f, 0.4f});
-		sphere2->GenerateSphere(1.5f, 32, 32);
-		sphere2->LoadMesh();
-		sphereBody2 = new RigidBody();
-		sphereBody2->setPosition(elevate::Vector3(-20.0f, 35.0f, 20.0f));
-		sphereBody2->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
-		sphereBody2->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		sphereBody2->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		sphereBody2->setMass(10.0f);
-		tensor;
-		coeff = 0.4f * sphereBody2->getMass() * 0.5f * 0.5f;
-		tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
-		sphereBody2->setInertiaTensor(tensor);
+		// +X wall
+		addEnvBox(
+			elevate::Vector3(25.0f, 3.0f, 0.0f), 
+			elevate::Vector3(1.0f, 8.0f, 50.0f)  
+		);
 
-		sphereBody2->setAwake(true);
-		gameObjects.push_back(sphere2);
-		cSphere0 = new CollisionSphere();
-		cSphere1 = new CollisionSphere();
-		cSphere0->body = sphereBody;
-		cSphere0->radius = 12.5f;
-		cSphere1->body = sphereBody2;
-		cSphere1->radius = 1.5f;
-		cSpheres[0] = cSphere0;
-		cSpheres[1] = cSphere1;
-		cSpheres[0]->body->calculateDerivedData();
-		cSpheres[1]->body->calculateDerivedData();
-		cSpheres[0]->calculateInternals();
-		cSpheres[1]->calculateInternals();
-		rbWorld->getForceRegistry().add(cSpheres[1]->body, rbGravity);
-		rbWorld->addBody(cSpheres[0]->body);
-		rbWorld->addBody(cSpheres[1]->body);
-		cSphere0->getTransform();
-		cSphere1->getTransform();
+		// -X wall
+		addEnvBox(
+			elevate::Vector3(-25.0f, 3.0f, 0.0f),
+			elevate::Vector3(1.0f, 8.0f, 50.0f)
+		);
 
-		pos = { -20.0f, 30.0f, -10.0f };
-		scale = { 4.0f, 4.0f, 4.0f };
-		cube = new Cube(pos, scale, &cubeShader, this);
-		cube->SetOrientation(glm::quat(0.9239f, 0.2706f, 0.2706f, 0.0f));
-		cube->LoadMesh();
-		gameObjects.push_back(cube);
-		testBody = new RigidBody();
-		testBody->setAwake(true);
-		testBody->setPosition(elevate::Vector3(-20.0f, 30.0f, -10.0f));
-		testBody->setOrientation(elevate::Quaternion(0.9239f, 0.2706f, 0.2706f, 0.0f));
-		testBody->setMass(10.0f);
-		tensor;
-		coeff = 0.4f * testBody->getMass() * 1.0f * 1.0f;
-		tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
-		testBody->setInertiaTensor(tensor);
+		// +Z wall
+		addEnvBox(
+			elevate::Vector3(0.0f, 3.0f, 25.0f),
+			elevate::Vector3(50.0f, 8.0f, 1.0f)
+		);
 
-		Matrix3 boxInertia;
-		//boxInertia.setBlockInertiaTensor(elevate::Vector3(2.0f, 2.0f, 2.0f), testBody->getMass());
-		//testBody->setInertiaTensor(boxInertia);
+		// -Z wall
+		addEnvBox(
+			elevate::Vector3(0.0f, 3.0f, -25.0f),
+			elevate::Vector3(50.0f, 8.0f, 1.0f)
+		);
 
-		cBox0 = new CollisionBox();
-		rbWorld->getForceRegistry().add(testBody, rbGravity);
-		rbWorld->addBody(testBody);
-		cBox0->body = testBody;
-		cBox0->halfSize = elevate::Vector3(2.0f, 2.0f, 2.0f);
-		cBox0->body->calculateDerivedData();
-		cBox0->calculateInternals();
-		cBox0->getTransform();
-
-		pos = { -20.0f, -35.0f, -10.0f };
-		scale = { 60.0f, 2.0f, 60.0f };
-
-		cube2 = new Cube(pos, scale, &cubeShader, this);
-		cube2->LoadMesh();
-		gameObjects.push_back(cube2);
-		testBody2 = new RigidBody();
-		testBody2->setAwake(true);
-		testBody2->setPosition(elevate::Vector3(-20.0f, -35.0f, -10.0f));
-		testBody2->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
-
-		testBody2->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		testBody2->setMass(100000.0f);
-		tensor;
-		coeff = 0.4f * testBody2->getMass() * 1.0f * 1.0f;
-		tensor.setInertiaTensorCoeffs(coeff, coeff, coeff);
-		testBody2->setInertiaTensor(tensor);
-
-		//boxInertia.setBlockInertiaTensor(elevate::Vector3(30.0f, 1.0f, 30.0f), testBody2->getMass());
-		//testBody2->setInertiaTensor(boxInertia);
-
-		cBox1 = new CollisionBox();
-		cBox1->halfSize = elevate::Vector3(30.0f, 1.0f, 30.0f);
-		rbWorld->addBody(testBody2);
-		cBox1->body = testBody2;
-		cBox1->body->calculateDerivedData();
-		cBox1->calculateInternals();
-		cBox1->getTransform();
-
-		pos = { 0.0f, 0.0f, 0.0f };
-		scale = { 50.0f, 1.0f, 50.0f };
-		plane = new Plane(pos, scale, &cubeShader, this);
-		plane->LoadMesh();
-		plane->SetAngle(0.0f);
-		plane->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
-		gameObjects.push_back(plane);
-		//planeBody = new RigidBody();
-		//planeBody->setAwake(true);
-		//planeBody->setPosition(elevate::Vector3(0.0f, -25.0f, 0.0f));
-		//planeBody->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
-		//planeBody->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		//planeBody->setMass(100.0f); 
-		//
-		//rbWorld->addBody(planeBody);
-		//Matrix3 planeInertia;
-		//planeInertia.setBlockInertiaTensor(elevate::Vector3(25.0f, 1.0f, 25.0f), planeBody->getMass());
-		//planeBody->setInertiaTensor(planeInertia);
-		cPlane = new CollisionPlane();
-		cPlane->direction = elevate::Vector3(0.0f, 1.0f, 0.0f);
-		cPlane->direction.normalize();
-		cPlane->offset = 0.0f;
+		// Optional: a central pillar to shoot at
+		addEnvBox(
+			elevate::Vector3(0.0f, 3.0f, 0.0f),
+			elevate::Vector3(2.0f, 6.0f, 2.0f)
+		);
 	}
+
+
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
@@ -231,12 +163,6 @@ void GameManager::showDebugUI()
 {
 	ShowLightControlWindow(dirLight);
 	ShowCameraControlWindow(*camera);
-
-	if (!showBuoyanceDemo)
-		ShowAmmoWindow();
-
-	if (showBuoyanceDemo)
-		ShowBuoyancyWindow();
 }
 
 void GameManager::renderDebugUI()
@@ -266,13 +192,7 @@ void GameManager::ShowAmmoWindow()
 
 void GameManager::ShowBuoyancyWindow()
 {
-	//ImGui::Begin("Water Height");
-	//ImGui::DragFloat("Height", &waterHeight, 0.1f, 0.0f, 100.0f);
-	 //ImGui::DragFloat("Max Depth", &maxDepth, 0.1f, 0.0f, 100.0f);
-	 //ImGui::DragFloat("Sphere Volume", &floatingSphereVolume, 0.1f, 0.0f, 100.0f);
-	 //ImGui::DragFloat("Water Density", &waterDensity, 0.1f, 0.0f, 100.0f);
-	 //ImGui::DragFloat("Sphere Mass", &floatingSphereMass, 0.1f, 0.0f, 100.0f);
-	//ImGui::End();
+
 }
 
 void GameManager::RemoveDestroyedGameObjects()
@@ -323,87 +243,12 @@ void GameManager::update(float deltaTime)
 
 	rbWorld->startFrame();
 	rbWorld->runPhysics(deltaTime);
-	//rbRegistry.updateForces(deltaTime);
 	generateContacts();
 	resolver.resolveContacts(cData.contacts, cData.contactCount, deltaTime);
 	rbWorld->startFrame();
 
 	
-	if (cubeDemo)
-	{
-		testBody->integrate(deltaTime);
-		cube->SetPosition(testBody->getPosition());
-	}
 
-	if (sphereDemo)
-	{
-	
-		//cSpheres[0]->body->integrate(deltaTime);
-		//cSpheres[1]->body->integrate(deltaTime);
-	//	sphere2->SetPosition(sphereBody2->getPosition());
-		Matrix4 sphere1Mat;
-		Matrix4 sphere0Mat;
-		//cSphere1.body->getGLTransformMatrix(sphere1Mat);
-		//cSphere0->body->calculateDerivedData();
-		//cSphere1->body->calculateDerivedData();
-		cSpheres[0]->calculateInternals();
-		cSpheres[1]->calculateInternals();
-		
-		//cBox0->body->calculateDerivedData();
-		//cBox1->body->calculateDerivedData();
-
-		cBox0->calculateInternals();
-		cBox1->calculateInternals();
-		//cBox1->isOverlapping = false;
-
-		Matrix4 box0Mat;
-		Matrix4 box1Mat;
-
-		box0Mat = cBox0->body->getTransform();
-		elevate::Vector3 box0Pos = box0Mat.getAxisVector(3);
-		float rotMat[12] = {
-			box0Mat.data[0], box0Mat.data[1], box0Mat.data[2],
-			box0Mat.data[4], box0Mat.data[5], box0Mat.data[6],
-			box0Mat.data[8], box0Mat.data[9], box0Mat.data[10]			
-		};
-		glm::mat3 rot = glm::make_mat3(rotMat);
-		cube->SetOrientation(glm::quat(
-			(float)cBox0->body->getOrientation().r,
-			(float)cBox0->body->getOrientation().i,
-			(float)cBox0->body->getOrientation().j,
-			(float)cBox0->body->getOrientation().k));
-	//	cube->SetRotationMatrix(glm::mat4(rot));
-		cube->SetPosition(box0Pos);
-		box1Mat = cBox1->body->getTransform();
-		Matrix4 box1MatBackup = box1Mat;
-		elevate::Vector3 box1Pos = box1MatBackup.getAxisVector(3);
-		cube2->SetPosition(box1Pos);
-
-		
-		float rotMat1[12] = {
-			box1Mat.data[0], box1Mat.data[1], box1Mat.data[2],
-	
-			box1Mat.data[4], box1Mat.data[5], box1Mat.data[6],
-			box1Mat.data[8], box1Mat.data[9], box1Mat.data[10]
-		};
-		glm::mat3 rot1 = glm::make_mat3(rotMat1);
-		cube2->SetOrientation(glm::quat(
-			(float)cBox1->body->getOrientation().r,
-			(float)cBox1->body->getOrientation().i,
-			(float)cBox1->body->getOrientation().j,
-			(float)cBox1->body->getOrientation().k));
-
-		sphere1Mat = cSphere1->body->getTransform();
-		elevate::Vector3 newPos = sphere1Mat.getAxisVector(3);
-		sphere2->SetPosition(newPos);
-	
-		sphere0Mat = cSphere0->body->getTransform();
-		newPos = sphere0Mat.getAxisVector(3);
-		sphere->SetPosition(newPos);
-	}
-
-
-	//rbWorld->generateContacts();
 
 }
 
@@ -415,22 +260,6 @@ void GameManager::generateContacts()
 	cData.tolerance = (real)0.01;
 	cData.contactArray = contacts;
 	cData.contacts = contacts;
-
-	elevate::CollisionDetector::sphereAndSphere(*cSphere0, *cSphere1, &cData);
-	
-	elevate::CollisionDetector::boxAndBox(*cBox0, *cBox1, &cData);
-	if (elevate::boxAndBoxIntersect(*cBox0, *cBox1))
-	{
-		cBox0->isOverlapping = true;
-		cBox1->isOverlapping = true;
-	}
-
-	elevate::CollisionDetector::boxAndSphere(*cBox0, *cSphere0, &cData);
-	elevate::CollisionDetector::boxAndSphere(*cBox1, *cSphere1, &cData);
-
-	
-	//elevate::CollisionDetector::boxAndHalfSpace(*cBox0, *cPlane, &cData);
-	//elevate::CollisionDetector::sphereAndHalfSpace(*cSphere1, *cPlane, &cData);
 
 	buildContactDebugLines();
 

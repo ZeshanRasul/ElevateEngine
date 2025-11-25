@@ -162,6 +162,16 @@ private:
 
     void generateContacts();
 
+    bool fpsSandboxDemo = true; 
+
+    static const int MaxEnvBoxes = 8;
+    int               numEnvBoxes = 8;
+
+    elevate::CollisionBox* envBoxes[MaxEnvBoxes];
+    elevate::RigidBody* envBodies[MaxEnvBoxes];
+    Cube* envCubes[MaxEnvBoxes];
+
+
     std::vector<DebugLine> m_DebugLines;
     GLuint m_DebugLineVAO = 0;
     GLuint m_DebugLineVBO = 0;
