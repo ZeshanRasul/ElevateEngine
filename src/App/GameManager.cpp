@@ -111,13 +111,13 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		pos = { 30.0f, 30.0f, 0.0f };
 		scale = { 2.0f, 2.0f, 2.0f };
 		cube = new Cube(pos, scale, &cubeShader, this);
-		cube->SetOrientation(glm::quat(0.2706f, 0.2706f, 0.0f, 0.9239f));
+		cube->SetOrientation(glm::quat(0.9239f, 0.2706f, 0.2706f, 0.0f));
 		cube->LoadMesh();
 		gameObjects.push_back(cube);
 		testBody = new RigidBody();
 		testBody->setAwake(true);
 		testBody->setPosition(elevate::Vector3(30.0f, 30.0f, 0.0f));
-		testBody->setOrientation(elevate::Quaternion(0.2706f, 0.2706f, 0.0f, 0.9239f));
+		testBody->setOrientation(elevate::Quaternion(0.9239f, 0.2706f, 0.2706f, 0.0f));
 		cube->SetAngle(45.0f);
 		cube->SetRotAxis(Vector3(0.7071f, 0.7071f, 0.0f));
 		testBody->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
@@ -128,7 +128,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		//testBody->setInertiaTensor(tensor);
 
 		Matrix3 boxInertia;
-		boxInertia.setBlockInertiaTensor(elevate::Vector3(2.0f, 2.0f, 2.0f), testBody->getMass());
+		boxInertia.setBlockInertiaTensor(elevate::Vector3(1.0f, 1.0f, 1.0f), testBody->getMass());
 		testBody->setInertiaTensor(boxInertia);
 
 		cBox0 = new CollisionBox();
@@ -191,6 +191,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		//planeBody->setInertiaTensor(planeInertia);
 		cPlane = new CollisionPlane();
 		cPlane->direction = elevate::Vector3(0.0f, 1.0f, 0.0f);
+		cPlane->direction.normalize();
 		cPlane->offset = 0.0f;
 	}
 }
@@ -330,11 +331,14 @@ void GameManager::update(float deltaTime)
 		Matrix4 sphere1Mat;
 		Matrix4 sphere0Mat;
 		//cSphere1.body->getGLTransformMatrix(sphere1Mat);
-		//cSphere0->body->calculateDerivedData();
-		//cSphere1->body->calculateDerivedData();
+		cSphere0->body->calculateDerivedData();
+		cSphere1->body->calculateDerivedData();
 		cSpheres[0]->calculateInternals();
 		cSpheres[1]->calculateInternals();
 		
+		cBox0->body->calculateDerivedData();
+		cBox1->body->calculateDerivedData();
+
 		cBox0->calculateInternals();
 		cBox1->calculateInternals();
 		cBox0->isOverlapping = false;
@@ -353,10 +357,10 @@ void GameManager::update(float deltaTime)
 		};
 		glm::mat3 rot = glm::make_mat3(rotMat);
 		cube->SetOrientation(glm::quat(
-			cBox0->body->getOrientation().r,
-			cBox0->body->getOrientation().i,
-			cBox0->body->getOrientation().j,
-			cBox0->body->getOrientation().k));
+			(float)cBox0->body->getOrientation().i,
+			(float)cBox0->body->getOrientation().j,
+			(float)cBox0->body->getOrientation().k,
+			(float)cBox0->body->getOrientation().r));
 	//	cube->SetRotationMatrix(glm::mat4(rot));
 		box1Mat = cBox1->body->getTransform();
 		Matrix4 box1MatBackup = box1Mat;
@@ -372,10 +376,10 @@ void GameManager::update(float deltaTime)
 		};
 		glm::mat3 rot1 = glm::make_mat3(rotMat1);
 		cube2->SetOrientation(glm::quat(
-			cBox1->body->getOrientation().r,
-			cBox1->body->getOrientation().i,
-			cBox1->body->getOrientation().j,
-			cBox1->body->getOrientation().k));
+			(float)cBox1->body->getOrientation().i,
+			(float)cBox1->body->getOrientation().j,
+			(float)cBox1->body->getOrientation().k,
+			(float)cBox1->body->getOrientation().r));
 
 		sphere1Mat = cSphere1->body->getTransform();
 		elevate::Vector3 newPos = sphere1Mat.getAxisVector(3);
@@ -394,9 +398,9 @@ void GameManager::update(float deltaTime)
 void GameManager::generateContacts()
 {
 	cData.reset(256);
-	cData.friction = (real)0.2;
-	cData.restitution = (real)0.6;
-	cData.tolerance = (real)0.1;
+	cData.friction = (real)0.9;
+	cData.restitution = (real)0.2;
+	cData.tolerance = (real)0.005;
 	cData.contactArray = contacts;
 	cData.contacts = contacts;
 

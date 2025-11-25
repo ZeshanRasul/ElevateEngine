@@ -171,8 +171,26 @@ namespace elevate {
 
 		position.addScaledVector(velocity, duration);
 		orientation.addScaledVector(rotation, duration);
+		orientation.normalise();
+		clearAccumulator();
 		calculateDerivedData();
 
-		clearAccumulator();
+
+		if (canSleep)
+		{
+			real currentMotion = velocity.scalarProduct(velocity) + rotation.scalarProduct(rotation);
+
+			real bias = real_pow(0.5f, duration);
+			motion = bias * motion + (1 - bias) * currentMotion;
+			
+			if (motion < sleepEpsilon)
+			{
+				setAwake(false);
+			}
+			else if (motion > 10 * sleepEpsilon)
+			{
+				motion = 10 * sleepEpsilon;
+			}
+		}
 	};
 }

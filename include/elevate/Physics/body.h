@@ -121,7 +121,10 @@ namespace elevate {
 		Vector3 forceAccum;
 		Vector3 torqueAccum;
 
-		bool isAwake;
+		bool isAwake = true;
+		real motion = 0.0f;
+		bool canSleep = true;
+		real sleepEpsilon = 0.3f;
 
 		Vector3 lastFrameAcceleration;
 

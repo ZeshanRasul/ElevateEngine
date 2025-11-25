@@ -73,6 +73,8 @@ namespace elevate {
 	class ContactResolver
 	{
 	public:
+		ContactResolver() = default;
+
 		void resolveContacts(Contact* contactArray, unsigned numContacts, real duration);
 
 		void prepareContacts(Contact* contactArray, unsigned numContacts, real duration);

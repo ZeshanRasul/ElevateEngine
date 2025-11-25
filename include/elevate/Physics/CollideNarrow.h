@@ -262,6 +262,8 @@ namespace elevate {
 		{
 			if (data->contactsLeft <= 0) return 0;
 
+			const real allowedPenetration = (real)0.01f;
+
 			if (!boxAndHalfSpaceIntersect(box, plane))
 			{
 				return 0;
@@ -272,21 +274,39 @@ namespace elevate {
 
 			Contact* contact = data->contacts;
 			unsigned contactsUsed = 0;
+
+			Vector3 n = plane.direction;
+			n.normalize();
+
 			for (unsigned i = 0; i < 8; i++) {
 
 				Vector3 vertexPos(mults[i][0], mults[i][1], mults[i][2]);
+				
+				
+				
+				
 				vertexPos.componentProductUpdate(box.halfSize);
 				vertexPos = box.transform.transform(vertexPos);
 
-				real vertexDistance = vertexPos * plane.direction;
+				real vertexDistance = vertexPos * n;
 
 				if (vertexDistance <= plane.offset)
 				{
-					contact->contactPoint = plane.direction;
-					contact->contactPoint *= (vertexDistance - plane.offset);
-					contact->contactPoint += vertexPos;
-					contact->contactNormal = plane.direction;
-					contact->penetration = plane.offset - vertexDistance;
+					real penetration = plane.offset - vertexDistance;
+
+					if (penetration < (real)0) continue;
+
+					if (penetration <= 0) continue;
+					
+					contact->contactNormal = n;
+					contact->penetration = penetration;
+
+					contact->contactPoint = vertexPos;
+					contact->contactPoint.addScaledVector(n, penetration);
+					//contact->contactPoint *= (vertexDistance - plane.offset);
+					//contact->contactPoint += vertexPos;
+					
+					
 
 					contact->setBodyData(box.body, NULL,
 						data->friction, data->restitution);

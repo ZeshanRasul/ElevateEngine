@@ -13,25 +13,33 @@ void elevate::Contact::calculateDesiredDeltaVelocity(real duration)
 {
 	const static real velocityLimit = (real)0.25f;
 
-	real velocityFromAcc = 0;
+	// 1) Current separating velocity along the contact normal (in contact space x)
+	real separatingVelocity = contactVelocity.x;
 
-	if (body[0]->getAwake())
+	// 2) Velocity that will be caused along the normal by acceleration (e.g. gravity)
+	real accCausedVelocity = 0.0f;
+
+	if (body[0])
 	{
-		velocityFromAcc += body[0]->getLastFrameAcceleration() * duration * contactNormal;
+		accCausedVelocity += body[0]->getLastFrameAcceleration().scalarProduct(contactNormal) * duration;
 	}
 
-	if (body[1] && body[1]->getAwake())
+	if (body[1])
 	{
-		velocityFromAcc -= body[1]->getLastFrameAcceleration() * duration * contactNormal;
+		accCausedVelocity -= body[1]->getLastFrameAcceleration().scalarProduct(contactNormal) * duration;
 	}
 
+	// 3) Possibly remove restitution for resting contacts
 	real thisRestitution = restitution;
-	if (real_abs(contactVelocity.x) < velocityLimit)
+	if (real_abs(separatingVelocity) < velocityLimit)
 	{
 		thisRestitution = (real)0.0f;
 	}
 
-	desiredDeltaVelocity = -contactVelocity.x - thisRestitution * (contactVelocity.x - velocityFromAcc);
+	// 4) Desired change in separating velocity
+	//    (this is straight from Millington)
+	desiredDeltaVelocity =
+		-separatingVelocity - thisRestitution * (separatingVelocity - accCausedVelocity);
 }
 
 
@@ -421,6 +429,11 @@ void elevate::ContactResolver::adjustPositions(Contact* c, unsigned numContacts,
 			{
 				max = c[i].penetration;
 				index = i;
+				//const real allowedPen = 0.01f;
+				max = c[i].penetration;
+				//real usedPen = max - allowedPen;
+				//if (usedPen < 0.0) max = 0.0f;
+				//max = usedPen;
 			}
 		}
 		if (index == numContacts) break;
