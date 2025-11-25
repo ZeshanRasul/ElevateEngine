@@ -72,13 +72,13 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		gameObjects.push_back(sphere);
 
 
-		pos = { -20.0f, 5.0f, -10.0f };
+		pos = { -20.0f, 35.0f, -10.0f };
 		scale = { 1.0f, 1.0f, 1.0f };
 		sphere2 = new Sphere(pos, scale, &cubeShader, this, {0.9f, 0.1f, 0.4f});
 		sphere2->GenerateSphere(1.5f, 32, 32);
 		sphere2->LoadMesh();
 		sphereBody2 = new RigidBody();
-		sphereBody2->setPosition(elevate::Vector3(-20.0f, 5.0f, -10.0f));
+		sphereBody2->setPosition(elevate::Vector3(-20.0f, 35.0f, -10.0f));
 		sphereBody2->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 		sphereBody2->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 		sphereBody2->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
@@ -414,6 +414,7 @@ void GameManager::generateContacts()
 	elevate::CollisionDetector::boxAndSphere(*cBox1, *cSphere1, &cData);
 
 	elevate::CollisionDetector::boxAndHalfSpace(*cBox0, *cPlane, &cData);
+	elevate::CollisionDetector::sphereAndHalfSpace(*cSphere1, *cPlane, &cData);
 }
 
 void GameManager::render()

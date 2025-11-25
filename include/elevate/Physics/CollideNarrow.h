@@ -228,6 +228,20 @@ namespace elevate {
 		}
 	}
 
+	static bool sphereAndHalfSpace(
+		const CollisionSphere& sphere,
+		const CollisionPlane& plane)
+	{
+		// Find the distance from the origin
+		real ballDistance =
+			plane.direction *
+			sphere.getAxis(3) -
+			sphere.radius;
+
+		// Check for the intersection
+		return ballDistance <= plane.offset;
+	}
+
 	static bool boxAndHalfSpaceIntersect(const CollisionBox& box, const CollisionPlane& plane)
 	{
 		real projectedRadius = transformToAxis(box, plane.direction);
@@ -287,6 +301,85 @@ namespace elevate {
 				}
 			}
 		};
+		static unsigned sphereAndHalfSpace(
+			const CollisionSphere& sphere,
+			const CollisionPlane& plane,
+			CollisionData* data
+		)
+		{
+			// Make sure we have contacts
+			if (data->contactsLeft <= 0) return 0;
+
+			// Cache the sphere position
+			Vector3 position = sphere.getAxis(3);
+
+			// Find the distance from the plane
+			real ballDistance =
+				plane.direction * position -
+				sphere.radius - plane.offset;
+
+			if (ballDistance >= 0) return 0;
+
+			// Create the contact - it has a normal in the plane direction.
+			Contact* contact = data->contacts;
+			contact->contactNormal = plane.direction;
+			contact->penetration = -ballDistance;
+			contact->contactPoint =
+				position - plane.direction * (ballDistance + sphere.radius);
+			contact->setBodyData(sphere.body, NULL,
+				data->friction, data->restitution);
+
+			data->addContacts(1);
+			data->contacts[data->contactCount - 1] = *contact;
+			data->contactArray[data->contactCount - 1] = *contact;
+
+			return 1;
+		}
+		static unsigned sphereAndTruePlane(
+			const CollisionSphere& sphere,
+			const CollisionPlane& plane,
+			CollisionData* data
+		)
+		{
+			// Make sure we have contacts
+			if (data->contactsLeft <= 0) return 0;
+
+			// Cache the sphere position
+			Vector3 position = sphere.getAxis(3);
+
+			// Find the distance from the plane
+			real centreDistance = plane.direction * position - plane.offset;
+
+			// Check if we're within radius
+			if (centreDistance * centreDistance > sphere.radius * sphere.radius)
+			{
+				return 0;
+			}
+
+			// Check which side of the plane we're on
+			Vector3 normal = plane.direction;
+			real penetration = -centreDistance;
+			if (centreDistance < 0)
+			{
+				normal *= -1;
+				penetration = -penetration;
+			}
+			penetration += sphere.radius;
+
+			// Create the contact - it has a normal in the plane direction.
+			Contact* contact = data->contacts;
+			contact->contactNormal = normal;
+			contact->penetration = penetration;
+			contact->contactPoint = position - plane.direction * centreDistance;
+			contact->setBodyData(sphere.body, NULL,
+				data->friction, data->restitution);
+
+			data->addContacts(1);
+			data->contacts[data->contactCount - 1] = *contact;
+			data->contactArray[data->contactCount - 1] = *contact;
+
+			return 1;
+		}
 
 		static unsigned sphereAndSphere(CollisionSphere& one, CollisionSphere& two, CollisionData* data)
 		{
