@@ -27,7 +27,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	cubeShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
 	lineShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/line_vert.glsl", "C:/dev/ElevateEngine/src/Shaders/line_frag.glsl");
 
-	camera = new Camera(glm::vec3(0.0f, 5.0f, 100.0f));
+	camera = new Camera(glm::vec3(0.0f, 5.0f, 40.0f));
 
 	inputManager->setContext(camera, this, width, height);
 
@@ -65,14 +65,14 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		cPlane = new elevate::CollisionPlane();
 		cPlane->direction = elevate::Vector3(0.0f, 1.0f, 0.0f);
 		cPlane->direction.normalize();
-		cPlane->offset = 0.75f; // plane at y = 0
+		cPlane->offset = 0.0f; // plane at y = 0
 
 		numStackCubes = 3; // choose 3–5 for testing
 
 		elevate::Vector3 cubeHalfSize(1.0f, 1.0f, 1.0f);
 		glm::vec3       renderScale(2.0f, 2.0f, 2.0f);
 
-		for (int i = 0; i < numStackCubes; ++i)
+		for (int i = 0; i < numStackCubes; i++)
 		{
 			float centerY = 2.1f + i * 2.1f;
 
@@ -510,6 +510,10 @@ void GameManager::generateContacts()
 		for (int i = 0; i < numStackCubes; ++i)
 		{
 			elevate::CollisionDetector::boxAndHalfSpace(*cStackBoxes[i], *cPlane, &cData);
+			if (elevate::boxAndHalfSpaceIntersect(*cStackBoxes[i], *cPlane))
+			{
+				cStackBoxes[i]->isOverlapping = true;
+			}
 		}
 
 		for (int i = 0; i < numStackCubes; ++i)
@@ -525,6 +529,7 @@ void GameManager::generateContacts()
 	}
 	else if (sphereDemo)
 	{
+		elevate::CollisionDetector::boxAndHalfSpace(*cBox0, *cPlane, &cData);
 		elevate::CollisionDetector::sphereAndSphere(*cSphere0, *cSphere1, &cData);
 		elevate::CollisionDetector::boxAndBox(*cBox0, *cBox1, &cData);
 
@@ -536,7 +541,6 @@ void GameManager::generateContacts()
 
 		elevate::CollisionDetector::boxAndSphere(*cBox0, *cSphere0, &cData);
 		elevate::CollisionDetector::boxAndSphere(*cBox1, *cSphere1, &cData);
-		elevate::CollisionDetector::boxAndHalfSpace(*cBox0, *cPlane, &cData);
 		elevate::CollisionDetector::sphereAndHalfSpace(*cSphere1, *cPlane, &cData);
 
 		buildContactDebugLines();
