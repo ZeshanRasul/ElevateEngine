@@ -254,6 +254,8 @@ namespace elevate {
 	class CollisionDetector
 	{
 	public:
+
+		// Replace existing boxAndHalfSpace inside CollisionDetector
 		static unsigned boxAndHalfSpace(
 			const CollisionBox& box,
 			const CollisionPlane& plane,
@@ -262,60 +264,113 @@ namespace elevate {
 		{
 			if (data->contactsLeft <= 0) return 0;
 
-			// Half-space test (plane normal points OUT of the solid region).
-			// We treat the solid region as: n · p <= offset
-			if (!boxAndHalfSpaceIntersect(box, plane))
-			{
-				return 0;
-			}
-
-			static real mults[8][3] = {
-				{1,1,1},{-1,1,1},{1,-1,1},{-1,-1,1},
-				{1,1,-1},{-1,1,-1},{1,-1,-1},{-1,-1,-1}
-			};
-
-			Contact* contact = data->contacts;
-			unsigned contactsUsed = 0;
-
+			// Plane half-space assumed: n · p <= offset (your current convention).
+			// We only create a contact if any part of box penetrates: distanceAlongNormal - boxExtent < offset.
 			Vector3 n = plane.direction;
 			n.normalize();
 
-			for (unsigned i = 0; i < 8 && contactsUsed < (unsigned)data->contactsLeft; ++i)
-			{
-				Vector3 vertexPos(mults[i][0], mults[i][1], mults[i][2]);
-				vertexPos.componentProductUpdate(box.halfSize);
-				vertexPos = box.getTransform().transform(vertexPos);
+			// Project box center onto plane normal.
+			Vector3 boxCenter = box.getAxis(3);
+			real centerDistance = n * boxCenter;
 
-				// Distance of vertex from plane
-				real vertexDistance = vertexPos * n;
+			// Extent of box along plane normal.
+			real radius =
+				box.halfSize.x * real_abs(n * box.getAxis(0)) +
+				box.halfSize.y * real_abs(n * box.getAxis(1)) +
+				box.halfSize.z * real_abs(n * box.getAxis(2));
 
-				// Penetration if vertex is inside solid half-space (below plane when n=(0,1,0))
-				if (vertexDistance <= plane.offset)
-				{
-					real penetration = plane.offset - vertexDistance;
-					if (penetration <= (real)0) continue;
+			// Penetration (positive means penetrating under plane).
+			// Using current convention (solid region below plane): penetration occurs if (centerDistance - radius) <= plane.offset
+			real distanceOfLowestPoint = centerDistance - radius;
+			real penetration = plane.offset - distanceOfLowestPoint;
 
-					// Contact normal points from plane towards box (i.e. push box out of plane)
-					contact->contactNormal = n;
-					contact->penetration = penetration;
+			if (penetration <= (real)0) return 0; // not inside
 
-					// Move contact point up to plane
-					contact->contactPoint = vertexPos;
-					contact->contactPoint.addScaledVector(n, penetration);
+			// Penetration slop to reduce jitter
+			const real slop = (real)0.01;
+			if (penetration < slop) penetration = (real)0; // ignore tiny penetrations
 
-					contact->setBodyData(box.body, nullptr, data->friction, data->restitution);
+			Contact* contact = data->contacts;
+			contact->contactNormal = n; // Upwards push
+			contact->penetration = penetration;
 
-					// Commit
-					data->addContacts(1);
-					data->contacts[data->contactCount - 1] = *contact;
-					data->contactArray[data->contactCount - 1] = *contact;
+			// Contact point: project center down to plane then move up slightly (average of bottom face).
+			// Bottom face center in world:
+			Vector3 contactPoint = boxCenter;
+			contactPoint.addScaledVector(n, (plane.offset - centerDistance)); // move along normal so that n·point == offset
+			contact->contactPoint = contactPoint;
 
-					++contact;
-					++contactsUsed;
-				}
-			}
-			return contactsUsed;
+			contact->setBodyData(box.body, nullptr, data->friction, data->restitution);
+
+			data->addContacts(1);
+			data->contacts[data->contactCount - 1] = *contact;
+			data->contactArray[data->contactCount - 1] = *contact;
+
+			return 1;
 		}
+
+		//static unsigned boxAndHalfSpace(
+		//	const CollisionBox& box,
+		//	const CollisionPlane& plane,
+		//	CollisionData* data
+		//)
+		//{
+		//	if (data->contactsLeft <= 0) return 0;
+
+		//	// Half-space test (plane normal points OUT of the solid region).
+		//	// We treat the solid region as: n · p <= offset
+		//	if (!boxAndHalfSpaceIntersect(box, plane))
+		//	{
+		//		return 0;
+		//	}
+
+		//	static real mults[8][3] = {
+		//		{1,1,1},{-1,1,1},{1,-1,1},{-1,-1,1},
+		//		{1,1,-1},{-1,1,-1},{1,-1,-1},{-1,-1,-1}
+		//	};
+
+		//	Contact* contact = data->contacts;
+		//	unsigned contactsUsed = 0;
+
+		//	Vector3 n = plane.direction;
+		//	n.normalize();
+
+		//	for (unsigned i = 0; i < 8 && contactsUsed < (unsigned)data->contactsLeft; ++i)
+		//	{
+		//		Vector3 vertexPos(mults[i][0], mults[i][1], mults[i][2]);
+		//		vertexPos.componentProductUpdate(box.halfSize);
+		//		vertexPos = box.getTransform().transform(vertexPos);
+
+		//		// Distance of vertex from plane
+		//		real vertexDistance = vertexPos * n;
+
+		//		// Penetration if vertex is inside solid half-space (below plane when n=(0,1,0))
+		//		if (vertexDistance <= plane.offset)
+		//		{
+		//			real penetration = plane.offset - vertexDistance;
+		//			if (penetration <= (real)0) continue;
+
+		//			// Contact normal points from plane towards box (i.e. push box out of plane)
+		//			contact->contactNormal = n;
+		//			contact->penetration = penetration;
+
+		//			// Move contact point up to plane
+		//			contact->contactPoint = vertexPos;
+		//			contact->contactPoint.addScaledVector(n, penetration);
+
+		//			contact->setBodyData(box.body, nullptr, data->friction, data->restitution);
+
+		//			// Commit
+		//			data->addContacts(1);
+		//			data->contacts[data->contactCount - 1] = *contact;
+		//			data->contactArray[data->contactCount - 1] = *contact;
+
+		//			++contact;
+		//			++contactsUsed;
+		//		}
+		//	}
+		//	return contactsUsed;
+		//}
 
 
 		static unsigned sphereAndHalfSpace(

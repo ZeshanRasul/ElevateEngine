@@ -57,10 +57,6 @@ void World::runPhysics(real duration)
 	//unsigned usedContacts = generateContacts();
 	//
 	//resolver.resolveContacts(contacts, usedContacts, duration);
-	for (RigidBodies::iterator p = bodies.begin(); p != bodies.end(); p++)
-	{
-		(*p)->clearAccumulator();
-		(*p)->calculateDerivedData();
-	}
+
 
 }
