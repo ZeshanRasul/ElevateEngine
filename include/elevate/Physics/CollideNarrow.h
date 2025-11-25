@@ -281,10 +281,6 @@ namespace elevate {
 			for (unsigned i = 0; i < 8; i++) {
 
 				Vector3 vertexPos(mults[i][0], mults[i][1], mults[i][2]);
-
-
-
-
 				vertexPos.componentProductUpdate(box.halfSize);
 				vertexPos = box.getTransform().transform(vertexPos);
 
