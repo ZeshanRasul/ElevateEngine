@@ -142,13 +142,23 @@ private:
 	ForceRegistry rbRegistry;
 	Gravity* rbGravity;
 
-	bool sphereDemo = true;
+	bool sphereDemo = false;
 	Sphere* sphere = nullptr;
 	Sphere* sphere2 = nullptr;
 	elevate::RigidBody* sphereBody = nullptr;
 	elevate::RigidBody* sphereBody2 = nullptr;
 
     elevate::RigidBody* planeBody = nullptr;
+
+    static const int MaxStackCubes = 5;
+
+    elevate::CollisionBox* cStackBoxes[MaxStackCubes];
+    elevate::RigidBody* stackBodies[MaxStackCubes];
+    Cube* stackCubes[MaxStackCubes];
+    int                    numStackCubes = 0;
+
+    bool stackDemo = true;
+
 
     elevate::Contact contacts[256];
     elevate::CollisionData cData;

@@ -48,6 +48,76 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	if (stackDemo)
+	{
+		rbWorld = new World(200, 100);
+		rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f * 0.25, 0.0f));
+
+		elevate::Vector3 planePos = { 0.0f, 0.0f, 0.0f };
+		elevate::Vector3 planeScale = { 50.0f, 1.0f, 50.0f };
+
+		plane = new Plane(planePos, planeScale, &cubeShader, this);
+		plane->LoadMesh();
+		plane->SetAngle(0.0f);
+		plane->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
+		gameObjects.push_back(plane);
+
+		cPlane = new elevate::CollisionPlane();
+		cPlane->direction = elevate::Vector3(0.0f, 1.0f, 0.0f);
+		cPlane->direction.normalize();
+		cPlane->offset = 0.5f; // plane at y = 0
+
+		numStackCubes = 3; // choose 3–5 for testing
+
+		elevate::Vector3 cubeHalfSize(1.0f, 1.0f, 1.0f);
+		glm::vec3       renderScale(2.0f, 2.0f, 2.0f);
+
+		for (int i = 0; i < numStackCubes; ++i)
+		{
+			float centerY = 4.1f + i * 2.1f;
+
+			elevate::Vector3 pos(0.0f, centerY, 0.0f);
+			elevate::Vector3 scale(renderScale.x, renderScale.y, renderScale.z);
+
+			// Render cube
+			Cube* cube = new Cube(pos, scale, &cubeShader, this);
+			cube->LoadMesh();
+			cube->SetAngle(0.0f);
+			cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
+			gameObjects.push_back(cube);
+			stackCubes[i] = cube;
+
+			// Physics body
+			elevate::RigidBody* body = new elevate::RigidBody();
+			body->setAwake(true);
+			body->setPosition(pos);
+			body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+			body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+			body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+
+			real mass = 0.2f;
+			body->setMass(mass);
+
+			elevate::Matrix3 boxInertia;
+			boxInertia.setBlockInertiaTensor(cubeHalfSize, mass);
+			body->setInertiaTensor(boxInertia);
+
+			rbWorld->addBody(body);
+			rbGravity->updateForce(body, 0); // or via registry below
+
+			rbWorld->getForceRegistry().add(body, rbGravity);
+
+			stackBodies[i] = body;
+
+			// Collision box
+			elevate::CollisionBox* cBox = new elevate::CollisionBox();
+			cBox->body = body;
+			cBox->halfSize = cubeHalfSize;
+			cBox->body->calculateDerivedData();
+			cBox->calculateInternals();
+			cStackBoxes[i] = cBox;
+		}
+	}
 
 	if (cubeDemo)
 	{
@@ -73,7 +143,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 		elevate::Vector3 pos = { 30.0f, -30.0f, 0.0f };
 		elevate::Vector3 scale = { 5.0f, 5.0f, 5.0f };
-		sphere = new Sphere(pos, scale, &ammoShader, this, {0.0f, 0.8f, 0.3f});
+		sphere = new Sphere(pos, scale, &ammoShader, this, { 0.0f, 0.8f, 0.3f });
 		sphere->GenerateSphere(2.5f, 32, 32);
 		sphere->LoadMesh();
 		sphereBody = new RigidBody();
@@ -92,7 +162,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 		pos = { -20.0f, 35.0f, 20.0f };
 		scale = { 1.0f, 1.0f, 1.0f };
-		sphere2 = new Sphere(pos, scale, &cubeShader, this, {0.9f, 0.1f, 0.4f});
+		sphere2 = new Sphere(pos, scale, &cubeShader, this, { 0.9f, 0.1f, 0.4f });
 		sphere2->GenerateSphere(1.5f, 32, 32);
 		sphere2->LoadMesh();
 		sphereBody2 = new RigidBody();
@@ -205,7 +275,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		cPlane = new CollisionPlane();
 		cPlane->direction = elevate::Vector3(0.0f, 1.0f, 0.0f);
 		cPlane->direction.normalize();
-		cPlane->offset = 0.0f;
+		cPlane->offset = 0.5f;
 	}
 }
 
@@ -327,8 +397,26 @@ void GameManager::update(float deltaTime)
 	generateContacts();
 	resolver.resolveContacts(cData.contacts, cData.contactCount, deltaTime);
 	rbWorld->startFrame();
+	if (stackDemo)
+	{
+		for (int i = 0; i < numStackCubes; ++i)
+		{
+			stackBodies[i]->calculateDerivedData();
+			cStackBoxes[i]->calculateInternals();
 
-	
+			elevate::Matrix4 t = stackBodies[i]->getTransform();
+			elevate::Vector3 p = t.getAxisVector(3);
+
+			stackCubes[i]->SetPosition(p);
+			stackCubes[i]->SetOrientation(glm::quat(
+				(float)stackBodies[i]->getOrientation().r,
+				(float)stackBodies[i]->getOrientation().i,
+				(float)stackBodies[i]->getOrientation().j,
+				(float)stackBodies[i]->getOrientation().k));
+		}
+	}
+
+
 	if (cubeDemo)
 	{
 		testBody->integrate(deltaTime);
@@ -337,7 +425,7 @@ void GameManager::update(float deltaTime)
 
 	if (sphereDemo)
 	{
-	
+
 		//cSpheres[0]->body->integrate(deltaTime);
 		//cSpheres[1]->body->integrate(deltaTime);
 	//	sphere2->SetPosition(sphereBody2->getPosition());
@@ -348,7 +436,7 @@ void GameManager::update(float deltaTime)
 		//cSphere1->body->calculateDerivedData();
 		cSpheres[0]->calculateInternals();
 		cSpheres[1]->calculateInternals();
-		
+
 		//cBox0->body->calculateDerivedData();
 		//cBox1->body->calculateDerivedData();
 
@@ -364,7 +452,7 @@ void GameManager::update(float deltaTime)
 		float rotMat[12] = {
 			box0Mat.data[0], box0Mat.data[1], box0Mat.data[2],
 			box0Mat.data[4], box0Mat.data[5], box0Mat.data[6],
-			box0Mat.data[8], box0Mat.data[9], box0Mat.data[10]			
+			box0Mat.data[8], box0Mat.data[9], box0Mat.data[10]
 		};
 		glm::mat3 rot = glm::make_mat3(rotMat);
 		cube->SetOrientation(glm::quat(
@@ -372,17 +460,17 @@ void GameManager::update(float deltaTime)
 			(float)cBox0->body->getOrientation().i,
 			(float)cBox0->body->getOrientation().j,
 			(float)cBox0->body->getOrientation().k));
-	//	cube->SetRotationMatrix(glm::mat4(rot));
+		//	cube->SetRotationMatrix(glm::mat4(rot));
 		cube->SetPosition(box0Pos);
 		box1Mat = cBox1->body->getTransform();
 		Matrix4 box1MatBackup = box1Mat;
 		elevate::Vector3 box1Pos = box1MatBackup.getAxisVector(3);
 		cube2->SetPosition(box1Pos);
 
-		
+
 		float rotMat1[12] = {
 			box1Mat.data[0], box1Mat.data[1], box1Mat.data[2],
-	
+
 			box1Mat.data[4], box1Mat.data[5], box1Mat.data[6],
 			box1Mat.data[8], box1Mat.data[9], box1Mat.data[10]
 		};
@@ -396,7 +484,7 @@ void GameManager::update(float deltaTime)
 		sphere1Mat = cSphere1->body->getTransform();
 		elevate::Vector3 newPos = sphere1Mat.getAxisVector(3);
 		sphere2->SetPosition(newPos);
-	
+
 		sphere0Mat = cSphere0->body->getTransform();
 		newPos = sphere0Mat.getAxisVector(3);
 		sphere->SetPosition(newPos);
@@ -410,29 +498,53 @@ void GameManager::update(float deltaTime)
 void GameManager::generateContacts()
 {
 	cData.reset(256);
-	cData.friction = (real)0.1;
-	cData.restitution = (real)0.9;
-	cData.tolerance = (real)0.01;
+	cData.friction = (real)0.6;
+	cData.restitution = (real)0.0;
+	cData.tolerance = (real)0.1;
 	cData.contactArray = contacts;
 	cData.contacts = contacts;
-
-	elevate::CollisionDetector::sphereAndSphere(*cSphere0, *cSphere1, &cData);
-	
-	elevate::CollisionDetector::boxAndBox(*cBox0, *cBox1, &cData);
-	if (elevate::boxAndBoxIntersect(*cBox0, *cBox1))
+	if (stackDemo)
 	{
-		cBox0->isOverlapping = true;
-		cBox1->isOverlapping = true;
+		for (int i = 0; i < numStackCubes; ++i)
+		{
+			elevate::CollisionDetector::boxAndHalfSpace(
+				*cStackBoxes[i], *cPlane, &cData);
+		}
+
+		for (int i = 0; i < numStackCubes; ++i)
+		{
+			for (int j = i + 1; j < numStackCubes; ++j)
+			{
+				elevate::CollisionDetector::boxAndBox(
+					*cStackBoxes[i], *cStackBoxes[j], &cData);
+			}
+		}
+
+		buildContactDebugLines();
+		return;
 	}
+	else if (sphereDemo)
+	{
 
-	elevate::CollisionDetector::boxAndSphere(*cBox0, *cSphere0, &cData);
-	elevate::CollisionDetector::boxAndSphere(*cBox1, *cSphere1, &cData);
+		elevate::CollisionDetector::sphereAndSphere(*cSphere0, *cSphere1, &cData);
 
-	
-	//elevate::CollisionDetector::boxAndHalfSpace(*cBox0, *cPlane, &cData);
-	//elevate::CollisionDetector::sphereAndHalfSpace(*cSphere1, *cPlane, &cData);
+		elevate::CollisionDetector::boxAndBox(*cBox0, *cBox1, &cData);
+		if (elevate::boxAndBoxIntersect(*cBox0, *cBox1))
+		{
+			cBox0->isOverlapping = true;
+			cBox1->isOverlapping = true;
+		}
 
-	buildContactDebugLines();
+		elevate::CollisionDetector::boxAndSphere(*cBox0, *cSphere0, &cData);
+		elevate::CollisionDetector::boxAndSphere(*cBox1, *cSphere1, &cData);
+
+
+		elevate::CollisionDetector::boxAndHalfSpace(*cBox0, *cPlane, &cData);
+		elevate::CollisionDetector::sphereAndHalfSpace(*cSphere1, *cPlane, &cData);
+
+		buildContactDebugLines();
+		return;
+	}
 
 }
 

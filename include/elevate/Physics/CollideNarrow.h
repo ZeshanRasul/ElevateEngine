@@ -262,15 +262,17 @@ namespace elevate {
 		{
 			if (data->contactsLeft <= 0) return 0;
 
-			const real allowedPenetration = (real)0.01f;
-
+			// Half-space test (plane normal points OUT of the solid region).
+			// We treat the solid region as: n · p <= offset
 			if (!boxAndHalfSpaceIntersect(box, plane))
 			{
 				return 0;
 			}
 
-			static real mults[8][3] = { {1,1,1},{-1,1,1},{1,-1,1},{-1,-1,1},
-						   {1,1,-1},{-1,1,-1},{1,-1,-1},{-1,-1,-1} };
+			static real mults[8][3] = {
+				{1,1,1},{-1,1,1},{1,-1,1},{-1,-1,1},
+				{1,1,-1},{-1,1,-1},{1,-1,-1},{-1,-1,-1}
+			};
 
 			Contact* contact = data->contacts;
 			unsigned contactsUsed = 0;
@@ -278,59 +280,43 @@ namespace elevate {
 			Vector3 n = plane.direction;
 			n.normalize();
 
-			for (unsigned i = 0; i < 8; i++) {
-
+			for (unsigned i = 0; i < 8 && contactsUsed < (unsigned)data->contactsLeft; ++i)
+			{
 				Vector3 vertexPos(mults[i][0], mults[i][1], mults[i][2]);
 				vertexPos.componentProductUpdate(box.halfSize);
 				vertexPos = box.getTransform().transform(vertexPos);
 
+				// Distance of vertex from plane
 				real vertexDistance = vertexPos * n;
 
+				// Penetration if vertex is inside solid half-space (below plane when n=(0,1,0))
 				if (vertexDistance <= plane.offset)
 				{
-					real vertexDistance = vertexPos * n;
 					real penetration = plane.offset - vertexDistance;
+					if (penetration <= (real)0) continue;
 
-					if (penetration < (real)0) continue;
-
-					contact->contactNormal = n * -1.0f;
-					contact->penetration = penetration;
-
-					if (penetration <= 0) continue;
-
-
-
+					// Contact normal points from plane towards box (i.e. push box out of plane)
 					contact->contactNormal = n;
 					contact->penetration = penetration;
 
+					// Move contact point up to plane
 					contact->contactPoint = vertexPos;
 					contact->contactPoint.addScaledVector(n, penetration);
-					//contact->contactPoint *= (vertexDistance - plane.offset);
-					//contact->contactPoint += vertexPos;
 
+					contact->setBodyData(box.body, nullptr, data->friction, data->restitution);
 
-
-					contact->setBodyData(box.body, NULL,
-						data->friction, data->restitution);
-
+					// Commit
 					data->addContacts(1);
 					data->contacts[data->contactCount - 1] = *contact;
 					data->contactArray[data->contactCount - 1] = *contact;
 
-					contact++;
-					contactsUsed++;
-					if (contactsUsed == (unsigned)data->contactsLeft) return contactsUsed;
-
+					++contact;
+					++contactsUsed;
 				}
-				data->addContacts(1);
-				data->contacts[data->contactCount - 1] = *contact;
-				data->contactArray[data->contactCount - 1] = *contact;
 			}
-			data->addContacts(1);
-			data->contacts[data->contactCount - 1] = *contact;
-			data->contactArray[data->contactCount - 1] = *contact;
 			return contactsUsed;
-		};
+		}
+
 
 		static unsigned sphereAndHalfSpace(
 			const CollisionSphere& sphere,
