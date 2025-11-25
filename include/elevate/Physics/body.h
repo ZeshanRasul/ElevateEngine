@@ -124,7 +124,7 @@ namespace elevate {
 		bool isAwake = true;
 		real motion = 0.0f;
 		bool canSleep = true;
-		real sleepEpsilon = 0.3f;
+		real sleepEpsilon = 10.3f;
 
 		Vector3 lastFrameAcceleration;
 

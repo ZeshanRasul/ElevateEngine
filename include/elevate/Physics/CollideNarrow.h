@@ -292,12 +292,17 @@ namespace elevate {
 
 				if (vertexDistance <= plane.offset)
 				{
+					real vertexDistance = vertexPos * n;
 					real penetration = plane.offset - vertexDistance;
 
 					if (penetration < (real)0) continue;
+					{
+						contact->contactNormal = n * -1.0f;
+						contact->penetration = penetration;
 
 					if (penetration <= 0) continue;
-					
+					}
+
 					contact->contactNormal = n;
 					contact->penetration = penetration;
 
@@ -306,7 +311,7 @@ namespace elevate {
 					//contact->contactPoint *= (vertexDistance - plane.offset);
 					//contact->contactPoint += vertexPos;
 					
-					
+
 
 					contact->setBodyData(box.body, NULL,
 						data->friction, data->restitution);
@@ -320,6 +325,10 @@ namespace elevate {
 					if (contactsUsed == (unsigned)data->contactsLeft) return contactsUsed;
 				}
 			}
+			data->addContacts(1);
+			data->contacts[data->contactCount - 1] = *contact;
+			data->contactArray[data->contactCount - 1] = *contact;
+			return contactsUsed;
 		};
 		static unsigned sphereAndHalfSpace(
 			const CollisionSphere& sphere,

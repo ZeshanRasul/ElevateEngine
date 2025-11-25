@@ -18,6 +18,14 @@
 #include "Physics/body.h"
 #include "Physics/World.h"
 
+struct DebugLine
+{
+    glm::vec3 p0;
+    glm::vec3 p1;
+    glm::vec3 color;
+};
+
+
 class GameManager {
 public:
     GameManager(Window* window, unsigned int width, unsigned int height);
@@ -153,4 +161,111 @@ private:
     elevate::CollisionPlane* cPlane;
 
     void generateContacts();
+
+    std::vector<DebugLine> m_DebugLines;
+    GLuint m_DebugLineVAO = 0;
+    GLuint m_DebugLineVBO = 0;
+
+    void buildContactDebugLines()
+    {
+        m_DebugLines.clear();
+
+        for (unsigned i = 0; i < cData.contactCount; ++i)
+        {
+            const elevate::Contact& c = cData.contacts[i];
+
+            // Contact point and normal, converted to glm
+            glm::vec3 p(
+                (float)c.contactPoint.x,
+                (float)c.contactPoint.y,
+                (float)c.contactPoint.z);
+
+            glm::vec3 n(
+                (float)c.contactNormal.x,
+                (float)c.contactNormal.y,
+                (float)c.contactNormal.z);
+
+            // Scale for visibility (tweak as needed)
+            float nLen = 2.0f;
+
+            // Line showing the normal
+            DebugLine normalLine;
+            normalLine.p0 = p;
+            normalLine.p1 = p + n * nLen;
+            normalLine.color = glm::vec3(1.0f, 0.0f, 0.0f); // red
+            m_DebugLines.push_back(normalLine);
+
+            // Small cross at the contact point (3 axis-aligned mini lines)
+            float s = 0.2f;
+
+            DebugLine crossX;
+            crossX.p0 = p + glm::vec3(-s, 0.0f, 0.0f);
+            crossX.p1 = p + glm::vec3(s, 0.0f, 0.0f);
+            crossX.color = glm::vec3(0.0f, 1.0f, 0.0f);
+            m_DebugLines.push_back(crossX);
+
+            DebugLine crossY;
+            crossY.p0 = p + glm::vec3(0.0f, -s, 0.0f);
+            crossY.p1 = p + glm::vec3(0.0f, s, 0.0f);
+            crossY.color = glm::vec3(0.0f, 1.0f, 0.0f);
+            m_DebugLines.push_back(crossY);
+
+            DebugLine crossZ;
+            crossZ.p0 = p + glm::vec3(0.0f, 0.0f, -s);
+            crossZ.p1 = p + glm::vec3(0.0f, 0.0f, s);
+            crossZ.color = glm::vec3(0.0f, 1.0f, 0.0f);
+            m_DebugLines.push_back(crossZ);
+        }
+    }
+
+    void drawDebugLines()
+    {
+        if (m_DebugLines.empty())
+            return;
+
+        // Build a CPU-side vertex array for all lines
+        std::vector<float> vertexData;
+        vertexData.reserve(m_DebugLines.size() * 2 * 6); // 2 vertices per line, 6 floats each
+
+        for (const auto& line : m_DebugLines)
+        {
+            // First endpoint
+            vertexData.push_back(line.p0.x);
+            vertexData.push_back(line.p0.y);
+            vertexData.push_back(line.p0.z);
+            vertexData.push_back(line.color.x);
+            vertexData.push_back(line.color.y);
+            vertexData.push_back(line.color.z);
+
+            // Second endpoint
+            vertexData.push_back(line.p1.x);
+            vertexData.push_back(line.p1.y);
+            vertexData.push_back(line.p1.z);
+            vertexData.push_back(line.color.x);
+            vertexData.push_back(line.color.y);
+            vertexData.push_back(line.color.z);
+        }
+
+        glBindVertexArray(m_DebugLineVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_DebugLineVBO);
+
+        glBufferData(GL_ARRAY_BUFFER,
+            vertexData.size() * sizeof(float),
+            vertexData.data(),
+            GL_DYNAMIC_DRAW);
+
+        lineShader.use();
+
+        // Assuming your line shader has view/projection uniforms
+        lineShader.setMat4("view", view);
+        lineShader.setMat4("projection", projection);
+
+        glLineWidth(2.0f);
+
+        glDrawArrays(GL_LINES, 0, (GLsizei)m_DebugLines.size() * 2);
+
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
 };

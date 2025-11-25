@@ -187,9 +187,9 @@ namespace elevate {
 			{
 				setAwake(false);
 			}
-			else if (motion > 10 * sleepEpsilon)
+			else if (motion > 100 * sleepEpsilon)
 			{
-				motion = 10 * sleepEpsilon;
+				motion = 100 * sleepEpsilon;
 			}
 		}
 	};

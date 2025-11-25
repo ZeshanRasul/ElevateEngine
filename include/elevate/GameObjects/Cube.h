@@ -19,10 +19,10 @@ private:
     float vertices[192] = {
         // Positions           // Normals          // Texture Coords
         // Back face (z = -0.5)
-        -0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,  0.0f, 0.0f,  // 0 Back-bottom-left
-         0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,  1.0f, 0.0f,  // 1 Back-bottom-right
-         0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,  1.0f, 1.0f,  // 2 Back-top-right
-        -0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,  0.0f, 1.0f,  // 3 Back-top-left
+        -0.5f, -0.5f, -0.5f,   0.0f,  0.0f, 1.0f,  0.0f, 0.0f,  // 0 Back-bottom-left
+         0.5f, -0.5f, -0.5f,   0.0f,  0.0f, 1.0f,  1.0f, 0.0f,  // 1 Back-bottom-right
+         0.5f,  0.5f, -0.5f,   0.0f,  0.0f, 1.0f,  1.0f, 1.0f,  // 2 Back-top-right
+        -0.5f,  0.5f, -0.5f,   0.0f,  0.0f, 1.0f,  0.0f, 1.0f,  // 3 Back-top-left
 
         // Front face (z = 0.5)
         -0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,  0.0f, 0.0f,  // 4 Front-bottom-left

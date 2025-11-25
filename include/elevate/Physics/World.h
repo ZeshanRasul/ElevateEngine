@@ -48,6 +48,11 @@ public:
 		bodies.push_back(body);
 	};
 
+	void removeBody(RigidBody* body)
+	{
+		bodies.erase(std::remove(bodies.begin(), bodies.end(), body), bodies.end());
+	};
+
 	ForceRegistry& getForceRegistry() {
 		return	registry;
 	};
