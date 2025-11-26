@@ -50,7 +50,7 @@ namespace elevate {
 
 		Matrix4 getTransform() { return transformMatrix; }
 
-		void setPosition(const Vector3& pos) { position = pos; };
+		void setPosition(const Vector3& pos) { position = pos; }
 		void setPosition(const real x, const real y, const real z);
 		Vector3 getPosition() const { return position; }
 

@@ -270,6 +270,58 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		//rbWorld->addBody(bones[i].body);
 		//	rbWorld->getForceRegistry().add(bones[i].body, );
 	}
+
+	numStackCubes = 5; // choose 3–5 for testing
+
+	elevate::Vector3 cubeHalfSize(1.0f, 1.0f, 1.0f);
+	glm::vec3       renderScale(2.0f, 2.0f, 2.0f);
+
+	for (int i = 0; i < numStackCubes; i++)
+	{
+		float centerY = 2.0f + i * 2.0f;
+
+		elevate::Vector3 pos(-20.0f, centerY, -20.0f);
+		elevate::Vector3 scale(renderScale.x, renderScale.y, renderScale.z);
+
+		// Render cube
+		Cube* cube = new Cube(pos, scale, &cubeShader, this);
+		cube->LoadMesh();
+		cube->SetAngle(0.0f);
+		cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
+		cube->SetColor(glm::vec3(0.2f, 0.7f, 0.3f));
+		gameObjects.push_back(cube);
+		stackCubes[i] = cube;
+
+		// Physics body
+		elevate::RigidBody* body = new elevate::RigidBody();
+		body->setAwake(true);
+		body->setPosition(pos);
+		body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+		body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+
+		real mass = 0.2f;
+		body->setMass(mass);
+
+		elevate::Matrix3 boxInertia;
+		boxInertia.setBlockInertiaTensor(cubeHalfSize, mass);
+		body->setInertiaTensor(boxInertia);
+
+		rbWorld->addBody(body);
+		rbGravity->updateForce(body, 0); // or via registry below
+
+		rbWorld->getForceRegistry().add(body, rbGravity);
+
+		stackBodies[i] = body;
+
+		// Collision box
+		elevate::CollisionBox* cBox = new elevate::CollisionBox();
+		cBox->body = body;
+		cBox->halfSize = cubeHalfSize;
+		cBox->body->calculateDerivedData();
+		cBox->calculateInternals();
+		cStackBoxes[i] = cBox;
+	}
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
@@ -491,7 +543,6 @@ void GameManager::update(float deltaTime)
 		//rbWorld->startFrame();
 		//
 		//rbWorld->runPhysics(1.0f / 60.0f);
-
 		for (int b = 0; b < numEnvBoxes; ++b)
 		{
 			
@@ -518,6 +569,17 @@ void GameManager::update(float deltaTime)
 				bone->body->integrate(deltaTime);
 			bone->calculateInternals();
 		}
+
+		for (int i = 0; i < numStackCubes; i++)
+		{
+			stackBodies[i]->clearAccumulator();
+			stackBodies[i]->calculateDerivedData();
+			rbGravity->updateForce(stackBodies[i], deltaTime);
+			stackBodies[i]->integrate(deltaTime);
+			cStackBoxes[i]->calculateInternals();
+		}
+
+
 		generateContacts();
 
 		resolver.resolveContacts(cData.contactArray, cData.contactCount, deltaTime);
@@ -578,6 +640,22 @@ void GameManager::update(float deltaTime)
 				(float)bone->body->getOrientation().k));
 		}
 
+		for (int i = 0; i < numStackCubes; ++i)
+		{
+			stackBodies[i]->calculateDerivedData();
+			cStackBoxes[i]->calculateInternals();
+
+			elevate::Matrix4 t = stackBodies[i]->getTransform();
+			elevate::Vector3 p = t.getAxisVector(3);
+
+			stackCubes[i]->SetPosition(p);
+			stackCubes[i]->SetOrientation(glm::quat(
+				(float)stackBodies[i]->getOrientation().r,
+				(float)stackBodies[i]->getOrientation().i,
+				(float)stackBodies[i]->getOrientation().j,
+				(float)stackBodies[i]->getOrientation().k));
+		}
+
 		return;
 	}
 }
@@ -595,6 +673,31 @@ void GameManager::generateContacts()
 
 	if (fpsSandboxDemo)
 	{
+		for (int i = 0; i < numStackCubes; ++i)
+		{
+			elevate::CollisionDetector::boxAndHalfSpace(*cStackBoxes[i], plane, &cData);
+			if (elevate::boxAndHalfSpaceIntersect(*cStackBoxes[i], plane))
+			{
+				cStackBoxes[i]->isOverlapping = true;
+			}
+		}
+
+		for (int i = 0; i < numStackCubes; ++i)
+		{
+			for (int j = i + 1; j < numStackCubes; ++j)
+			{
+				elevate::CollisionDetector::boxAndBox(*cStackBoxes[i], *cStackBoxes[j], &cData);
+			}
+
+			for (int b = 0; b < numEnvBoxes; ++b)
+			{
+				elevate::CollisionDetector::boxAndBox(
+					*envBoxes[b],
+					*cStackBoxes[i],
+					&cData);
+			}
+		}
+
 		for (int i = 0; i < ammoCount; ++i)
 		{
 			AmmoRound& r = ammoPool[i];
@@ -616,6 +719,14 @@ void GameManager::generateContacts()
 
 				elevate::CollisionDetector::sphereAndSphere(boneSphere, *r.coll, &cData);
 			};
+
+			for (int i = 0; i < numStackCubes; ++i)
+			{
+				for (int j = i + 1; j < numStackCubes; ++j)
+				{
+					elevate::CollisionDetector::boxAndSphere(*cStackBoxes[i], *r.coll, &cData);
+				}
+			}
 		}
 		elevate::Matrix4 transform, otherTransform;
 		elevate::Vector3 position, otherPosition;

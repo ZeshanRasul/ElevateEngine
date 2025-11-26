@@ -197,6 +197,13 @@ private:
 
     elevate::Joint joints[11];
 
+    static const int MaxStackCubes = 5;
+
+    elevate::CollisionBox* cStackBoxes[MaxStackCubes];
+    elevate::RigidBody* stackBodies[MaxStackCubes];
+    Cube* stackCubes[MaxStackCubes];
+    int                    numStackCubes = 0;
+
 
     std::vector<DebugLine> m_DebugLines;
     GLuint m_DebugLineVAO = 0;
