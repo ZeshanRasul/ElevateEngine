@@ -17,7 +17,9 @@ public:
     void drawObject(glm::mat4 viewMat, glm::mat4 proj) override;
 
     void SetColor(glm::vec3 col) { color = col; }
+    void SetShader(Shader* shdr) { shader = shdr; }
 
+	Shader* GetShader() const { return shader; }
 private:
 
     float vertices[192] = {

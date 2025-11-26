@@ -81,7 +81,8 @@ namespace elevate
             CollisionPrimitive* shape,
             real mass,
             const std::string& meshId,
-            const std::string& materialId);
+            const std::string& materialId,
+            Shader* shader);
 
         PhysicsObject* CreatePhysicsObject(
             const std::string& name,
@@ -89,21 +90,24 @@ namespace elevate
             CollisionPrimitive* shape,
             real mass,
             const std::string& meshId,
-            PhysicsMaterialId materialId);
+            PhysicsMaterialId materialId,
+            Shader* shader);
 
         PhysicsObject* SpawnBox(
             const Vector3& position,
             const Vector3& halfExtents,
             real mass,
             const std::string& meshId,
-            PhysicsMaterialId materialId);
+            PhysicsMaterialId materialId,
+            Shader* shader);
 
         PhysicsObject* SpawnSphere(
             const Vector3& position,
             real radius,
             real mass,
             const std::string& meshId,
-            PhysicsMaterialId materialId);
+            PhysicsMaterialId materialId,
+            Shader* shader);
 
         PhysicsObject* SpawnCapsule(
             const Vector3& position,
@@ -123,6 +127,7 @@ namespace elevate
 
         PhysicsObject* SpawnCrate(
             const Vector3& position,
+            Shader* shader,
             const Vector3& size = { 1.0f, 1.0f, 1.0f },
             real mass = 10.0f);
 
@@ -153,7 +158,7 @@ namespace elevate
         PhysicsObject* SpawnGrenade(
             const Vector3& startPos,
             const Vector3& velocity,
-            real fuseTime,
+            Shader* shader,
             real radius = 0.1f,
             real mass = 0.5f);
 
@@ -171,7 +176,8 @@ namespace elevate
             int height,
             int depth,
             const Vector3& crateSize,
-            real massPerCrate);
+            real massPerCrate,
+            Shader* shader);
 
         void BuildBrickWall(
             const Vector3& basePos,

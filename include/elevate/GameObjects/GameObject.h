@@ -56,7 +56,7 @@ public:
         orientation = glm::quat_cast(rotMat);
 	}
 
-	void SetShader(Shader* shdr) { shader = shdr; }
+	virtual void SetShader(Shader* shdr) { shader = shdr; }
 
     bool isDestroyed = false;
 

@@ -57,19 +57,30 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	shapeFactory = new elevate::ShapeFactory();
 	spawnFactory = new elevate::SpawnFactory(spawnContext);
 
-	PhysicsObject* crate = spawnFactory->SpawnCrate(
+	crate = spawnFactory->SpawnCrate(
 		elevate::Vector3(0.0f, 5.0f, 0.0f),
+		&cubeShader,
 		elevate::Vector3(1.0f, 1.0f, 1.0f),
 		1.0f
 	);
 
 	crate->mesh->SetShader(&cubeShader);
 	crate->mesh->setGameManager(this);
-	crate->mesh->LoadMesh();
-	crate->mesh->SetPosition(crate->body->getPosition());
-	crate->mesh->SetScale(elevate::Vector3(10.0f, 10.0f, 10.0f));
 
 	gameObjects.push_back(crate->mesh);
+
+	ball = spawnFactory->SpawnGrenade(
+		elevate::Vector3(10.0f, 10.0f, 0.0f),
+		elevate::Vector3(0.0f, -9.81f, 0.0f),
+		&ammoShader,
+		3.0f,
+		5.0f
+	);
+
+	ball->mesh->SetShader(&ammoShader);
+	ball->mesh->setGameManager(this);
+
+	gameObjects.push_back(ball->mesh);
 
 	if (fpsSandboxDemo)
 	{
@@ -309,6 +320,8 @@ void GameManager::setSceneData()
 
 void GameManager::reset()
 {
+	return;
+
 	bones[0].setState(
 		elevate::Vector3(0, 0.993, -0.5),
 		elevate::Vector3(0.301, 1.0, 0.234));
@@ -513,54 +526,54 @@ void GameManager::ShowLightControlWindow(DirLight& light)
 
 void GameManager::fireRound(AmmoType type)
 {
-	AmmoRound* round = nullptr;
-	for (int i = 0; i < ammoCount; ++i)
-	{
-		if (!ammoPool[i].active)
-		{
-			round = &ammoPool[i];
-			break;
-		}
-	}
+	//AmmoRound* round = nullptr;
+	//for (int i = 0; i < ammoCount; ++i)
+	//{
+	//	if (!ammoPool[i].active)
+	//	{
+	//		round = &ammoPool[i];
+	//		break;
+	//	}
+	//}
 
-	if (!round)
-	{
-		return;
-	}
+	//if (!round)
+	//{
+	//	return;
+	//}
 
-	glm::vec3 camPos = camera->Position;
-	glm::vec3 camFront = glm::normalize(camera->Front);
+	//glm::vec3 camPos = camera->Position;
+	//glm::vec3 camFront = glm::normalize(camera->Front);
 
-	glm::vec3 spawnPos = camPos + camFront * 2.0f;
+	//glm::vec3 spawnPos = camPos + camFront * 2.0f;
 
-	elevate::RigidBody* body = round->body;
+	//elevate::RigidBody* body = round->body;
 
-	body->setAwake(true);
-	body->clearAccumulator();
-	body->setPosition(elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z));
-	body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
-	body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
-	rbWorld->getForceRegistry().add(body, rbGravity);
+	//body->setAwake(true);
+	//body->clearAccumulator();
+	//body->setPosition(elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z));
+	//body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+	//body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+	//rbWorld->getForceRegistry().add(body, rbGravity);
 
-	real speed = 50.0f;
-	switch (type)
-	{
-	case AmmoType::Pistol: speed = 40.0f; break;
-	case AmmoType::Rifle:  speed = 88.0f; break;
-	case AmmoType::Rocket: speed = 22.0f; break;
-	}
-	elevate::Vector3 v(camFront.x * speed,
-		camFront.y * speed,
-		camFront.z * speed);
-	body->setVelocity(v);
+	//real speed = 50.0f;
+	//switch (type)
+	//{
+	//case AmmoType::Pistol: speed = 40.0f; break;
+	//case AmmoType::Rifle:  speed = 88.0f; break;
+	//case AmmoType::Rocket: speed = 22.0f; break;
+	//}
+	//elevate::Vector3 v(camFront.x * speed,
+	//	camFront.y * speed,
+	//	camFront.z * speed);
+	//body->setVelocity(v);
 
-	body->calculateDerivedData();
-	round->coll->calculateInternals();
+	//body->calculateDerivedData();
+	//round->coll->calculateInternals();
 
-	round->active = true;
-	round->lifetime = 5.0f;
+	//round->active = true;
+	//round->lifetime = 5.0f;
 
-	round->visual->SetPosition(elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z));
+	//round->visual->SetPosition(elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z));
 }
 
 void GameManager::ShowAmmoWindow()
@@ -616,7 +629,7 @@ void GameManager::ShowCameraControlWindow(Camera& cam)
 void GameManager::update(float deltaTime)
 {
 	//deltaTime = glm::clamp(deltaTime, 0.0f, 1/ 60.0f);
-	RemoveDestroyedGameObjects();
+//	RemoveDestroyedGameObjects();
 	inputManager->processInput(window->getWindow(), deltaTime);
 
 	//rbWorld->startFrame();
@@ -969,39 +982,37 @@ void GameManager::generateContacts()
 		}
 
 
-	}
 
-	// Perform collision detection
-	elevate::Matrix4 transform, otherTransform;
-	elevate::Vector3 position, otherPosition;
-	for (Block* block = blocks; block < blocks + 9; block++)
-	{
-		if (!block->exists) continue;
-
-		// Check for collisions with the ground plane
-		if (!cData.hasMoreContacts()) return;
-		elevate::CollisionDetector::boxAndHalfSpace(*block, plane, &cData);
-
-		// Check for collisions with each other box
-		for (Block* other = block + 1; other < blocks + 9; other++)
+		// Perform collision detection
+		for (Block* block = blocks; block < blocks + 9; block++)
 		{
-			if (!other->exists) continue;
+			if (!block->exists) continue;
 
+			// Check for collisions with the ground plane
 			if (!cData.hasMoreContacts()) return;
-			elevate::CollisionDetector::boxAndBox(*block, *other, &cData);
-		}
+			elevate::CollisionDetector::boxAndHalfSpace(*block, plane, &cData);
+
+			// Check for collisions with each other box
+			for (Block* other = block + 1; other < blocks + 9; other++)
+			{
+				if (!other->exists) continue;
+
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::boxAndBox(*block, *other, &cData);
+			}
 
 
-		for (int b = 0; b < numEnvBoxes; ++b)
-		{
-			elevate::CollisionDetector::boxAndBox(
-				*block,
-				*cStackBoxes[b],
-				&cData);
+			for (int b = 0; b < numEnvBoxes; ++b)
+			{
+				elevate::CollisionDetector::boxAndBox(
+					*block,
+					*cStackBoxes[b],
+					&cData);
+			}
 		}
+		buildContactDebugLines();
+
 	}
-	buildContactDebugLines();
-
 }
 
 void GameManager::render()
@@ -1010,6 +1021,6 @@ void GameManager::render()
 		renderer->draw(obj, view, projection);
 	}
 
-	drawDebugLines();
+//	drawDebugLines();
 
 }

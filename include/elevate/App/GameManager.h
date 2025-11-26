@@ -95,9 +95,9 @@ private:
 
     std::vector<GameObject*> gameObjects;
 
-    Shader ammoShader{};
-	Shader cubeShader{};
-	Shader lineShader{};
+    Shader ammoShader;
+	Shader cubeShader;
+	Shader lineShader;
 
     Cube* cube;
     Cube* cube2;
@@ -216,6 +216,9 @@ private:
 	ShapeFactory* shapeFactory;
 	SpawnFactory* spawnFactory;
 
+    PhysicsObject* crate;
+    PhysicsObject* ball;
+
     std::vector<DebugLine> m_DebugLines;
     GLuint m_DebugLineVAO = 0;
     GLuint m_DebugLineVBO = 0;
@@ -270,6 +273,8 @@ private:
 
     void drawDebugLines()
     {
+        return;
+
         if (m_DebugLines.empty())
             return;
 
