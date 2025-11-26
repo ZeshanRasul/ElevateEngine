@@ -182,6 +182,13 @@ public:
             direction.normalize();
 
             blocks[i].visual = *cubes++;
+            blocks[i].visual->SetScale(
+               elevate::Vector3(
+                    (float)(halfSize.x * 2.0f),
+                    (float)(halfSize.y * 2.0f),
+                    (float)(halfSize.z * 2.0f)
+                )
+			);
 
             // Set the body's properties (we assume the block has a body
             // already that we're going to overwrite).

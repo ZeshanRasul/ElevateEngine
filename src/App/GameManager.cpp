@@ -876,8 +876,12 @@ void GameManager::generateContacts()
 				if (!cData.hasMoreContacts()) return;
 				if (elevate::CollisionDetector::boxAndSphere(*block, *r.coll, &cData))
 				{
-					hit = true;
-					fracture_contact = cData.contactCount - 1;
+					if (firstHit && block->exists)
+					{
+						hit = true;
+						firstHit = false;
+						fracture_contact = cData.contactCount - 1;
+					}
 
 				}
 			}

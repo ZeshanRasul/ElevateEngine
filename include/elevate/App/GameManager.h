@@ -205,6 +205,7 @@ private:
     int                    numStackCubes = 0;
 
     bool hit;
+    bool firstHit = true;
     bool ball_active;
     unsigned fracture_contact;
     Block blocks[9];
