@@ -72,7 +72,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	ball = spawnFactory->SpawnGrenade(
 		elevate::Vector3(10.0f, 10.0f, 0.0f),
 		elevate::Vector3(0.0f, -9.81f, 0.0f),
-		&ammoShader,
+		&cubeShader,
 		3.0f,
 		5.0f
 	);

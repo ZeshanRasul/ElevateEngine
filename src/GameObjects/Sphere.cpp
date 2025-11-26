@@ -59,7 +59,7 @@ void Sphere::GenerateSphere(float radius, unsigned int sectorCount, unsigned int
 
 void Sphere::LoadMesh()
 {
-	GenerateSphere(1.0f, 36, 18);
+	GenerateSphere(1.0f, 16, 16);
 
     glGenVertexArrays(1, &mVAO);
     glGenBuffers(1, &mVBO);

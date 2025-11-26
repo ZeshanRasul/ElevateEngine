@@ -31,5 +31,5 @@ private:
     GLuint mVBO;
     GLuint mEBO;
 
-	glm::vec3 color;
+    glm::vec3 color = {0.8f, 0.8f, 0.1f};
 };

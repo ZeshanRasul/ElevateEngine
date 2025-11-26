@@ -97,7 +97,7 @@ namespace elevate
 			obj->mesh = sphere;
 			obj->mesh->LoadMesh();
 			obj->mesh->SetPosition(obj->body->getPosition());
-			obj->mesh->SetScale(elevate::Vector3(transform.position)),
+			obj->mesh->SetScale(elevate::Vector3(transform.scale)),
 			obj->mesh->SetShader(shader);
 		}
 
