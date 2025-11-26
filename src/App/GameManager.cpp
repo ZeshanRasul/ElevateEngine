@@ -17,6 +17,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	: window(window),
 	resolver(256 * 4)
 {
+
 	inputManager = new InputManager();
 
 	window->setInputManager(inputManager);
@@ -395,6 +396,7 @@ void GameManager::reset()
 	gameObjects.push_back(cube);
 
 	// Set the first block
+	// Set the first block
 	blocks[0].halfSize = elevate::Vector3(4, 4, 4);
 	blocks[0].body->setPosition(elevate::Vector3(-10, 7, 10));
 	blocks[0].body->setOrientation(elevate::Quaternion(1, 0, 0, 0));
@@ -411,6 +413,8 @@ void GameManager::reset()
 	blocks[0].body->setAcceleration(elevate::Vector3::GRAVITY);
 	blocks[0].body->setAwake(true);
 	blocks[0].body->setCanSleep(true);
+
+	hit = false;
 
 	//elevate::real strength = -random.randomReal(500.0f, 1000.0f);
 	//for (unsigned i = 0; i < 12; i++)
@@ -712,26 +716,19 @@ void GameManager::update(float deltaTime)
 				block->body->calculateDerivedData();
 				block->calculateInternals();
 
+				elevate::Matrix4 t = block->getTransform();
+				elevate::Vector3 p = t.getAxisVector(3);
 
+				block->visual->SetPosition(p);
+				block->visual->SetOrientation(glm::quat(
+					(float)block->body->getOrientation().r,
+					(float)block->body->getOrientation().i,
+					(float)block->body->getOrientation().j,
+					(float)block->body->getOrientation().k));
 			}
 
-			if (hit)
-			{
-				Cube* c = new Cube(blocks[0].getTransform().getAxisVector(3), elevate::Vector3(1.0f, 1.0f, 1.0f), &cubeShader, this);
-				c->LoadMesh();
-				c->SetAngle(0.0f);
-				c->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
-				c->SetColor(glm::vec3(0.2f, 0.1f, 0.3f));
-				gameObjects.push_back(c);
-				blocks[0].divideBlock(
-					cData.contactArray[fracture_contact],
-					blocks,
-					blocks + 1,
-					c
-				);
-				ball_active = false;
-			}
-			for (Block* block = blocks; block < blocks + 9; block++)
+
+			/*for (Block* block = blocks; block < blocks + 9; block++)
 			{
 				if (block->exists)
 				{
@@ -746,7 +743,42 @@ void GameManager::update(float deltaTime)
 						(float)block->body->getOrientation().k));
 				}
 
+			}*/
+		}
+
+		if (hit)
+		{
+			for (Cube* cube = cubes; cube < cubes + 9; cube++)
+			{
+				float newPosX = blocks[0].getTransform().getAxisVector(3).x + random.randomBinomial(2.0f);
+				float newPosY = blocks[0].getTransform().getAxisVector(3).y + random.randomBinomial(2.0f);
+				float newPosZ = blocks[0].getTransform().getAxisVector(3).z + random.randomBinomial(2.0f);
+
+				//Cube* c = new Cube(elevate::Vector3(newPosX, blocks[0].getTransform().getAxisVector(3).y, newPosZ), elevate::Vector3(1.0f, 1.0f, 1.0f), &cubeShader, this);
+				Cube* c = new Cube(blocks[0].getTransform().getAxisVector(3), elevate::Vector3(1.0f, 1.0f, 1.0f), &cubeShader, this);
+				c->LoadMesh();
+				c->SetAngle(0.0f);
+				c->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
+				c->SetColor(glm::vec3(0.2f, 0.1f, 0.3f));
+				cube = c;
+				gameObjects.push_back(c);
 			}
+
+			blocks[0].divideBlock(
+				cData.contactArray[fracture_contact],
+				blocks,
+				blocks + 1	,
+				cubes
+			);
+
+			gameObjects.erase(
+				std::remove(
+					gameObjects.begin(),
+					gameObjects.end(),
+					blocks[0].visual),
+				gameObjects.end()
+			);
+			ball_active = false;
 		}
 		return;
 	}
@@ -833,7 +865,6 @@ void GameManager::generateContacts()
 				}
 			}
 
-			// Perform collision detection
 			elevate::Matrix4 transform, otherTransform;
 			elevate::Vector3 position, otherPosition;
 			for (Block* block = blocks; block < blocks + 9; block++)

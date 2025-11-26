@@ -180,7 +180,7 @@ public:
             // Work out the direction to the impact.
             elevate::Vector3 direction = newPos - contact.contactPoint;
             direction.normalize();
-            blocks[i].visual = cube;
+            blocks[i].visual = &cube[i];
 
             // Set the body's properties (we assume the block has a body
             // already that we're going to overwrite).

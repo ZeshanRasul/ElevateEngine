@@ -7,7 +7,9 @@ public:
     Cube(elevate::Vector3 pos, elevate::Vector3 scale, Shader* shdr, GameManager* gameMgr, float yaw = 0.0f)
         : GameObject(pos, scale, yaw, shdr, gameMgr)
     {}
-
+    Cube()
+		: GameObject(elevate::Vector3(0.0f, 0.0f, 0.0f), elevate::Vector3(1.0f, 1.0f, 1.0f), 0.0f, nullptr, nullptr)
+    {};
     void LoadMesh();
 
     void CreateAndUploadVertexBuffer() const;

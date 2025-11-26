@@ -208,6 +208,7 @@ private:
     bool ball_active;
     unsigned fracture_contact;
     Block blocks[9];
+    Cube cubes[9];
 
 
     std::vector<DebugLine> m_DebugLines;
