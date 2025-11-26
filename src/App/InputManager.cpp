@@ -110,6 +110,15 @@ void InputManager::processInput(GLFWwindow* window, float deltaTime)
         mGameManager->setPushDir(-3.0f);
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         mGameManager->setPushDir(3.0f);
+    
+
+    bool rKeyCurrentlyPressed = (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS);
+
+    if (rKeyCurrentlyPressed && !rKeyPressed)
+		mGameManager->reset();
+
+    rKeyPressed = rKeyCurrentlyPressed;
+
 }
 
 void InputManager::setContext(Camera* cam, GameManager* gameMgr, unsigned int width, unsigned int height)

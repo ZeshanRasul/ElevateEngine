@@ -275,57 +275,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		//	rbWorld->getForceRegistry().add(bones[i].body, );
 	}
 
-	numStackCubes = 5; // choose 3–5 for testing
 
-	elevate::Vector3 cubeHalfSize(1.0f, 1.0f, 1.0f);
-	glm::vec3       renderScale(2.0f, 2.0f, 2.0f);
-
-	for (int i = 0; i < numStackCubes; i++)
-	{
-		float centerY = 2.0f + i * 2.0f;
-
-		elevate::Vector3 pos(-20.0f, centerY, -20.0f);
-		elevate::Vector3 scale(renderScale.x, renderScale.y, renderScale.z);
-
-		// Render cube
-		Cube* cube = new Cube(pos, scale, &cubeShader, this);
-		cube->LoadMesh();
-		cube->SetAngle(0.0f);
-		cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
-		cube->SetColor(glm::vec3(0.2f, 0.7f, 0.3f));
-		gameObjects.push_back(cube);
-		stackCubes[i] = cube;
-
-		// Physics body
-		elevate::RigidBody* body = new elevate::RigidBody();
-		body->setAwake(true);
-		body->setPosition(pos);
-		body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
-		body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
-
-		real mass = 0.2f;
-		body->setMass(mass);
-
-		elevate::Matrix3 boxInertia;
-		boxInertia.setBlockInertiaTensor(cubeHalfSize, mass);
-		body->setInertiaTensor(boxInertia);
-
-		rbWorld->addBody(body);
-		rbGravity->updateForce(body, 0); // or via registry below
-
-		rbWorld->getForceRegistry().add(body, rbGravity);
-
-		stackBodies[i] = body;
-
-		// Collision box
-		elevate::CollisionBox* cBox = new elevate::CollisionBox();
-		cBox->body = body;
-		cBox->halfSize = cubeHalfSize;
-		cBox->body->calculateDerivedData();
-		cBox->calculateInternals();
-		cStackBoxes[i] = cBox;
-	}
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
@@ -381,11 +331,20 @@ void GameManager::reset()
 		elevate::Vector3(0.267, 0.888, 0.207));
 
 	// Only the first block exists
-	blocks[0].exists = true;
-	for (Block* block = blocks + 1; block < blocks + 9; block++)
+	for (Block* block = blocks; block < blocks + 9; block++)
 	{
 		block->exists = false;
+
+		gameObjects.erase(
+			std::remove(
+				gameObjects.begin(),
+				gameObjects.end(),
+				block->visual),
+			gameObjects.end()
+		);
 	}
+
+	firstHit = true;
 
 	Cube* cube = new Cube(elevate::Vector3(-10, 7, 10), elevate::Vector3(5, 5, 5), &cubeShader, this);
 	cube->LoadMesh();
@@ -413,8 +372,9 @@ void GameManager::reset()
 	blocks[0].body->setAcceleration(elevate::Vector3::GRAVITY);
 	blocks[0].body->setAwake(true);
 	blocks[0].body->setCanSleep(true);
+	blocks[0].exists = true;
 
-	hit = false;
+//	hit = false;
 
 	//elevate::real strength = -random.randomReal(500.0f, 1000.0f);
 	//for (unsigned i = 0; i < 12; i++)
@@ -429,6 +389,74 @@ void GameManager::reset()
 	//);
 
 	// Reset the contacts
+
+	
+
+	numStackCubes = 5; // choose 3–5 for testing
+
+	elevate::Vector3 cubeHalfSize(1.0f, 1.0f, 1.0f);
+	glm::vec3       renderScale(2.0f, 2.0f, 2.0f);
+
+	for (int i = 0; i < numStackCubes; i++)
+	{
+		gameObjects.erase(
+			std::remove(
+				gameObjects.begin(),
+				gameObjects.end(),
+				stackCubes[i]),
+			gameObjects.end()
+		);
+
+		rbWorld->removeBody(stackBodies[i]);
+
+		delete cStackBoxes[i];
+
+		float centerY = 2.0f + i * 2.0f;
+
+		elevate::Vector3 pos(-20.0f, centerY, -20.0f);
+		elevate::Vector3 scale(renderScale.x, renderScale.y, renderScale.z);
+
+		// Render cube
+		Cube* cube = new Cube(pos, scale, &cubeShader, this);
+		cube->LoadMesh();
+		cube->SetAngle(0.0f);
+		cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
+		cube->SetColor(glm::vec3(0.2f, 0.7f, 0.3f));
+		gameObjects.push_back(cube);
+		stackCubes[i] = cube;
+
+		// Physics body
+		elevate::RigidBody* body = new elevate::RigidBody();
+		body->setAwake(true);
+		body->setPosition(pos);
+		body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+		body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+
+		real mass = 0.2f;
+		body->setMass(mass);
+
+		elevate::Matrix3 boxInertia;
+		boxInertia.setBlockInertiaTensor(cubeHalfSize, mass);
+		body->setInertiaTensor(boxInertia);
+
+		rbWorld->addBody(body);
+		rbGravity->updateForce(body, 0); // or via registry below
+
+		rbWorld->getForceRegistry().add(body, rbGravity);
+
+		stackBodies[i] = body;
+
+		// Collision box
+		elevate::CollisionBox* cBox = new elevate::CollisionBox();
+		cBox->body = body;
+		cBox->halfSize = cubeHalfSize;
+		cBox->body->calculateDerivedData();
+		cBox->calculateInternals();
+		cStackBoxes[i] = cBox;
+	}
+	hit = false;
+
 	cData.contactCount = 0;
 }
 
@@ -780,6 +808,7 @@ void GameManager::update(float deltaTime)
 					blocks[0].visual),
 				gameObjects.end()
 			);
+
 			ball_active = false;
 
 			hit = false;
