@@ -748,28 +748,30 @@ void GameManager::update(float deltaTime)
 
 		if (hit)
 		{
-			for (Cube* cube = cubes; cube < cubes + 9; cube++)
+			for (int i = 0; i < 8; i++)
 			{
-				float newPosX = blocks[0].getTransform().getAxisVector(3).x + random.randomBinomial(2.0f);
-				float newPosY = blocks[0].getTransform().getAxisVector(3).y + random.randomBinomial(2.0f);
-				float newPosZ = blocks[0].getTransform().getAxisVector(3).z + random.randomBinomial(2.0f);
+				float newPosX = random.randomBinomial(2.0f);
+				float newPosY = random.randomBinomial(2.0f);
+				float newPosZ = random.randomBinomial(2.0f);
 
 				//Cube* c = new Cube(elevate::Vector3(newPosX, blocks[0].getTransform().getAxisVector(3).y, newPosZ), elevate::Vector3(1.0f, 1.0f, 1.0f), &cubeShader, this);
-				Cube* c = new Cube(blocks[0].getTransform().getAxisVector(3), elevate::Vector3(1.0f, 1.0f, 1.0f), &cubeShader, this);
+				Cube* c = new Cube(elevate::Vector3(3.0f, 5.0f, 3.0f), elevate::Vector3(1.0f, 1.0f, 1.0f), &cubeShader, this);
 				c->LoadMesh();
 				c->SetAngle(0.0f);
 				c->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
 				c->SetColor(glm::vec3(0.2f, 0.1f, 0.3f));
-				cube = c;
+				cubes[i] = c;
 				gameObjects.push_back(c);
 			}
 
 			blocks[0].divideBlock(
 				cData.contactArray[fracture_contact],
 				blocks,
-				blocks + 1	,
+				blocks + 1,
 				cubes
 			);
+
+			blocks[0].exists = false;
 
 			gameObjects.erase(
 				std::remove(
@@ -779,6 +781,8 @@ void GameManager::update(float deltaTime)
 				gameObjects.end()
 			);
 			ball_active = false;
+
+			hit = false;
 		}
 		return;
 	}

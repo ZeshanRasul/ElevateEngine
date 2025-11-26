@@ -8,7 +8,7 @@ class Block : public elevate::CollisionBox
 {
 public:
     bool exists;
-    Cube* visual = nullptr;
+    Cube* visual;
 
     Block()
         :
@@ -94,7 +94,7 @@ public:
      * The algorithm is structured to allow this reuse.
      */
     void divideBlock(const elevate::Contact& contact,
-        Block* target, Block* blocks, Cube* cube)
+        Block* target, Block* blocks, Cube** cubes)
     {
 
         // Find out if we're block one or two in the contact structure, and
@@ -180,7 +180,8 @@ public:
             // Work out the direction to the impact.
             elevate::Vector3 direction = newPos - contact.contactPoint;
             direction.normalize();
-            blocks[i].visual = &cube[i];
+
+            blocks[i].visual = *cubes++;
 
             // Set the body's properties (we assume the block has a body
             // already that we're going to overwrite).
