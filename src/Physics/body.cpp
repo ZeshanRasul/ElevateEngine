@@ -95,6 +95,11 @@ namespace elevate {
 			t62 * rotmat.data[10];
 	}
 
+	Vector3 RigidBody::getPointInWorldSpace(const Vector3& point) const
+	{
+		return transformMatrix.transform(point);
+	}
+
 	Matrix3 elevate::RigidBody::getInverseInertiaTensor() const
 	{
 		return inverseInertiaTensor;

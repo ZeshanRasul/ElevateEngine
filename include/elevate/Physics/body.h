@@ -62,8 +62,8 @@ namespace elevate {
 			velocity += deltaVel;
 		};
 
-		void setAcceleration(const Vector3& acc);
-		void setAcceleration(const real x, const real y, const real z);
+		void setAcceleration(const Vector3& acc) { acceleration = acc; }
+	//	void setAcceleration(const real x, const real y, const real z);
 		Vector3 getAcceleration() const { return acceleration; };
 
 		void addRotation(const Vector3& deltaRot)
@@ -75,6 +75,8 @@ namespace elevate {
 
 		Quaternion getOrientation() const { return orientation; }
 		void setOrientation(const Quaternion& orient) { orientation = orient; }
+
+		Vector3 getPointInWorldSpace(const Vector3& point) const;
 
 		Matrix3 getInverseInertiaTensor() const;
 		void setInverseInertiaTensor(const Matrix3& tensor);
@@ -111,6 +113,8 @@ namespace elevate {
 			linearDamping = linear;
 			angularDamping = angular;
 		}
+		
+		void setCanSleep(const bool canSleep) { this->canSleep = canSleep; }
 
 	protected:
 		real linearDamping;

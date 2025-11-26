@@ -127,9 +127,86 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 			elevate::Vector3(50.0f, 8.0f, 1.0f)
 		);
 
-		addEnvBox(
-			elevate::Vector3(0.0f, 3.0f, 0.0f),
-			elevate::Vector3(2.0f, 6.0f, 2.0f)
+		//addEnvBox(
+		//	elevate::Vector3(0.0f, 3.0f, 0.0f),
+		//	elevate::Vector3(2.0f, 6.0f, 2.0f)
+		//);
+
+		reset();
+
+		// Right Knee
+		joints[0].set(
+			bones[0].body, elevate::Vector3(0, 1.07f, 0),
+			bones[1].body, elevate::Vector3(0, -1.07f, 0),
+			0.15f
+		);
+
+		// Left Knee
+		joints[1].set(
+			bones[2].body, elevate::Vector3(0, 1.07f, 0),
+			bones[3].body, elevate::Vector3(0, -1.07f, 0),
+			0.15f
+		);
+
+		// Right elbow
+		joints[2].set(
+			bones[9].body, elevate::Vector3(0, 0.96f, 0),
+			bones[8].body, elevate::Vector3(0, -0.96f, 0),
+			0.15f
+		);
+
+		// Left elbow
+		joints[3].set(
+			bones[11].body, elevate::Vector3(0, 0.96f, 0),
+			bones[10].body, elevate::Vector3(0, -0.96f, 0),
+			0.15f
+		);
+
+		// Stomach to Waist
+		joints[4].set(
+			bones[4].body, elevate::Vector3(0.054f, 0.50f, 0),
+			bones[5].body, elevate::Vector3(-0.043f, -0.45f, 0),
+			0.15f
+		);
+
+		joints[5].set(
+			bones[5].body, elevate::Vector3(-0.043f, 0.411f, 0),
+			bones[6].body, elevate::Vector3(0, -0.411f, 0),
+			0.15f
+		);
+
+		joints[6].set(
+			bones[6].body, elevate::Vector3(0, 0.521f, 0),
+			bones[7].body, elevate::Vector3(0, -0.752f, 0),
+			0.15f
+		);
+
+		// Right hip
+		joints[7].set(
+			bones[1].body, elevate::Vector3(0, 1.066f, 0),
+			bones[4].body, elevate::Vector3(0, -0.458f, -0.5f),
+			0.15f
+		);
+
+		// Left Hip
+		joints[8].set(
+			bones[3].body, elevate::Vector3(0, 1.066f, 0),
+			bones[4].body, elevate::Vector3(0, -0.458f, 0.5f),
+			0.105f
+		);
+
+		// Right shoulder
+		joints[9].set(
+			bones[6].body, elevate::Vector3(0, 0.367f, -0.8f),
+			bones[8].body, elevate::Vector3(0, 0.888f, 0.32f),
+			0.15f
+		);
+
+		// Left shoulder
+		joints[10].set(
+			bones[6].body, elevate::Vector3(0, 0.367f, 0.8f),
+			bones[10].body, elevate::Vector3(0, 0.888f, -0.32f),
+			0.15f
 		);
 	}
 
@@ -179,7 +256,15 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		ammoPool[i].lifetime = 0.0f;
 	}
 
-
+	for (unsigned i = 0; i < 12; i++)
+	{
+		Cube* c = new Cube(bones[i].getTransform().getAxisVector(3), bones[i].halfSize * 2, &ammoShader, this);
+		c->LoadMesh();
+		bones[i].visual= c;
+		gameObjects.push_back(c);
+		rbWorld->addBody(bones[i].body);
+		rbWorld->getForceRegistry().add(bones[i].body, rbGravity);
+	}
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
@@ -191,6 +276,61 @@ void GameManager::setupCamera(unsigned int width, unsigned int height)
 void GameManager::setSceneData()
 {
 	renderer->setScene(view, projection, dirLight);
+}
+
+void GameManager::reset()
+{
+	bones[0].setState(
+		elevate::Vector3(0, 0.993, -0.5),
+		elevate::Vector3(0.301, 1.0, 0.234));
+	bones[1].setState(
+		elevate::Vector3(0, 3.159, -0.56),
+		elevate::Vector3(0.301, 1.0, 0.234));
+	bones[2].setState(
+		elevate::Vector3(0, 0.993, 0.5),
+		elevate::Vector3(0.301, 1.0, 0.234));
+	bones[3].setState(
+		elevate::Vector3(0, 3.15, 0.56),
+		elevate::Vector3(0.301, 1.0, 0.234));
+	bones[4].setState(
+		elevate::Vector3(-0.054, 4.683, 0.013),
+		elevate::Vector3(0.415, 0.392, 0.690));
+	bones[5].setState(
+		elevate::Vector3(0.043, 5.603, 0.013),
+		elevate::Vector3(0.301, 0.367, 0.693));
+	bones[6].setState(
+		elevate::Vector3(0, 6.485, 0.013),
+		elevate::Vector3(0.435, 0.367, 0.786));
+	bones[7].setState(
+		elevate::Vector3(0, 7.759, 0.013),
+		elevate::Vector3(0.45, 0.598, 0.421));
+	bones[8].setState(
+		elevate::Vector3(0, 5.946, -1.066),
+		elevate::Vector3(0.267, 0.888, 0.207));
+	bones[9].setState(
+		elevate::Vector3(0, 4.024, -1.066),
+		elevate::Vector3(0.267, 0.888, 0.207));
+	bones[10].setState(
+		elevate::Vector3(0, 5.946, 1.066),
+		elevate::Vector3(0.267, 0.888, 0.207));
+	bones[11].setState(
+		elevate::Vector3(0, 4.024, 1.066),
+		elevate::Vector3(0.267, 0.888, 0.207));
+
+	//elevate::real strength = -random.randomReal(500.0f, 1000.0f);
+	//for (unsigned i = 0; i < 12; i++)
+	//{
+	//	bones[i].body->addForceAtBodyPoint(
+	//		elevate::Vector3(strength, 0, 0), elevate::Vector3()
+	//	);
+	//}
+	//bones[6].body->addForceAtBodyPoint(
+	//	elevate::Vector3(strength, 0, random.randomBinomial(1000.0f)),
+	//	elevate::Vector3(random.randomBinomial(4.0f), random.randomBinomial(3.0f), 0)
+	//);
+
+	// Reset the contacts
+	cData.contactCount = 0;
 }
 
 void GameManager::setUpDebugUI()
@@ -337,13 +477,13 @@ void GameManager::update(float deltaTime)
 	inputManager->processInput(window->getWindow(), deltaTime);
 
 	rbWorld->startFrame();
-	rbWorld->runPhysics(deltaTime);
+	rbWorld->runPhysics(1.0f / 60.0f);
 
 	if (fpsSandboxDemo)
 	{
 		rbWorld->startFrame();
 
-		rbWorld->runPhysics(deltaTime);
+		rbWorld->runPhysics(1.0f / 60.0f);
 
 		for (int b = 0; b < numEnvBoxes; ++b)
 		{
@@ -359,10 +499,14 @@ void GameManager::update(float deltaTime)
 			r.body->calculateDerivedData();
 			r.coll->calculateInternals();
 		}
-
+		for (Bone* bone = bones; bone < bones + 12; bone++)
+		{
+			bone->body->integrate(deltaTime);
+			bone->calculateInternals();
+		}
 		generateContacts();
 
-		resolver.resolveContacts(cData.contacts, cData.contactCount, deltaTime);
+		resolver.resolveContacts(cData.contacts, cData.contactCount, 1.0f / 60.0f);
 
 		for (int b = 0; b < numEnvBoxes; ++b)
 		{
@@ -389,7 +533,7 @@ void GameManager::update(float deltaTime)
 				(float)r.body->getOrientation().j,
 				(float)r.body->getOrientation().k));
 
-			r.lifetime -= deltaTime;
+			r.lifetime -= 1.0f / 60.0f;
 
 			elevate::Vector3 pos = r.body->getPosition();
 			if (r.lifetime <= 0.0f || pos.y < -100.0f)
@@ -432,7 +576,44 @@ void GameManager::generateContacts()
 					*r.coll,
 					&cData);
 			}
+
+			// Perform exhaustive collision detection on the ground plane
+			elevate::Matrix4 transform, otherTransform;
+			elevate::Vector3 position, otherPosition;
+			for (Bone* bone = bones; bone < bones + 12; bone++)
+			{
+				// Check for collisions with the ground plane
+				if (!cData.hasMoreContacts()) return;
+				
+				elevate::CollisionSphere boneSphere = bone->getCollisionSphere();
+				
+				elevate::CollisionDetector::sphereAndSphere(boneSphere, *r.coll, &cData);
+
+				for (int b = 0; b < numEnvBoxes; ++b)
+				{
+					elevate::CollisionDetector::boxAndSphere(
+						*envBoxes[b],
+						boneSphere,
+						&cData);
+				}
+
+				// Check for collisions with each other box
+				for (Bone* other = bone + 1; other < bones + 12; other++)
+				{
+					if (!cData.hasMoreContacts()) return;
+
+					elevate::CollisionSphere otherSphere = other->getCollisionSphere();
+
+					elevate::CollisionDetector::sphereAndSphere(
+						boneSphere,
+						otherSphere,
+						&cData
+					);
+				}
+			}
 		}
+
+
 
 	}
 	buildContactDebugLines();

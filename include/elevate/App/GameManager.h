@@ -16,6 +16,10 @@
 #include "Physics/pworld.h"
 #include "Physics/body.h"
 #include "Physics/World.h"
+#include "Physics/bone.h"
+#include "Physics/joints.h"
+#include "Physics/random.h"
+
 
 struct DebugLine
 {
@@ -73,6 +77,7 @@ public:
     void setPushDir(float newDir) { pushDirX = newDir; }
     void fireRound(AmmoType type);
 
+    void reset();
 private:
     void ShowCameraControlWindow(Camera& cam);
     void ShowLightControlWindow(DirLight& light);
@@ -177,6 +182,8 @@ private:
     static const int MaxEnvBoxes = 8;
     int               numEnvBoxes = 8;
 
+    Random random;
+
     elevate::CollisionBox* envBoxes[MaxEnvBoxes];
     elevate::RigidBody* envBodies[MaxEnvBoxes];
     Cube* envCubes[MaxEnvBoxes];
@@ -185,6 +192,10 @@ private:
 
     AmmoRound ammoPool[MaxAmmoRounds];
     int       ammoCount = 0;
+
+    Bone bones[12];
+
+    elevate::Joint joints[11];
 
 
     std::vector<DebugLine> m_DebugLines;

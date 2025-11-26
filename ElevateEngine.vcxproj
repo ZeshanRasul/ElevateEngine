@@ -160,12 +160,14 @@
     <ClInclude Include="include\elevate\Physics\Demos\AmmoRound.h" />
     <ClInclude Include="include\elevate\Physics\Demos\FloatingSphere.h" />
     <ClInclude Include="include\elevate\Physics\fgen.h" />
+    <ClInclude Include="include\elevate\Physics\joints.h" />
     <ClInclude Include="include\elevate\Physics\particle.h" />
     <ClInclude Include="include\elevate\Physics\pcontacts.h" />
     <ClInclude Include="include\elevate\Physics\pfgen.h" />
     <ClInclude Include="include\elevate\Physics\plinks.h" />
     <ClInclude Include="include\elevate\Physics\precision.h" />
     <ClInclude Include="include\elevate\Physics\pworld.h" />
+    <ClInclude Include="include\elevate\Physics\random.h" />
     <ClInclude Include="include\elevate\Physics\World.h" />
     <ClInclude Include="include\external\imgui\backend\imgui_impl_glfw.h" />
     <ClInclude Include="include\external\imgui\backend\imgui_impl_opengl3.h" />
@@ -180,6 +182,7 @@
     <ClInclude Include="include\external\stb_image_write.h" />
     <ClInclude Include="include\elevate\GameObjects\Line.h" />
     <ClInclude Include="include\elevate\Physics\body.h" />
+    <ClInclude Include="src\Physics\bone.h" />
     <ClInclude Include="src\Tools\Logger.h" />
     <ClInclude Include="src\Window\Window.h" />
   </ItemGroup>
@@ -214,11 +217,13 @@
     <ClCompile Include="src\Physics\CollideBroad.cpp" />
     <ClCompile Include="src\Physics\core.cpp" />
     <ClCompile Include="src\Physics\fgen.cpp" />
+    <ClCompile Include="src\Physics\joints.cpp" />
     <ClCompile Include="src\Physics\particle.cpp" />
     <ClCompile Include="src\Physics\pcontacts.cpp" />
     <ClCompile Include="src\Physics\pfgen.cpp" />
     <ClCompile Include="src\Physics\plinks.cpp" />
     <ClCompile Include="src\Physics\pworld.cpp" />
+    <ClCompile Include="src\Physics\random.cpp" />
     <ClCompile Include="src\Physics\World.cpp" />
     <ClCompile Include="src\Tools\Logger.cpp" />
     <ClCompile Include="src\Window\Window.cpp" />
