@@ -157,7 +157,7 @@ private:
 	ForceRegistry rbRegistry;
 	Gravity* rbGravity;
 
-	bool sphereDemo = true;
+	bool sphereDemo = false;
 	Sphere* sphere = nullptr;
 	Sphere* sphere2 = nullptr;
 	elevate::RigidBody* sphereBody = nullptr;

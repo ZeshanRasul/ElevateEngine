@@ -104,12 +104,12 @@ namespace elevate {
 		void adjustPositions(Contact* contacts, unsigned numContacts, real duration);
 
 		unsigned velocityIterationsUsed = 0;
-		unsigned velocityIterations = 50;
-		real velocityEpsilon = 0.1f;
+		unsigned velocityIterations = 20;
+		real velocityEpsilon = 0.01f;
 
 		unsigned positionIterationsUsed = 0;
-		unsigned positionIterations = 50;
-		real positionEpsilon = 0.1f;
+		unsigned positionIterations = 20;
+		real positionEpsilon = 0.01f;
 	};
 
 	class ContactGenerator
