@@ -778,11 +778,6 @@ void GameManager::update(float deltaTime)
 		{
 			for (int i = 0; i < 8; i++)
 			{
-				float newPosX = random.randomBinomial(2.0f);
-				float newPosY = random.randomBinomial(2.0f);
-				float newPosZ = random.randomBinomial(2.0f);
-
-				//Cube* c = new Cube(elevate::Vector3(newPosX, blocks[0].getTransform().getAxisVector(3).y, newPosZ), elevate::Vector3(1.0f, 1.0f, 1.0f), &cubeShader, this);
 				Cube* c = new Cube(elevate::Vector3(3.0f, 5.0f, 3.0f), elevate::Vector3(1.0f, 1.0f, 1.0f), &cubeShader, this);
 				c->LoadMesh();
 				c->SetAngle(0.0f);

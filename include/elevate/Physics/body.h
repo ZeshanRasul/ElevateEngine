@@ -112,7 +112,7 @@ namespace elevate {
 
 
 		Matrix4 getTransformMatrix() const { return transformMatrix; }
-		void getGLTransformMatrix(float* mat) { mat = transformMatrix.data; }
+		void getGLTransformMatrix(real* mat) { mat = transformMatrix.data; }
 
 
 		void setAwake(const bool awake) { isAwake = awake; }
