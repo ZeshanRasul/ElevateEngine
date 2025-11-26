@@ -14,6 +14,8 @@ public:
 
     void drawObject(glm::mat4 viewMat, glm::mat4 proj) override;
 
+    void SetColor(glm::vec3 col) { color = col; }
+
 private:
 
     float vertices[192] = {

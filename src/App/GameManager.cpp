@@ -264,6 +264,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	{
 		Cube* c = new Cube(bones[i].getTransform().getAxisVector(3), bones[i].halfSize * 2, &ammoShader, this);
 		c->LoadMesh();
+		c->SetColor(glm::vec3(0.92f, 0.9f, 0.87f));
 		bones[i].visual = c;
 		gameObjects.push_back(c);
 		//rbWorld->addBody(bones[i].body);
@@ -309,6 +310,7 @@ void GameManager::reset()
 	bones[7].setState(
 		elevate::Vector3(0, 7.759, 0.013),
 		elevate::Vector3(0.45, 0.598, 0.421));
+	bones[7].body->setMass(FLT_MAX);
 	bones[8].setState(
 		elevate::Vector3(0, 5.946, -1.066),
 		elevate::Vector3(0.267, 0.888, 0.207));
@@ -512,7 +514,7 @@ void GameManager::update(float deltaTime)
 		{
 			bone->body->clearAccumulator();
 			bone->body->calculateDerivedData();
-			if (bone != &bones[4]) // make waist static
+			if (bone != &bones[4] && bone != &bones[7])
 				bone->body->integrate(deltaTime);
 			bone->calculateInternals();
 		}
