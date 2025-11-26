@@ -177,7 +177,8 @@ namespace elevate
             int depth,
             const Vector3& crateSize,
             real massPerCrate,
-            Shader* shader);
+            Shader* shader,
+            std::vector<PhysicsObject*>& crates);
 
         void BuildBrickWall(
             const Vector3& basePos,

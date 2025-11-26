@@ -45,11 +45,11 @@ void Renderer::setScene(glm::mat4 viewMat, glm::mat4 proj, DirLight light)
 void Renderer::draw(GameObject* gameObj, glm::mat4 viewMat, glm::mat4 proj)
 {
 	Shader* shader = gameObj->GetShader();
-	if (!shader)
+	/*if (!shader)
 	{
 		Logger::log(1, "%s error: game object has no shader assigned\n", __FUNCTION__);
 		return;
-	}
+	}*/
 	shader->use();
 	shader->setVec3("dirLight.direction", sun.direction);
 	shader->setVec3("dirLight.ambient", sun.ambient);

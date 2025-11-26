@@ -102,7 +102,6 @@ namespace elevate
 		}
 
 
-		// Optionally register PhysicsObject somewhere central (GameManager).
 		return obj;
 	}
 
@@ -416,7 +415,8 @@ namespace elevate
 		int depth,
 		const Vector3& crateSize,
 		real massPerCrate,
-		Shader* shader)
+		Shader* shader,
+		std::vector<PhysicsObject*>& crates)
 	{
 		Vector3 step =
 		{
@@ -425,6 +425,11 @@ namespace elevate
 			crateSize.z
 		};
 
+		int noCrates = width * height * depth;
+
+		crates.reserve(noCrates);
+
+		int i = 0;
 		for (int y = 0; y < height; ++y)
 		{
 			for (int z = 0; z < depth; ++z)
@@ -438,7 +443,7 @@ namespace elevate
 						basePos.z + (z - depth * 0.5f + 0.5f) * step.z
 					};
 
-					SpawnCrate(pos, shader, crateSize, massPerCrate);
+					crates.push_back(SpawnCrate(pos, shader, crateSize, massPerCrate));
 				}
 			}
 		}

@@ -82,6 +82,25 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	gameObjects.push_back(ball->mesh);
 
+	spawnFactory->BuildCrateStack(
+		elevate::Vector3(-10.0f, 0.0f, 0.0f),
+		3,
+		3,
+		3,
+		elevate::Vector3(1.1f, 1.1f, 1.1f),
+		1.0f,
+		&cubeShader,
+		crates
+	);
+
+	for (int i = 0; i < 27; ++i)
+	{
+		crates[i]->mesh->SetShader(&ammoShader);
+		crates[i]->mesh->setGameManager(this);
+
+		gameObjects.push_back(crates[i]->mesh);
+	}
+
 	if (fpsSandboxDemo)
 	{
 		cubeDemo = false;
