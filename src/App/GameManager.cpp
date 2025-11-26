@@ -69,6 +69,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 				cube->LoadMesh();
 				cube->SetAngle(0.0f);
 				cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
+				cube->SetColor(glm::vec3(0.7f, 0.1f, 0.3f));
 				gameObjects.push_back(cube);
 
 				elevate::RigidBody* body = new elevate::RigidBody();
@@ -264,7 +265,8 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	{
 		Cube* c = new Cube(bones[i].getTransform().getAxisVector(3), bones[i].halfSize * 2, &ammoShader, this);
 		c->LoadMesh();
-		c->SetColor(glm::vec3(0.92f, 0.9f, 0.87f));
+//		elevate::Vector3 color = random.randomVector(1.0f);
+		c->SetColor(glm::vec3(87.0f, 0.8f, 0.9f));
 		bones[i].visual = c;
 		gameObjects.push_back(c);
 		//rbWorld->addBody(bones[i].body);
