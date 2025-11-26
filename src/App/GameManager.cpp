@@ -266,7 +266,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		c->LoadMesh();
 		bones[i].visual = c;
 		gameObjects.push_back(c);
-		rbWorld->addBody(bones[i].body);
+		//rbWorld->addBody(bones[i].body);
 		//	rbWorld->getForceRegistry().add(bones[i].body, );
 	}
 }
@@ -476,7 +476,7 @@ void GameManager::ShowCameraControlWindow(Camera& cam)
 
 void GameManager::update(float deltaTime)
 {
-
+	//deltaTime = glm::clamp(deltaTime, 0.0f, 1/ 60.0f);
 	RemoveDestroyedGameObjects();
 	inputManager->processInput(window->getWindow(), deltaTime);
 
@@ -491,8 +491,10 @@ void GameManager::update(float deltaTime)
 
 		for (int b = 0; b < numEnvBoxes; ++b)
 		{
-			envBodies[b]->integrate(deltaTime);
+			
+			envBodies[b]->clearAccumulator();
 			envBodies[b]->calculateDerivedData();
+			envBodies[b]->integrate(deltaTime);
 			envBoxes[b]->calculateInternals();
 		}
 
@@ -500,14 +502,16 @@ void GameManager::update(float deltaTime)
 		{
 			AmmoRound& r = ammoPool[i];
 			if (!r.active) continue;
-			r.body->integrate(deltaTime);
+			r.body->clearAccumulator();
 			r.body->calculateDerivedData();
+			r.body->integrate(deltaTime);
 			r.coll->calculateInternals();
 		}
 		for (Bone* bone = bones; bone < bones + 12; bone++)
 		{
-			bone->body->integrate(deltaTime);
+			bone->body->clearAccumulator();
 			bone->body->calculateDerivedData();
+			bone->body->integrate(deltaTime);
 			bone->calculateInternals();
 		}
 		generateContacts();
@@ -516,6 +520,7 @@ void GameManager::update(float deltaTime)
 
 		for (int b = 0; b < numEnvBoxes; ++b)
 		{
+			envBoxes[b]->calculateInternals();
 			elevate::Matrix4 t = envBodies[b]->getTransform();
 			elevate::Vector3 p = t.getAxisVector(3);
 			envCubes[b]->SetPosition(p);
@@ -530,8 +535,8 @@ void GameManager::update(float deltaTime)
 		{
 			AmmoRound& r = ammoPool[i];
 			if (!r.active) continue;
-
-			elevate::Vector3 p = r.body->getPosition();
+			r.coll->calculateInternals();
+			elevate::Vector3 p = r.body->getTransform().getAxisVector(3);
 			r.visual->SetPosition(p);
 			r.visual->SetOrientation(glm::quat(
 				(float)r.body->getOrientation().r,
@@ -556,10 +561,11 @@ void GameManager::update(float deltaTime)
 
 		for (Bone* bone = bones; bone < bones + 12; bone++)
 		{
-			bone->body->calculateDerivedData();
+			elevate::Matrix4 t = bone->body->getTransform();
+			//bone->body->calculateDerivedData();
 			bone->calculateInternals();
 
-			elevate::Vector3 p = bone->body->getPosition();
+			elevate::Vector3 p = t.getAxisVector(3);
 			bone->visual->SetPosition(p);
 			bone->visual->SetOrientation(glm::quat(
 				(float)bone->body->getOrientation().r,
@@ -579,7 +585,7 @@ void GameManager::generateContacts()
 	plane.offset = 0;
 
 	cData.reset(256);
-	cData.friction = (real)0.3;
+	cData.friction = (real)0.9;
 	cData.restitution = (real)0.6;
 	cData.tolerance = (real)0.1;
 
@@ -611,10 +617,10 @@ void GameManager::generateContacts()
 		elevate::Vector3 position, otherPosition;
 		for (Bone* bone = bones; bone < bones + 12; bone++)
 		{
-			if (!cData.hasMoreContacts()) return;
-			elevate::CollisionDetector::boxAndHalfSpace(*bone, plane, &cData);
-
 			elevate::CollisionSphere boneSphere = bone->getCollisionSphere();
+			if (!cData.hasMoreContacts()) return;
+			elevate::CollisionDetector::sphereAndHalfSpace(boneSphere, plane, &cData);
+
 
 
 			for (int b = 0; b < numEnvBoxes; ++b)

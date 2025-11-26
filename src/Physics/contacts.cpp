@@ -13,33 +13,29 @@ void elevate::Contact::calculateDesiredDeltaVelocity(real duration)
 {
 	const static real velocityLimit = (real)0.25f;
 
-	// 1) Current separating velocity along the contact normal (in contact space x)
-	real separatingVelocity = contactVelocity.x;
+	real velocityFromAcc = 0;
 
-	// 2) Velocity that will be caused along the normal by acceleration (e.g. gravity)
-	real accCausedVelocity = 0.0f;
-
-	if (body[0])
+	if (body[0]->getAwake())
 	{
-		accCausedVelocity += body[0]->getLastFrameAcceleration().scalarProduct(contactNormal) * duration;
+		velocityFromAcc +=
+			body[0]->getLastFrameAcceleration() * duration * contactNormal;
 	}
 
-	if (body[1])
+	if (body[1] && body[1]->getAwake())
 	{
-		accCausedVelocity -= body[1]->getLastFrameAcceleration().scalarProduct(contactNormal) * duration;
+		velocityFromAcc -=
+			body[1]->getLastFrameAcceleration() * duration * contactNormal;
 	}
 
-	// 3) Possibly remove restitution for resting contacts
 	real thisRestitution = restitution;
-	if (real_abs(separatingVelocity) < velocityLimit)
+	if (real_abs(contactVelocity.x) < velocityLimit)
 	{
 		thisRestitution = (real)0.0f;
 	}
 
-	// 4) Desired change in separating velocity
-	//    (this is straight from Millington)
 	desiredDeltaVelocity =
-		-separatingVelocity - thisRestitution * (separatingVelocity - accCausedVelocity);
+		-contactVelocity.x
+		- thisRestitution * (contactVelocity.x - velocityFromAcc);
 }
 
 
@@ -385,7 +381,7 @@ void Contact::applyPositionChange(Vector3 linearChange[2],
 		// data. Otherwise the resolution will not change the position
 		// of the object, and the next collision detection round will
 		// have the same penetration.
-		if (!body[i]->getAwake()) body[i]->calculateDerivedData();
+		body[i]->calculateDerivedData();
 	}
 }
 void elevate::Contact::matchAwakeState()
@@ -454,16 +450,20 @@ void elevate::ContactResolver::adjustVelocities(Contact* c, unsigned numContacts
 	}
 }
 
-void elevate::ContactResolver::adjustPositions(Contact* c, unsigned numContacts, real duration)
+void elevate::ContactResolver::adjustPositions(Contact* c,
+	unsigned numContacts,
+	real duration)
 {
 	unsigned i, index;
 	Vector3 linearChange[2], angularChange[2];
 	real max;
 	Vector3 deltaPosition;
 
+	// iteratively resolve interpenetrations in order of severity.
 	positionIterationsUsed = 0;
 	while (positionIterationsUsed < positionIterations)
 	{
+		// Find biggest penetration
 		max = positionEpsilon;
 		index = numContacts;
 		for (i = 0; i < numContacts; i++)
@@ -472,30 +472,43 @@ void elevate::ContactResolver::adjustPositions(Contact* c, unsigned numContacts,
 			{
 				max = c[i].penetration;
 				index = i;
-				//const real allowedPen = 0.01f;
-				max = c[i].penetration;
-				//real usedPen = max - allowedPen;
-				//if (usedPen < 0.0) max = 0.0f;
-				//max = usedPen;
 			}
 		}
 		if (index == numContacts) break;
 
+		// Match the awake state at the contact
 		c[index].matchAwakeState();
 
-		c[index].applyPositionChange(linearChange, angularChange, max);
+		// Resolve the penetration.
+		c[index].applyPositionChange(
+			linearChange,
+			angularChange,
+			max);
 
+		// Again this action may have changed the penetration of other
+		// bodies, so we update contacts.
 		for (i = 0; i < numContacts; i++)
 		{
+			// Check each body in the contact
 			for (unsigned b = 0; b < 2; b++) if (c[i].body[b])
 			{
+				// Check for a match with each body in the newly
+				// resolved contact
 				for (unsigned d = 0; d < 2; d++)
 				{
 					if (c[i].body[b] == c[index].body[d])
 					{
-						deltaPosition = linearChange[d] + angularChange[d].vectorProduct(c[i].relativeContactPosition[b]);
+						deltaPosition = linearChange[d] +
+							angularChange[d].vectorProduct(
+								c[i].relativeContactPosition[b]);
 
-						c[i].penetration += deltaPosition.scalarProduct(c[i].contactNormal) * (b ? 1 : -1);
+						// The sign of the change is positive if we're
+						// dealing with the second body in a contact
+						// and negative otherwise (because we're
+						// subtracting the resolution)..
+						c[i].penetration +=
+							deltaPosition.scalarProduct(c[i].contactNormal)
+							* (b ? 1 : -1);
 					}
 				}
 			}
@@ -508,10 +521,13 @@ void elevate::ContactResolver::resolveContacts(Contact* contacts, unsigned numCo
 {
 	if (numContacts == 0) return;
 
+	if (!isValid()) return;
+
 	prepareContacts(contacts, numContacts, duration);
 
 	adjustPositions(contacts, numContacts, duration);
 
 	adjustVelocities(contacts, numContacts, duration);
 }
+
 

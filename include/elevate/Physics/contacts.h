@@ -90,6 +90,15 @@ namespace elevate {
 		}
 	protected:
 
+
+		bool isValid()
+		{
+			return (velocityIterations > 0) &&
+				(positionIterations > 0) &&
+				(positionEpsilon >= 0.0f) &&
+				(positionEpsilon >= 0.0f);
+		}
+
 		void adjustVelocities(Contact* contactArray, unsigned numContacts, real duration);
 
 		void adjustPositions(Contact* contacts, unsigned numContacts, real duration);
