@@ -244,21 +244,21 @@ namespace elevate
 			shader);
 	}
 
-	//PhysicsObject* SpawnFactory::SpawnBrick(
-	//	const Vector3& position,
-	//	const Vector3& size,
-	//	real mass,
-	//	Shader* shader)
-	//{
-	//	Vector3 halfExtents = { size.x * 0.5f, size.y * 0.5f, size.z * 0.5f };
-	//	return SpawnBox(
-	//		position,
-	//		halfExtents,
-	//		mass,
-	//		"Mesh_Brick",
-	//		PhysicsMaterialId::Brick,
-	//		shader);
-	//}
+	PhysicsObject* SpawnFactory::SpawnBrick(
+		const Vector3& position,
+		Shader* shader,
+		real mass,
+		const Vector3& size)
+	{
+		Vector3 halfExtents = { size.x * 0.5f, size.y * 0.5f, size.z * 0.5f };
+		return SpawnBox(
+			position,
+			halfExtents,
+			mass,
+			"Mesh_Brick",
+			PhysicsMaterialId::Brick,
+			shader);
+	}
 
 	//PhysicsObject* SpawnFactory::SpawnBarrel(
 	//    const Vector3& position,
@@ -449,39 +449,41 @@ namespace elevate
 		}
 	}
 
-	//void SpawnFactory::BuildBrickWall(
-	//	const Vector3& basePos,
-	//	int bricksWide,
-	//	int bricksHigh,
-	//	const Vector3& brickSize,
-	//	real massPerBrick,
-	//	bool staggered)
-	//{
-	//	Vector3 step =
-	//	{
-	//		brickSize.x,
-	//		brickSize.y,
-	//		brickSize.z
-	//	};
+	void SpawnFactory::BuildBrickWall(
+		const Vector3& basePos,
+		int bricksWide,
+		int bricksHigh,
+		const Vector3& brickSize,
+		real massPerBrick,
+		bool staggered,
+		std::vector<PhysicsObject*>& bricks,
+		Shader* shader)
+	{
+		Vector3 step =
+		{
+			brickSize.x,
+			brickSize.y,
+			brickSize.z
+		};
 
-	//	for (int y = 0; y < bricksHigh; ++y)
-	//	{
-	//		bool offsetRow = staggered && (y % 2 == 1);
-	//		for (int x = 0; x < bricksWide; ++x)
-	//		{
-	//			float offset = offsetRow ? 0.5f : 0.0f;
+		for (int y = 0; y < bricksHigh; ++y)
+		{
+			bool offsetRow = staggered && (y % 2 == 1);
+			for (int x = 0; x < bricksWide; ++x)
+			{
+				float offset = offsetRow ? 0.5f : 0.0f;
 
-	//			Vector3 pos =
-	//			{
-	//				basePos.x + ((x - bricksWide * 0.5f + 0.5f + offset) * step.x),
-	//				basePos.y + y * step.y,
-	//				basePos.z
-	//			};
+				Vector3 pos =
+				{
+					basePos.x + ((x - bricksWide * 0.5f + 0.5f + offset) * step.x),
+					basePos.y + y * step.y,
+					basePos.z
+				};
 
-	//			SpawnBrick(pos, brickSize, massPerBrick);
-	//		}
-	//	}
-	//}
+				bricks.push_back(SpawnBrick(pos, shader, massPerBrick, brickSize));
+			}
+		}
+	}
 
 	//void SpawnFactory::BuildDominoLine(
 	//	const Vector3& startPos,

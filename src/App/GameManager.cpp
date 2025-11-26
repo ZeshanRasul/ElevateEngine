@@ -93,12 +93,30 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		crates
 	);
 
-	for (int i = 0; i < 27; ++i)
+	for (int i = 0; i < crates.size(); ++i)
 	{
 		crates[i]->mesh->SetShader(&ammoShader);
 		crates[i]->mesh->setGameManager(this);
 
 		gameObjects.push_back(crates[i]->mesh);
+	}
+
+	spawnFactory->BuildBrickWall(
+		elevate::Vector3(0.0f, 0.0f, -10.0f),
+		3,
+		3,
+		elevate::Vector3(1.0f, 0.5f, 0.5f),
+		2.0f,
+		true,
+		bricks,
+		&ammoShader
+	);
+
+	for (size_t i = 0; i < bricks.size(); ++i)
+	{
+		bricks[i]->mesh->SetShader(&ammoShader);
+		bricks[i]->mesh->setGameManager(this);
+		gameObjects.push_back(bricks[i]->mesh);
 	}
 
 	if (fpsSandboxDemo)

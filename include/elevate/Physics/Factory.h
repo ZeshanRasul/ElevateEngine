@@ -133,8 +133,10 @@ namespace elevate
 
         PhysicsObject* SpawnBrick(
             const Vector3& position,
-            const Vector3& size = { 0.25f, 0.06f, 0.12f },
-            real mass = 2.0f);
+            Shader* shader,
+            real mass = 2.0f,
+            const Vector3& size = { 0.25f, 0.06f, 0.12f }
+        );
 
         PhysicsObject* SpawnBarrel(
             const Vector3& position,
@@ -186,7 +188,9 @@ namespace elevate
             int bricksHigh,
             const Vector3& brickSize,
             real massPerBrick,
-            bool staggered);
+            bool staggered,
+            std::vector<PhysicsObject*>& bricks,
+            Shader* shader);
 
         void BuildDominoLine(
             const Vector3& startPos,

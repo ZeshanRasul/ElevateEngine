@@ -219,6 +219,7 @@ private:
     PhysicsObject* crate;
     PhysicsObject* ball;
     std::vector<PhysicsObject*> crates;
+    std::vector<PhysicsObject*> bricks;
 
     std::vector<DebugLine> m_DebugLines;
     GLuint m_DebugLineVAO = 0;
