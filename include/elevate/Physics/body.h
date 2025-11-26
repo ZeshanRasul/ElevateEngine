@@ -105,6 +105,13 @@ namespace elevate {
 
 		void setAwake(const bool awake) { isAwake = awake; }
 		bool getAwake() const { return isAwake; }
+
+		void setDamping(const real linear, const real angular)
+		{
+			linearDamping = linear;
+			angularDamping = angular;
+		}
+
 	protected:
 		real linearDamping;
 		real angularDamping;

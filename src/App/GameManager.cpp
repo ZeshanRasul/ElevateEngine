@@ -31,14 +31,12 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	inputManager->setContext(camera, this, width, height);
 
-	// Debug line GL setup
 	glGenVertexArrays(1, &m_DebugLineVAO);
 	glGenBuffers(1, &m_DebugLineVBO);
 
 	glBindVertexArray(m_DebugLineVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_DebugLineVBO);
 
-	// Each vertex: vec3 position + vec3 color = 6 floats
 	glEnableVertexAttribArray(0); // position
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)0);
 
@@ -50,16 +48,14 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	if (fpsSandboxDemo)
 	{
-		// If you want this instead of the sphere/cube demo:
 		cubeDemo = false;
 		sphereDemo = false;
 
 		rbWorld = new World(200, 100);
-		rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f, 0.0f));
+		rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f * 0.2f, 0.0f));
 
 		numEnvBoxes = 0;
 
-		// Convenience: a lambda to create a static box in the environment
 		auto addEnvBox = [&](const elevate::Vector3& pos,
 			const elevate::Vector3& scale)
 			{
@@ -78,7 +74,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 				body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 				body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
 
-				body->setMass(0.0f);
+				body->setMass(FLT_MAX);
 				rbWorld->addBody(body);
 
 				elevate::CollisionBox* cbox = new elevate::CollisionBox();
@@ -131,11 +127,56 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 			elevate::Vector3(50.0f, 8.0f, 1.0f)
 		);
 
-		// Optional: a central pillar to shoot at
 		addEnvBox(
 			elevate::Vector3(0.0f, 3.0f, 0.0f),
 			elevate::Vector3(2.0f, 6.0f, 2.0f)
 		);
+	}
+
+	ammoCount = MaxAmmoRounds;
+
+	for (int i = 0; i < ammoCount; ++i)
+	{
+		elevate::Vector3 startPos(0.0f, -100.0f, 0.0f); // far below world
+
+		elevate::Vector3 scale(1.0f, 1.0f, 1.0f);
+		Sphere* s = new Sphere(startPos, scale, &ammoShader, this,
+			glm::vec3(0.9f, 0.1f, 0.1f));
+		s->GenerateSphere(0.5f, 16, 16);
+		s->LoadMesh();
+		gameObjects.push_back(s);
+
+		elevate::RigidBody* body = new elevate::RigidBody();
+		body->setAwake(false);
+		body->setPosition(startPos);
+		body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+		body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+
+		real mass = 0.7f;
+		body->setMass(mass);
+		body->setDamping(0.97f, 0.97f); 
+
+		real r = 0.5f;
+		real coeff = (real)0.4f * mass * r * r;
+		elevate::Matrix3 inertia;
+		inertia.setInertiaTensorCoeffs(coeff, coeff, coeff);
+		body->setInertiaTensor(inertia);
+
+		rbWorld->addBody(body);
+		rbWorld->getForceRegistry().add(body, rbGravity);
+
+		elevate::CollisionSphere* cs = new elevate::CollisionSphere();
+		cs->body = body;
+		cs->radius = r;
+		cs->body->calculateDerivedData();
+		cs->calculateInternals();
+
+		ammoPool[i].visual = s;
+		ammoPool[i].body = body;
+		ammoPool[i].coll = cs;
+		ammoPool[i].active = false;
+		ammoPool[i].lifetime = 0.0f;
 	}
 
 
@@ -184,6 +225,60 @@ void GameManager::ShowLightControlWindow(DirLight& light)
 
 	ImGui::End();
 }
+
+void GameManager::fireRound(AmmoType type)
+{
+	AmmoRound* round = nullptr;
+	for (int i = 0; i < ammoCount; ++i)
+	{
+		if (!ammoPool[i].active)
+		{
+			round = &ammoPool[i];
+			break;
+		}
+	}
+
+	if (!round)
+	{
+		return;
+	}
+
+	glm::vec3 camPos = camera->Position;
+	glm::vec3 camFront = glm::normalize(camera->Front);
+
+	glm::vec3 spawnPos = camPos + camFront * 2.0f; 
+
+	elevate::RigidBody* body = round->body;
+
+	body->setAwake(true);
+	body->clearAccumulator();
+	body->setPosition(elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z));
+	body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+	body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+	rbWorld->getForceRegistry().add(body, rbGravity);
+	
+	real speed = 50.0f;
+	switch (type)
+	{
+	case AmmoType::Pistol: speed = 40.0f; break;
+	case AmmoType::Rifle:  speed = 88.0f; break;
+	case AmmoType::Rocket: speed = 22.0f; break;
+	}
+	elevate::Vector3 v(camFront.x * speed,
+		camFront.y * speed,
+		camFront.z * speed);
+	body->setVelocity(v);
+
+	body->calculateDerivedData();
+	round->coll->calculateInternals();
+
+	round->active = true;
+	round->lifetime = 5.0f;
+
+	round->visual->SetPosition(elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z));
+}
+
+
 
 void GameManager::ShowAmmoWindow()
 {
@@ -243,24 +338,103 @@ void GameManager::update(float deltaTime)
 
 	rbWorld->startFrame();
 	rbWorld->runPhysics(deltaTime);
-	generateContacts();
-	resolver.resolveContacts(cData.contacts, cData.contactCount, deltaTime);
-	rbWorld->startFrame();
 
-	
+	if (fpsSandboxDemo)
+	{
+		rbWorld->startFrame();
 
+		rbWorld->runPhysics(deltaTime);
 
+		for (int b = 0; b < numEnvBoxes; ++b)
+		{
+			envBodies[b]->calculateDerivedData();
+			envBoxes[b]->calculateInternals();
+		}
+
+		for (int i = 0; i < ammoCount; ++i)
+		{
+			AmmoRound& r = ammoPool[i];
+			if (!r.active) continue;
+
+			r.body->calculateDerivedData();
+			r.coll->calculateInternals();
+		}
+
+		generateContacts();
+
+		resolver.resolveContacts(cData.contacts, cData.contactCount, deltaTime);
+
+		for (int b = 0; b < numEnvBoxes; ++b)
+		{
+			elevate::Matrix4 t = envBodies[b]->getTransform();
+			elevate::Vector3 p = t.getAxisVector(3);
+			envCubes[b]->SetPosition(p);
+			envCubes[b]->SetOrientation(glm::quat(
+				(float)envBodies[b]->getOrientation().r,
+				(float)envBodies[b]->getOrientation().i,
+				(float)envBodies[b]->getOrientation().j,
+				(float)envBodies[b]->getOrientation().k));
+		}
+
+		for (int i = 0; i < ammoCount; ++i)
+		{
+			AmmoRound& r = ammoPool[i];
+			if (!r.active) continue;
+
+			elevate::Vector3 p = r.body->getPosition();
+			r.visual->SetPosition(p);
+			r.visual->SetOrientation(glm::quat(
+				(float)r.body->getOrientation().r,
+				(float)r.body->getOrientation().i,
+				(float)r.body->getOrientation().j,
+				(float)r.body->getOrientation().k));
+
+			r.lifetime -= deltaTime;
+
+			elevate::Vector3 pos = r.body->getPosition();
+			if (r.lifetime <= 0.0f || pos.y < -100.0f)
+			{
+				r.active = false;
+				r.body->setAwake(false);
+				r.body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+				r.body->setPosition(elevate::Vector3(0.0f, -100.0f, 0.0f));
+				r.coll->calculateInternals();
+				r.visual->SetPosition(r.body->getPosition());
+				continue;
+			}
+		}
+
+		return;
+	}
 }
 
 void GameManager::generateContacts()
 {
 	cData.reset(256);
-	cData.friction = (real)0.1;
-	cData.restitution = (real)0.9;
+	cData.friction = (real)0.6;
+	cData.restitution = (real)0.3;
 	cData.tolerance = (real)0.01;
 	cData.contactArray = contacts;
 	cData.contacts = contacts;
 
+	if (fpsSandboxDemo)
+	{
+		for (int i = 0; i < ammoCount; ++i)
+		{
+			AmmoRound& r = ammoPool[i];
+			if (!r.active)
+				continue;
+
+			for (int b = 0; b < numEnvBoxes; ++b)
+			{
+				elevate::CollisionDetector::boxAndSphere(
+					*envBoxes[b],
+					*r.coll,
+					&cData);
+			}
+		}
+
+	}
 	buildContactDebugLines();
 
 }

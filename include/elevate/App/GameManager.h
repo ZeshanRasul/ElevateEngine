@@ -11,7 +11,6 @@
 #include "GameObjects/Sphere.h"
 #include "GameObjects/Line.h"
 #include "GameObjects/Plane.h"
-#include "Physics/Demos/AmmoRound.h"
 #include "Physics/Demos/FloatingSphere.h"
 #include "Physics/pfgen.h"
 #include "Physics/pworld.h"
@@ -25,6 +24,21 @@ struct DebugLine
     glm::vec3 color;
 };
 
+enum class AmmoType
+{
+    Pistol,
+    Rifle,
+    Rocket
+};
+
+struct AmmoRound
+{
+    Sphere* visual = nullptr;
+    elevate::RigidBody* body = nullptr;
+    elevate::CollisionSphere* coll = nullptr;
+    bool                     active = false;
+    float                    lifetime = 0.0f;
+};
 
 class GameManager {
 public:
@@ -47,8 +61,6 @@ public:
     glm::mat4 getView() const { return view; }
     glm::mat4 getProjection() const { return projection; }
 
-    void fireRound() {};
-	void setCurrentShotType(ShotType type) { currentShotType = type; }
 
     void update(float deltaTime);
 
@@ -59,6 +71,7 @@ public:
     void renderDebugUI();
 
     void setPushDir(float newDir) { pushDirX = newDir; }
+    void fireRound(AmmoType type);
 
 private:
     void ShowCameraControlWindow(Camera& cam);
@@ -103,10 +116,7 @@ private:
 
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection = glm::mat4(1.0f);
-
     const static unsigned ammoRounds = 16;
-    AmmoRound ammo[ammoRounds];
-    ShotType currentShotType = PISTOL;
 
 	FloatingSphere* Sphere0;
 	FloatingSphere* Sphere1;
@@ -133,7 +143,7 @@ private:
 	float floatingSphereVolume = 0.1f;
 	float waterDensity = 1000.0f;
 
-    bool showBuoyanceDemo = true;
+    bool showBuoyanceDemo = false;
 
 	bool cubeDemo = false;
 	elevate::RigidBody* testBody = nullptr;
@@ -171,6 +181,11 @@ private:
     elevate::RigidBody* envBodies[MaxEnvBoxes];
     Cube* envCubes[MaxEnvBoxes];
 
+    static const int MaxAmmoRounds = 32;
+
+    AmmoRound ammoPool[MaxAmmoRounds];
+    int       ammoCount = 0;
+
 
     std::vector<DebugLine> m_DebugLines;
     GLuint m_DebugLineVAO = 0;
@@ -184,7 +199,6 @@ private:
         {
             const elevate::Contact& c = cData.contacts[i];
 
-            // Contact point and normal, converted to glm
             glm::vec3 p(
                 (float)c.contactPoint.x,
                 (float)c.contactPoint.y,
@@ -195,17 +209,14 @@ private:
                 (float)c.contactNormal.y,
                 (float)c.contactNormal.z);
 
-            // Scale for visibility (tweak as needed)
             float nLen = 2.0f;
 
-            // Line showing the normal
             DebugLine normalLine;
             normalLine.p0 = p;
             normalLine.p1 = p + n * nLen;
-            normalLine.color = glm::vec3(1.0f, 0.0f, 0.0f); // red
+            normalLine.color = glm::vec3(1.0f, 0.0f, 0.0f);
             m_DebugLines.push_back(normalLine);
 
-            // Small cross at the contact point (3 axis-aligned mini lines)
             float s = 0.2f;
 
             DebugLine crossX;
@@ -233,9 +244,8 @@ private:
         if (m_DebugLines.empty())
             return;
 
-        // Build a CPU-side vertex array for all lines
         std::vector<float> vertexData;
-        vertexData.reserve(m_DebugLines.size() * 2 * 6); // 2 vertices per line, 6 floats each
+        vertexData.reserve(m_DebugLines.size() * 2 * 6); 
 
         for (const auto& line : m_DebugLines)
         {
@@ -266,7 +276,6 @@ private:
 
         lineShader.use();
 
-        // Assuming your line shader has view/projection uniforms
         lineShader.setMat4("view", view);
         lineShader.setMat4("projection", projection);
 
