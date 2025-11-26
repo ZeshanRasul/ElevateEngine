@@ -52,12 +52,30 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	rbWorld = new World(200, 100);
+	spawnContext.World = rbWorld;
+	shapeFactory = new elevate::ShapeFactory();
+	spawnFactory = new elevate::SpawnFactory(spawnContext);
+
+	PhysicsObject* crate = spawnFactory->SpawnCrate(
+		elevate::Vector3(0.0f, 5.0f, 0.0f),
+		elevate::Vector3(1.0f, 1.0f, 1.0f),
+		1.0f
+	);
+
+	crate->mesh->SetShader(&cubeShader);
+	crate->mesh->setGameManager(this);
+	crate->mesh->LoadMesh();
+	crate->mesh->SetPosition(crate->body->getPosition());
+	crate->mesh->SetScale(elevate::Vector3(10.0f, 10.0f, 10.0f));
+
+	gameObjects.push_back(crate->mesh);
+
 	if (fpsSandboxDemo)
 	{
 		cubeDemo = false;
 		sphereDemo = false;
 
-		rbWorld = new World(200, 100);
 		rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f * 0.2f, 0.0f));
 
 		numEnvBoxes = 0;
@@ -215,66 +233,66 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 			bones[10].body, elevate::Vector3(0, 0.888f, -0.32f),
 			0.15f
 		);
+
+		ammoCount = MaxAmmoRounds;
+
+		for (int i = 0; i < ammoCount; ++i)
+		{
+			elevate::Vector3 startPos(0.0f, -100.0f, 0.0f); // far below world
+
+			elevate::Vector3 scale(1.0f, 1.0f, 1.0f);
+			Sphere* s = new Sphere(startPos, scale, &ammoShader, this,
+				glm::vec3(0.9f, 0.1f, 0.1f));
+			s->GenerateSphere(0.5f, 16, 16);
+			s->LoadMesh();
+			gameObjects.push_back(s);
+
+			elevate::RigidBody* body = new elevate::RigidBody();
+			body->setAwake(false);
+			body->setPosition(startPos);
+			body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+			body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+			body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+
+			real mass = 1.7f;
+			body->setMass(mass);
+			body->setDamping(0.97f, 0.97f);
+
+			real r = 0.5f;
+			real coeff = (real)0.4f * mass * r * r;
+			elevate::Matrix3 inertia;
+			inertia.setInertiaTensorCoeffs(coeff, coeff, coeff);
+			body->setInertiaTensor(inertia);
+
+			rbWorld->addBody(body);
+			rbWorld->getForceRegistry().add(body, rbGravity);
+
+			elevate::CollisionSphere* cs = new elevate::CollisionSphere();
+			cs->body = body;
+			cs->radius = r;
+			cs->body->calculateDerivedData();
+			cs->calculateInternals();
+
+			ammoPool[i].visual = s;
+			ammoPool[i].body = body;
+			ammoPool[i].coll = cs;
+			ammoPool[i].active = false;
+			ammoPool[i].lifetime = 0.0f;
+		}
+
+		for (unsigned i = 0; i < 12; i++)
+		{
+			Cube* c = new Cube(bones[i].getTransform().getAxisVector(3), bones[i].halfSize * 2, &ammoShader, this);
+			c->LoadMesh();
+			//		elevate::Vector3 color = random.randomVector(1.0f);
+			c->SetColor(glm::vec3(87.0f, 0.8f, 0.9f));
+			bones[i].visual = c;
+			gameObjects.push_back(c);
+			//rbWorld->addBody(bones[i].body);
+			//	rbWorld->getForceRegistry().add(bones[i].body, );
+		}
+
 	}
-
-	ammoCount = MaxAmmoRounds;
-
-	for (int i = 0; i < ammoCount; ++i)
-	{
-		elevate::Vector3 startPos(0.0f, -100.0f, 0.0f); // far below world
-
-		elevate::Vector3 scale(1.0f, 1.0f, 1.0f);
-		Sphere* s = new Sphere(startPos, scale, &ammoShader, this,
-			glm::vec3(0.9f, 0.1f, 0.1f));
-		s->GenerateSphere(0.5f, 16, 16);
-		s->LoadMesh();
-		gameObjects.push_back(s);
-
-		elevate::RigidBody* body = new elevate::RigidBody();
-		body->setAwake(false);
-		body->setPosition(startPos);
-		body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
-		body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
-
-		real mass = 1.7f;
-		body->setMass(mass);
-		body->setDamping(0.97f, 0.97f);
-
-		real r = 0.5f;
-		real coeff = (real)0.4f * mass * r * r;
-		elevate::Matrix3 inertia;
-		inertia.setInertiaTensorCoeffs(coeff, coeff, coeff);
-		body->setInertiaTensor(inertia);
-
-		rbWorld->addBody(body);
-		rbWorld->getForceRegistry().add(body, rbGravity);
-
-		elevate::CollisionSphere* cs = new elevate::CollisionSphere();
-		cs->body = body;
-		cs->radius = r;
-		cs->body->calculateDerivedData();
-		cs->calculateInternals();
-
-		ammoPool[i].visual = s;
-		ammoPool[i].body = body;
-		ammoPool[i].coll = cs;
-		ammoPool[i].active = false;
-		ammoPool[i].lifetime = 0.0f;
-	}
-
-	for (unsigned i = 0; i < 12; i++)
-	{
-		Cube* c = new Cube(bones[i].getTransform().getAxisVector(3), bones[i].halfSize * 2, &ammoShader, this);
-		c->LoadMesh();
-		//		elevate::Vector3 color = random.randomVector(1.0f);
-		c->SetColor(glm::vec3(87.0f, 0.8f, 0.9f));
-		bones[i].visual = c;
-		gameObjects.push_back(c);
-		//rbWorld->addBody(bones[i].body);
-		//	rbWorld->getForceRegistry().add(bones[i].body, );
-	}
-
 
 }
 
@@ -374,23 +392,23 @@ void GameManager::reset()
 	blocks[0].body->setCanSleep(true);
 	blocks[0].exists = true;
 
-//	hit = false;
+	//	hit = false;
 
-	//elevate::real strength = -random.randomReal(500.0f, 1000.0f);
-	//for (unsigned i = 0; i < 12; i++)
-	//{
-	//	bones[i].body->addForceAtBodyPoint(
-	//		elevate::Vector3(strength, 0, 0), elevate::Vector3()
-	//	);
-	//}
-	//bones[6].body->addForceAtBodyPoint(
-	//	elevate::Vector3(strength, 0, random.randomBinomial(1000.0f)),
-	//	elevate::Vector3(random.randomBinomial(4.0f), random.randomBinomial(3.0f), 0)
-	//);
+		//elevate::real strength = -random.randomReal(500.0f, 1000.0f);
+		//for (unsigned i = 0; i < 12; i++)
+		//{
+		//	bones[i].body->addForceAtBodyPoint(
+		//		elevate::Vector3(strength, 0, 0), elevate::Vector3()
+		//	);
+		//}
+		//bones[6].body->addForceAtBodyPoint(
+		//	elevate::Vector3(strength, 0, random.randomBinomial(1000.0f)),
+		//	elevate::Vector3(random.randomBinomial(4.0f), random.randomBinomial(3.0f), 0)
+		//);
 
-	// Reset the contacts
+		// Reset the contacts
 
-	
+
 
 	numStackCubes = 5; // choose 3–5 for testing
 

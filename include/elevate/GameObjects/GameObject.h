@@ -29,6 +29,10 @@ public:
         drawObject(viewMat, proj);
     }
 
+    virtual void LoadMesh() = 0;
+
+	void setGameManager(class GameManager* gameMgr) { mGameManager = gameMgr; }
+
     virtual Shader* GetShader() const { return shader; }
 
 	GameManager* GetGameManager() const { return mGameManager; }
@@ -51,6 +55,8 @@ public:
     void SetRotationMatrix(glm::mat4 rotMat) {
         orientation = glm::quat_cast(rotMat);
 	}
+
+	void SetShader(Shader* shdr) { shader = shdr; }
 
     bool isDestroyed = false;
 

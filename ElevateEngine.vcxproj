@@ -142,8 +142,10 @@
     <ClInclude Include="include\elevate\App\GameManager.h" />
     <ClInclude Include="include\elevate\App\InputManager.h" />
     <ClInclude Include="include\elevate\GameObjects\Cube.h" />
+    <ClInclude Include="include\elevate\Physics\Factory.h" />
     <ClInclude Include="include\elevate\GameObjects\GameObject.h" />
     <ClInclude Include="include\elevate\GameObjects\Plane.h" />
+    <ClInclude Include="include\elevate\GameObjects\Primitives.h" />
     <ClInclude Include="include\elevate\GameObjects\Sphere.h" />
     <ClInclude Include="include\elevate\OpenGL\Framebuffer.h" />
     <ClInclude Include="include\elevate\OpenGL\RenderData.h" />
@@ -188,6 +190,7 @@
     <ClInclude Include="src\Window\Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Physics\Factory.cpp" />
     <ClCompile Include="src\GameObjects\Plane.cpp" />
     <ClCompile Include="src\Physics\CollideNarrow.cpp" />
     <ClCompile Include="src\Physics\contacts.cpp" />

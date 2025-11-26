@@ -11,6 +11,7 @@
 #include "GameObjects/Sphere.h"
 #include "GameObjects/Line.h"
 #include "GameObjects/Plane.h"
+#include "Physics/Factory.h"
 #include "Physics/Demos/FloatingSphere.h"
 #include "Physics/pfgen.h"
 #include "Physics/pworld.h"
@@ -177,7 +178,7 @@ private:
 
     void generateContacts();
 
-    bool fpsSandboxDemo = true; 
+    bool fpsSandboxDemo = false; 
 
     static const int MaxEnvBoxes = 8;
     int               numEnvBoxes = 8;
@@ -211,6 +212,9 @@ private:
     Block blocks[9];
     Cube* cubes[9];
 
+	SpawnContext spawnContext;
+	ShapeFactory* shapeFactory;
+	SpawnFactory* spawnFactory;
 
     std::vector<DebugLine> m_DebugLines;
     GLuint m_DebugLineVAO = 0;

@@ -9,6 +9,45 @@ void World::startFrame()
 	}
 }
 
+RigidBody* elevate::World::CreateRigidBody(const Transform& transform, real mass, CollisionPrimitive* shape)
+{
+	RigidBody* body = new RigidBody();
+
+	body->setPosition(transform.position);
+	body->setOrientation(transform.rotation);
+	body->setMass(mass);
+	addBody(body);
+	return body;
+}
+
+CollisionPrimitive* elevate::World::CreateBoxShape(const Vector3& halfExtents)
+{
+	elevate::CollisionBox* cbox = new elevate::CollisionBox();
+//	cbox->body = body;
+
+	cbox->halfSize = elevate::Vector3(
+		halfExtents.x,
+		halfExtents.y,
+		halfExtents.z
+	);
+	cbox->isOverlapping = false;
+
+//	body->calculateDerivedData();
+//	cbox->calculateInternals();
+
+	return cbox;
+}
+
+CollisionPrimitive* elevate::World::CreateSphereShape(const real radius)
+{
+	elevate::CollisionSphere* cSphere = new elevate::CollisionSphere();
+	//	cbox->body = body;
+
+	cSphere->radius = radius;
+
+	return cSphere;
+}
+
 unsigned World::generateContacts()
 {
 	unsigned limit = maxContacts;
