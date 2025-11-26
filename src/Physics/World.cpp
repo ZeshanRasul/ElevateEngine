@@ -43,7 +43,6 @@ void World::integrate(real duration)
 
 void World::runPhysics(real duration)
 {
-	registry.updateForces(duration);
 	BodyRegistration* reg = firstBody;
 	while (reg)
 	{
@@ -52,15 +51,13 @@ void World::runPhysics(real duration)
 
 		// Get the next registration
 		reg = reg->next;
-	}// Resolve the contacts
+	}
 
-	//unsigned usedContacts = generateContacts();
-	//
-	//resolver.resolveContacts(contacts, usedContacts, duration);
-	//for (RigidBodies::iterator p = bodies.begin(); p != bodies.end(); p++)
-	//{
-	//	(*p)->clearAccumulator();
-	//	(*p)->calculateDerivedData();
-	//}
+	// Generate contacts
+	unsigned usedContacts = generateContacts();
+
+	// And process them
+	if (calculateIterations) resolver.setIterations(usedContacts * 4, usedContacts * 4);
+	resolver.resolveContacts(contacts, usedContacts, duration);
 
 }

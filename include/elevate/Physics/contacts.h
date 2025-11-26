@@ -73,11 +73,21 @@ namespace elevate {
 	class ContactResolver
 	{
 	public:
-		ContactResolver() = default;
+		ContactResolver(unsigned iterations,
+			real velocityEpsilon = (real)0.01,
+			real positionEpsilon = (real)0.01) {
+		};
 
 		void resolveContacts(Contact* contactArray, unsigned numContacts, real duration);
 
 		void prepareContacts(Contact* contactArray, unsigned numContacts, real duration);
+
+		void setIterations(unsigned velocityIterations,
+			unsigned positionIterations)
+		{
+			ContactResolver::velocityIterations = velocityIterations;
+			ContactResolver::positionIterations = positionIterations;
+		}
 	protected:
 
 		void adjustVelocities(Contact* contactArray, unsigned numContacts, real duration);

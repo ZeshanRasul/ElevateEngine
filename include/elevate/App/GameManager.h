@@ -165,7 +165,7 @@ private:
 
     elevate::RigidBody* planeBody = nullptr;
 
-    elevate::Contact contacts[256];
+    elevate::Contact* contacts;
     elevate::CollisionData cData;
     elevate::ContactResolver resolver;
 	elevate::CollisionSphere* cSpheres[2];

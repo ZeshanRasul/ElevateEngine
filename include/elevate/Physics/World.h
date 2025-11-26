@@ -30,6 +30,11 @@ protected:
 
 public:
 	World(unsigned maxContacts, unsigned iterations = 0)
+		:
+		firstBody(NULL),
+		resolver(iterations),
+		firstContactGen(NULL),
+		maxContacts(maxContacts)
 	{
 		maxContacts = maxContacts;
 	};

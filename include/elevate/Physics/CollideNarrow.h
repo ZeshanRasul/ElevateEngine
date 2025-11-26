@@ -7,19 +7,10 @@
 namespace elevate {
 	struct CollisionData
 	{
-		CollisionData() : contactArray(nullptr),
-			contacts(nullptr),
-			contactsLeft(0),
-			contactCount(0),
-			friction(0),
-			restitution(1),
-			tolerance(0)
-		{
-		}
 
-		Contact* contactArray{};
+		Contact* contactArray;
 
-		Contact* contacts{};
+		Contact* contacts;
 
 		int contactsLeft;
 
@@ -177,9 +168,6 @@ namespace elevate {
 			data->friction, data->restitution);
 		data->addContacts(1);
 
-		data->contacts[data->contactCount - 1] = *contact;
-		data->contactArray[data->contactCount - 1] = *contact;
-
 	}
 	static inline Vector3 contactPoint(
 		const Vector3& pOne,
@@ -260,77 +248,63 @@ namespace elevate {
 			CollisionData* data
 		)
 		{
+			// Make sure we have contacts
 			if (data->contactsLeft <= 0) return 0;
 
-			const real allowedPenetration = (real)0.01f;
-
+			// Check for intersection
 			if (!boxAndHalfSpaceIntersect(box, plane))
 			{
 				return 0;
 			}
 
+			// We have an intersection, so find the intersection points. We can make
+			// do with only checking vertices. If the box is resting on a plane
+			// or on an edge, it will be reported as four or two contact points.
+
+			// Go through each combination of + and - for each half-size
 			static real mults[8][3] = { {1,1,1},{-1,1,1},{1,-1,1},{-1,-1,1},
-						   {1,1,-1},{-1,1,-1},{1,-1,-1},{-1,-1,-1} };
+									   {1,1,-1},{-1,1,-1},{1,-1,-1},{-1,-1,-1} };
 
 			Contact* contact = data->contacts;
 			unsigned contactsUsed = 0;
-
-			Vector3 n = plane.direction;
-			n.normalize();
-
 			for (unsigned i = 0; i < 8; i++) {
 
+				// Calculate the position of each vertex
 				Vector3 vertexPos(mults[i][0], mults[i][1], mults[i][2]);
 				vertexPos.componentProductUpdate(box.halfSize);
-				vertexPos = box.getTransform().transform(vertexPos);
+				vertexPos = box.transform.transform(vertexPos);
 
-				real vertexDistance = vertexPos * n;
+				// Calculate the distance from the plane
+				real vertexDistance = vertexPos * plane.direction;
 
+				// Compare this to the plane's distance
 				if (vertexDistance <= plane.offset)
 				{
-					real vertexDistance = vertexPos * n;
-					real penetration = plane.offset - vertexDistance;
+					// Create the contact data.
 
-					if (penetration < (real)0) continue;
+					// The contact point is halfway between the vertex and the
+					// plane - we multiply the direction by half the separation
+					// distance and add the vertex location.
+					contact->contactPoint = plane.direction;
+					contact->contactPoint *= (vertexDistance - plane.offset);
+					contact->contactPoint += vertexPos;
+					contact->contactNormal = plane.direction;
+					contact->penetration = plane.offset - vertexDistance;
 
-					contact->contactNormal = n * -1.0f;
-					contact->penetration = penetration;
-
-					if (penetration <= 0) continue;
-
-
-
-					contact->contactNormal = n;
-					contact->penetration = penetration;
-
-					contact->contactPoint = vertexPos;
-					contact->contactPoint.addScaledVector(n, penetration);
-					//contact->contactPoint *= (vertexDistance - plane.offset);
-					//contact->contactPoint += vertexPos;
-
-
-
+					// Write the appropriate data
 					contact->setBodyData(box.body, NULL,
 						data->friction, data->restitution);
 
-					data->addContacts(1);
-					data->contacts[data->contactCount - 1] = *contact;
-					data->contactArray[data->contactCount - 1] = *contact;
-
+					// Move onto the next contact
 					contact++;
 					contactsUsed++;
 					if (contactsUsed == (unsigned)data->contactsLeft) return contactsUsed;
-
 				}
-				data->addContacts(1);
-				data->contacts[data->contactCount - 1] = *contact;
-				data->contactArray[data->contactCount - 1] = *contact;
 			}
-			data->addContacts(1);
-			data->contacts[data->contactCount - 1] = *contact;
-			data->contactArray[data->contactCount - 1] = *contact;
+
+			data->addContacts(contactsUsed);
 			return contactsUsed;
-		};
+		}
 
 		static unsigned sphereAndHalfSpace(
 			const CollisionSphere& sphere,
@@ -361,8 +335,7 @@ namespace elevate {
 				data->friction, data->restitution);
 
 			data->addContacts(1);
-			data->contacts[data->contactCount - 1] = *contact;
-			data->contactArray[data->contactCount - 1] = *contact;
+		
 
 			return 1;
 		}
@@ -406,8 +379,7 @@ namespace elevate {
 				data->friction, data->restitution);
 
 			data->addContacts(1);
-			data->contacts[data->contactCount - 1] = *contact;
-			data->contactArray[data->contactCount - 1] = *contact;
+			
 
 			return 1;
 		}
@@ -437,8 +409,7 @@ namespace elevate {
 			contact->setBodyData(one.body, two.body, data->friction, data->restitution);
 
 			data->addContacts(1);
-			data->contacts[data->contactCount - 1] = *contact;
-			data->contactArray[data->contactCount - 1] = *contact;
+			
 
 			return 1;
 
@@ -497,8 +468,7 @@ namespace elevate {
 				data->friction, data->restitution);
 
 			data->addContacts(1);
-			data->contacts[data->contactCount - 1] = *contact;
-			data->contactArray[data->contactCount - 1] = *contact;
+			
 			return 1;
 		}
 #define CHECK_OVERLAP(axis, index) \
@@ -583,9 +553,6 @@ namespace elevate {
 				contact->setBodyData(one.body, two.body,
 					data->friction, data->restitution);
 				data->addContacts(1);
-
-				data->contacts[data->contactCount - 1] = *contact;
-				data->contactArray[data->contactCount - 1] = *contact;
 
 				return 1;
 			}

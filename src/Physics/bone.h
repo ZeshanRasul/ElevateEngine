@@ -36,7 +36,7 @@ public:
         halfSize = extents;
 
         elevate::real mass = halfSize.x * halfSize.y * halfSize.z * 8.0f;
-        body->setMass(mass);
+        body->setMass(0.1f);
 
         elevate::Matrix3 tensor;
         tensor.setBlockInertiaTensor(halfSize, mass);
