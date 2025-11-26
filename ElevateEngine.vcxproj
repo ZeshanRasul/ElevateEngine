@@ -153,6 +153,7 @@
     <ClInclude Include="include\elevate\OpenGL\Texture.h" />
     <ClInclude Include="include\elevate\OpenGL\UniformBuffer.h" />
     <ClInclude Include="include\elevate\OpenGL\VertexBuffer.h" />
+    <ClInclude Include="include\elevate\Physics\block.h" />
     <ClInclude Include="include\elevate\Physics\CollideBroad.h" />
     <ClInclude Include="include\elevate\Physics\CollideNarrow.h" />
     <ClInclude Include="include\elevate\Physics\contacts.h" />

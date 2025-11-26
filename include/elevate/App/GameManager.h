@@ -19,7 +19,7 @@
 #include "Physics/bone.h"
 #include "Physics/joints.h"
 #include "Physics/random.h"
-
+#include "Physics/block.h"
 
 struct DebugLine
 {
@@ -203,6 +203,11 @@ private:
     elevate::RigidBody* stackBodies[MaxStackCubes];
     Cube* stackCubes[MaxStackCubes];
     int                    numStackCubes = 0;
+
+    bool hit;
+    bool ball_active;
+    unsigned fracture_contact;
+    Block blocks[9];
 
 
     std::vector<DebugLine> m_DebugLines;

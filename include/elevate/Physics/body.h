@@ -41,7 +41,7 @@ namespace elevate {
 			}
 		}
 		void setMass(const real mass) { inverseMass = 1.0f / mass; }
-		void setInverseMass(const real invMass);
+		void setInverseMass(const real invMass) { inverseMass = invMass; }
 		real getInverseMass() const { return inverseMass; };
 
 		bool hasFiniteMass() const {
@@ -75,6 +75,16 @@ namespace elevate {
 
 		Quaternion getOrientation() const { return orientation; }
 		void setOrientation(const Quaternion& orient) { orientation = orient; }
+
+		Vector3 getPointInLocalSpace(const Vector3& point) const
+		{
+			return transformMatrix.transformInverse(point);
+		}
+
+		Vector3 getDirectionInLocalSpace(const Vector3& direction) const
+		{
+			return transformMatrix.transformInverseDirection(direction);
+		}
 
 		Vector3 getPointInWorldSpace(const Vector3& point) const;
 
@@ -114,6 +124,11 @@ namespace elevate {
 			angularDamping = angular;
 		}
 		
+		void setLinearDamping(const real linear) { linearDamping = linear; }
+		real getLinearDamping() const { return linearDamping; }
+		void setAngularDamping(const real angular) { angularDamping = angular; }
+		real getAngularDamping() const { return angularDamping; }
+
 		void setCanSleep(const bool canSleep) { this->canSleep = canSleep; }
 
 	protected:
