@@ -234,7 +234,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 		body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
 
-		real mass = 0.7f;
+		real mass = 1.7f;
 		body->setMass(mass);
 		body->setDamping(0.97f, 0.97f);
 
@@ -516,7 +516,7 @@ void GameManager::update(float deltaTime)
 		}
 		generateContacts();
 
-		resolver.resolveContacts(cData.contacts, cData.contactCount, deltaTime);
+		resolver.resolveContacts(cData.contactArray, cData.contactCount, deltaTime);
 
 		for (int b = 0; b < numEnvBoxes; ++b)
 		{
