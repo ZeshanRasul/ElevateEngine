@@ -45,6 +45,35 @@ struct AmmoRound
     float                    lifetime = 0.0f;
 };
 
+enum class ShapeType
+{
+    Box,
+    Sphere,
+    HalfSpace
+};
+
+enum class BodyType
+{
+    Unknown,
+    StackCube,
+    EnvBox,
+    Block,
+    Ammo,
+    Bone,
+    GroundPlane
+};
+
+struct CollisionBody
+{
+    ShapeType shapeType;
+    BodyType  bodyType;
+    void* owner;
+
+    elevate::CollisionBox* box = nullptr;
+    elevate::CollisionSphere* sphere = nullptr;
+    elevate::CollisionPlane* plane = nullptr;
+};
+
 class GameManager {
 public:
     GameManager(Window* window, unsigned int width, unsigned int height);
@@ -77,6 +106,7 @@ public:
 
     void setPushDir(float newDir) { pushDirX = newDir; }
     void fireRound(AmmoType type);
+    void DoAllPairCollisions(std::vector<CollisionBody>& bodies, elevate::CollisionData& cData);
 
     void reset();
 private:
@@ -326,6 +356,63 @@ private:
 
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    bool DispatchCollisionPair(
+        const CollisionBody& a,
+        const CollisionBody& b,
+        elevate::CollisionData& cData)
+    {
+        using ST = ShapeType;
+
+        if (!cData.hasMoreContacts()) return false;
+
+        switch (a.shapeType)
+        {
+        case ST::Box:
+            switch (b.shapeType)
+            {
+            case ST::Box:
+                return elevate::CollisionDetector::boxAndBox(*a.box, *b.box, &cData);
+
+            case ST::Sphere:
+                return elevate::CollisionDetector::boxAndSphere(*a.box, *b.sphere, &cData);
+
+            case ST::HalfSpace:
+                return elevate::CollisionDetector::boxAndHalfSpace(*a.box, *b.plane, &cData);
+            }
+            break;
+
+        case ST::Sphere:
+            switch (b.shapeType)
+            {
+            case ST::Box:
+                return elevate::CollisionDetector::boxAndSphere(*b.box, *a.sphere, &cData);
+
+            case ST::Sphere:
+                return elevate::CollisionDetector::sphereAndSphere(*a.sphere, *b.sphere, &cData);
+
+            case ST::HalfSpace:
+                return elevate::CollisionDetector::sphereAndHalfSpace(*a.sphere, *b.plane, &cData);
+            }
+            break;
+
+        case ST::HalfSpace:
+            switch (b.shapeType)
+            {
+            case ST::Box:
+                return elevate::CollisionDetector::boxAndHalfSpace(*b.box, *a.plane, &cData);
+
+            case ST::Sphere:
+                return elevate::CollisionDetector::sphereAndHalfSpace(*b.sphere, *a.plane, &cData);
+
+            case ST::HalfSpace:
+                return false;
+            }
+            break;
+        }
+
+        return false;
     }
 
 };

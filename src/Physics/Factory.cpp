@@ -380,7 +380,7 @@ namespace elevate
 			"Floor",
 			t,
 			shape,
-			0.0f, // static
+			FLT_MAX, // static
 			"Mesh_Floor",
 			PhysicsMaterialId::ConcreteFloor,
 			shader);
@@ -403,7 +403,7 @@ namespace elevate
 			"Wall",
 			t,
 			shape,
-			0.0f,
+			FLT_MAX,
 			"Mesh_Wall",
 			PhysicsMaterialId::Wall,
 			shader);

@@ -16,7 +16,7 @@ RigidBody* elevate::World::CreateRigidBody(const Transform& transform, real mass
 	body->setPosition(transform.position);
 	body->setOrientation(transform.rotation);
 	body->setMass(mass);
-	addBody(body);
+//	addBody(body);
 	return body;
 }
 
@@ -77,6 +77,7 @@ void World::integrate(real duration)
 	for (RigidBodies::iterator p = bodies.begin(); p != bodies.end(); p++)
 	{
 		(*p)->integrate(duration);
+
 	}
 }
 
@@ -96,7 +97,7 @@ void World::runPhysics(real duration)
 	unsigned usedContacts = generateContacts();
 
 	// And process them
-	if (calculateIterations) resolver.setIterations(usedContacts * 4, usedContacts * 4);
+//	if (calculateIterations) resolver.setIterations(usedContacts * 4, usedContacts * 4);
 	resolver.resolveContacts(contacts, usedContacts, duration);
 
 }
