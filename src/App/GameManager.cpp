@@ -123,81 +123,6 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 		reset();
 
-		// Right Knee
-		joints[0].set(
-			bones[0].body, elevate::Vector3(0, 1.07f, 0),
-			bones[1].body, elevate::Vector3(0, -1.07f, 0),
-			0.15f
-		);
-
-		// Left Knee
-		joints[1].set(
-			bones[2].body, elevate::Vector3(0, 1.07f, 0),
-			bones[3].body, elevate::Vector3(0, -1.07f, 0),
-			0.15f
-		);
-
-		// Right elbow
-		joints[2].set(
-			bones[9].body, elevate::Vector3(0, 0.96f, 0),
-			bones[8].body, elevate::Vector3(0, -0.96f, 0),
-			0.15f
-		);
-
-		// Left elbow
-		joints[3].set(
-			bones[11].body, elevate::Vector3(0, 0.96f, 0),
-			bones[10].body, elevate::Vector3(0, -0.96f, 0),
-			0.15f
-		);
-
-		// Stomach to Waist
-		joints[4].set(
-			bones[4].body, elevate::Vector3(0.054f, 0.50f, 0),
-			bones[5].body, elevate::Vector3(-0.043f, -0.45f, 0),
-			0.15f
-		);
-
-		joints[5].set(
-			bones[5].body, elevate::Vector3(-0.043f, 0.411f, 0),
-			bones[6].body, elevate::Vector3(0, -0.411f, 0),
-			0.15f
-		);
-
-		joints[6].set(
-			bones[6].body, elevate::Vector3(0, 0.521f, 0),
-			bones[7].body, elevate::Vector3(0, -0.752f, 0),
-			0.15f
-		);
-
-		// Right hip
-		joints[7].set(
-			bones[1].body, elevate::Vector3(0, 1.066f, 0),
-			bones[4].body, elevate::Vector3(0, -0.458f, -0.5f),
-			0.15f
-		);
-
-		// Left Hip
-		joints[8].set(
-			bones[3].body, elevate::Vector3(0, 1.066f, 0),
-			bones[4].body, elevate::Vector3(0, -0.458f, 0.5f),
-			0.105f
-		);
-
-		// Right shoulder
-		joints[9].set(
-			bones[6].body, elevate::Vector3(0, 0.367f, -0.8f),
-			bones[8].body, elevate::Vector3(0, 0.888f, 0.32f),
-			0.15f
-		);
-
-		// Left shoulder
-		joints[10].set(
-			bones[6].body, elevate::Vector3(0, 0.367f, 0.8f),
-			bones[10].body, elevate::Vector3(0, 0.888f, -0.32f),
-			0.15f
-		);
-
 		ammoCount = MaxAmmoRounds;
 
 		for (int i = 0; i < ammoCount; ++i)
@@ -242,18 +167,6 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 			ammoPool[i].coll = cs;
 			ammoPool[i].active = false;
 			ammoPool[i].lifetime = 0.0f;
-		}
-
-		for (unsigned i = 0; i < 12; i++)
-		{
-			Cube* c = new Cube(bones[i].getTransform().getAxisVector(3), bones[i].halfSize * 2, &ammoShader, this);
-			c->LoadMesh();
-			//		elevate::Vector3 color = random.randomVector(1.0f);
-			c->SetColor(glm::vec3(87.0f, 0.8f, 0.9f));
-			bones[i].visual = c;
-			gameObjects.push_back(c);
-			//spawnContext.World->addBody(bones[i].body);
-			//	spawnContext.World->getForceRegistry().add(bones[i].body, );
 		}
 
 	}
@@ -307,7 +220,7 @@ void GameManager::reset()
 	{
 		elevate::Matrix3 tensor;
 		tensor.setBlockInertiaTensor(elevate::Vector3(2.0f, 5.0f, 0.8f), 0.5f);
-		domino->body->setInertiaTensor(tensor);		
+		domino->body->setInertiaTensor(tensor);
 		domino->body->calculateDerivedData();
 		domino->shape->calculateInternals();
 
@@ -324,48 +237,49 @@ void GameManager::reset()
 		gameObjects.push_back(domino->mesh);
 	}
 
-	bones[0].setState(
-		elevate::Vector3(0, 0.993, -0.5),
-		elevate::Vector3(0.301, 1.0, 0.234));
-	bones[1].setState(
-		elevate::Vector3(0, 3.159, -0.56),
-		elevate::Vector3(0.301, 1.0, 0.234));
-	bones[2].setState(
-		elevate::Vector3(0, 0.993, 0.5),
-		elevate::Vector3(0.301, 1.0, 0.234));
-	bones[3].setState(
-		elevate::Vector3(0, 3.15, 0.56),
-		elevate::Vector3(0.301, 1.0, 0.234));
-	bones[4].setState(
-		elevate::Vector3(-0.054, 4.683, 0.013),
-		elevate::Vector3(0.415, 0.392, 0.690));
-	bones[5].setState(
-		elevate::Vector3(0.043, 5.603, 0.013),
-		elevate::Vector3(0.301, 0.367, 0.693));
-	bones[6].setState(
-		elevate::Vector3(0, 6.485, 0.013),
-		elevate::Vector3(0.435, 0.367, 0.786));
-	bones[7].setState(
-		elevate::Vector3(0, 7.759, 0.013),
-		elevate::Vector3(0.45, 0.598, 0.421));
-	bones[7].body->setMass(FLT_MAX);
-	bones[8].setState(
-		elevate::Vector3(0, 5.946, -1.066),
-		elevate::Vector3(0.267, 0.888, 0.207));
-	bones[9].setState(
-		elevate::Vector3(0, 4.024, -1.066),
-		elevate::Vector3(0.267, 0.888, 0.207));
-	bones[10].setState(
-		elevate::Vector3(0, 5.946, 1.066),
-		elevate::Vector3(0.267, 0.888, 0.207));
-	bones[11].setState(
-		elevate::Vector3(0, 4.024, 1.066),
-		elevate::Vector3(0.267, 0.888, 0.207));
+	for (Ragdoll* ragdoll : ragdolls)
+	{
+		for (Bone& bone : ragdoll->bones)
+		{
+			if (bone.visual)
+			{
+				gameObjects.erase(
+					std::remove(
+						gameObjects.begin(),
+						gameObjects.end(),
+						bone.visual),
+					gameObjects.end()
+				);
+			}
+			
+			delete bone.visual;
+			bone.visual = nullptr;
 
-	//for (Bone bone : bones)
-	//{
-	//	spawnContext.World->addBody(bone.body);
-	//}
+		}
+	}
+
+	for (Ragdoll* ragdoll : ragdolls)
+	{
+		delete ragdoll;
+	}
+	ragdolls.clear();
+
+	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(0.0f, 2.0f, 0.0f)));
+	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(10.0f, 2.0f, 0.0f)));
+	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(20.0f, 2.0f, 0.0f)));
+
+	for (Ragdoll* ragdoll : ragdolls)
+	{
+
+		for (Bone& bone : ragdoll->bones)
+		{
+			Cube* c = new Cube(bone.getTransform().getAxisVector(3), bone.halfSize * 2, &ammoShader, this);
+			c->LoadMesh();
+			c->SetColor(glm::vec3(0.9f, 0.3f, 0.4f));
+			bone.visual = c;
+			gameObjects.push_back(c);
+		}
+	}
 
 	// Only the first block exists
 	for (Block* block = blocks; block < blocks + 9; block++)
@@ -797,13 +711,17 @@ void GameManager::update(float deltaTime)
 			r.body->integrate(deltaTime);
 			r.coll->calculateInternals();
 		}
-		for (Bone* bone = bones; bone < bones + 12; bone++)
+
+		for (Ragdoll* ragdoll : ragdolls)
 		{
-			bone->body->clearAccumulator();
-			bone->body->calculateDerivedData();
-			if (bone != &bones[4] && bone != &bones[7])
-				bone->body->integrate(deltaTime);
-			bone->calculateInternals();
+			for (Bone* bone = ragdoll->bones; bone < ragdoll->bones + 12; bone++)
+			{
+				bone->body->clearAccumulator();
+				bone->body->calculateDerivedData();
+				if (bone != &ragdoll->bones[7])
+					bone->body->integrate(deltaTime);
+				bone->calculateInternals();
+			}
 		}
 
 		for (int i = 0; i < numStackCubes; i++)
@@ -921,19 +839,23 @@ void GameManager::update(float deltaTime)
 				(float)bricks[i]->body->getOrientation().k));
 		}
 
-		for (Bone* bone = bones; bone < bones + 12; bone++)
+		for (Ragdoll* ragdoll : ragdolls)
 		{
-			bone->body->calculateDerivedData();
-			bone->calculateInternals();
-			elevate::Matrix4 t = bone->body->getTransform();
 
-			elevate::Vector3 p = t.getAxisVector(3);
-			bone->visual->SetPosition(p);
-			bone->visual->SetOrientation(glm::quat(
-				(float)bone->body->getOrientation().r,
-				(float)bone->body->getOrientation().i,
-				(float)bone->body->getOrientation().j,
-				(float)bone->body->getOrientation().k));
+			for (Bone* bone = ragdoll->bones; bone < ragdoll->bones + 12; bone++)
+			{
+				bone->body->calculateDerivedData();
+				bone->calculateInternals();
+				elevate::Matrix4 t = bone->body->getTransform();
+
+				elevate::Vector3 p = t.getAxisVector(3);
+				bone->visual->SetPosition(p);
+				bone->visual->SetOrientation(glm::quat(
+					(float)bone->body->getOrientation().r,
+					(float)bone->body->getOrientation().i,
+					(float)bone->body->getOrientation().j,
+					(float)bone->body->getOrientation().k));
+			}
 		}
 
 		for (int i = 0; i < numStackCubes; ++i)
@@ -952,7 +874,7 @@ void GameManager::update(float deltaTime)
 				(float)stackBodies[i]->getOrientation().k));
 		}
 
-		for (int i = 0 ; i < dominoes.size(); i++)
+		for (int i = 0; i < dominoes.size(); i++)
 		{
 			dominoes[i]->body->calculateDerivedData();
 			dominoes[i]->shape->calculateInternals();
@@ -1069,7 +991,7 @@ void GameManager::generateContacts()
 			{
 				elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(dominoes[i]->shape), *r.coll, &cData);
 
-				for (int j =i + 1; j < dominoes.size(); j++)
+				for (int j = i + 1; j < dominoes.size(); j++)
 				{
 					if (!cData.hasMoreContacts()) return;
 					elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(dominoes[i]->shape), *static_cast<CollisionBox*>(dominoes[j]->shape), &cData);
@@ -1083,14 +1005,17 @@ void GameManager::generateContacts()
 				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crates[i]->shape), *static_cast<CollisionBox*>(floor->shape), &cData);
 			}
 
-			for (Bone* bone = bones; bone < bones + 12; bone++)
+			for (Ragdoll* ragdoll : ragdolls)
 			{
-				if (!cData.hasMoreContacts()) return;
+				for (Bone* bone = ragdoll->bones; bone < ragdoll->bones + 12; bone++)
+				{
+					if (!cData.hasMoreContacts()) return;
 
-				elevate::CollisionSphere boneSphere = bone->getCollisionSphere();
+					elevate::CollisionSphere boneSphere = bone->getCollisionSphere();
 
-				elevate::CollisionDetector::sphereAndSphere(boneSphere, *r.coll, &cData);
-			};
+					elevate::CollisionDetector::sphereAndSphere(boneSphere, *r.coll, &cData);
+				};
+			}
 
 			for (int i = 0; i < numStackCubes; ++i)
 			{
@@ -1179,37 +1104,41 @@ void GameManager::generateContacts()
 
 		elevate::Matrix4 transform, otherTransform;
 		elevate::Vector3 position, otherPosition;
-		for (Bone* bone = bones; bone < bones + 12; bone++)
+
+		for (Ragdoll* ragdoll : ragdolls)
 		{
-			elevate::CollisionSphere boneSphere = bone->getCollisionSphere();
-			if (!cData.hasMoreContacts()) return;
-			elevate::CollisionDetector::sphereAndHalfSpace(boneSphere, plane, &cData);
+			for (Bone* bone = ragdoll->bones; bone < ragdoll->bones + 12; bone++)
+			{
+				elevate::CollisionSphere boneSphere = bone->getCollisionSphere();
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::sphereAndHalfSpace(boneSphere, plane, &cData);
 
 
-			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(crate->shape), boneSphere, &cData);
+				elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(crate->shape), boneSphere, &cData);
 
 
 
-			// Check for collisions with each other box
-			for (Bone* other = bone + 1; other < bones + 12; other++)
+				// Check for collisions with each other box
+				for (Bone* other = bone + 1; other < ragdoll->bones + 12; other++)
+				{
+					if (!cData.hasMoreContacts()) return;
+
+					elevate::CollisionSphere otherSphere = other->getCollisionSphere();
+
+					elevate::CollisionDetector::sphereAndSphere(
+						boneSphere,
+						otherSphere,
+						&cData
+					);
+				}
+			}
+			// Check for joint violation
+			for (elevate::Joint* joint = ragdoll->joints; joint < ragdoll->joints + 11; joint++)
 			{
 				if (!cData.hasMoreContacts()) return;
-
-				elevate::CollisionSphere otherSphere = other->getCollisionSphere();
-
-				elevate::CollisionDetector::sphereAndSphere(
-					boneSphere,
-					otherSphere,
-					&cData
-				);
+				unsigned added = joint->addContact(cData.contacts, cData.contactsLeft);
+				cData.addContacts(added);
 			}
-		}
-		// Check for joint violation
-		for (elevate::Joint* joint = joints; joint < joints + 11; joint++)
-		{
-			if (!cData.hasMoreContacts()) return;
-			unsigned added = joint->addContact(cData.contacts, cData.contactsLeft);
-			cData.addContacts(added);
 		}
 		for (int i = 0; i < numStackCubes; ++i)
 		{
@@ -1256,7 +1185,7 @@ void GameManager::generateContacts()
 			elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crate->shape), *block, &cData);
 
 		}
-		
+
 		for (int i = 0; i < dominoes.size(); i++)
 		{
 			elevate::CollisionDetector::boxAndHalfSpace(*static_cast<CollisionBox*>(dominoes[i]->shape), plane, &cData);

@@ -10,219 +10,233 @@
 #include "Physics/body.h"
 #include "Physics/contacts.h"
 #include "Physics/World.h"
+#include "Physics/bone.h"
+#include "Physics/joints.h"
 #include "GameObjects/GameObject.h"
 
 
 namespace elevate
 {
-    struct PhysicsObject
-    {
-        RigidBody* body = nullptr;
-        CollisionPrimitive* shape = nullptr;
-        std::string    meshId;
-        std::string    materialId;
-        GameObject* mesh = nullptr;
-    };
+	struct PhysicsObject
+	{
+		RigidBody* body = nullptr;
+		CollisionPrimitive* shape = nullptr;
+		std::string    meshId;
+		std::string    materialId;
+		GameObject* mesh = nullptr;
+	};
 
-    enum class PhysicsMaterialId
-    {
-        Default,
-        WoodCrate,
-        Brick,
-        MetalBarrel,
-        ConcreteFloor,
-        Wall,
-        Rubber,
-        Bullet,
-        Rocket,
-        Grenade,
-        Glass
-    };
+	enum class PhysicsMaterialId
+	{
+		Default,
+		WoodCrate,
+		Brick,
+		MetalBarrel,
+		ConcreteFloor,
+		Wall,
+		Rubber,
+		Bullet,
+		Rocket,
+		Grenade,
+		Glass
+	};
 
-    class ShapeFactory
-    {
-    public:
-        static CollisionPrimitive* CreateBoxShape(
-            World& world,
-            const Vector3& halfExtents);
+	struct Ragdoll
+	{
+		static const int NumBones = 12;
+		static const int NumJoints = 11;
 
-        static CollisionPrimitive* CreateSphereShape(
-            World& world,
-            real radius);
+		Bone  bones[NumBones];
+		Joint joints[NumJoints];
+	};
 
-        static CollisionPrimitive* CreateCapsuleShape(
-            World& world,
-            real radius,
-            real halfHeight);
+	class ShapeFactory
+	{
+	public:
+		static CollisionPrimitive* CreateBoxShape(
+			World& world,
+			const Vector3& halfExtents);
 
-        static CollisionPrimitive* CreateCylinderShape(
-            World& world,
-            real radius,
-            real halfHeight);
+		static CollisionPrimitive* CreateSphereShape(
+			World& world,
+			real radius);
 
-        static CollisionPrimitive* CreateConvexHullShape(
-            World& world,
-            const std::vector<Vector3>& points);
-    };
+		static CollisionPrimitive* CreateCapsuleShape(
+			World& world,
+			real radius,
+			real halfHeight);
 
-    struct SpawnContext
-    {
-        World* World = nullptr;
-    };
+		static CollisionPrimitive* CreateCylinderShape(
+			World& world,
+			real radius,
+			real halfHeight);
 
-    class SpawnFactory
-    {
-    public:
-        explicit SpawnFactory(const SpawnContext& ctx);
+		static CollisionPrimitive* CreateConvexHullShape(
+			World& world,
+			const std::vector<Vector3>& points);
+	};
 
-        PhysicsObject* CreatePhysicsObject(
-            const std::string& name,
-            const Transform& transform,
-            CollisionPrimitive* shape,
-            real mass,
-            const std::string& meshId,
-            const std::string& materialId,
-            Shader* shader);
+	struct SpawnContext
+	{
+		World* World = nullptr;
+	};
 
-        PhysicsObject* CreatePhysicsObject(
-            const std::string& name,
-            const Transform& transform,
-            CollisionPrimitive* shape,
-            real mass,
-            const std::string& meshId,
-            PhysicsMaterialId materialId,
-            Shader* shader);
+	class SpawnFactory
+	{
+	public:
+		explicit SpawnFactory(const SpawnContext& ctx);
 
-        PhysicsObject* SpawnBox(
-            const Vector3& position,
-            const Vector3& halfExtents,
-            real mass,
-            const std::string& meshId,
-            PhysicsMaterialId materialId,
-            Shader* shader);
+		PhysicsObject* CreatePhysicsObject(
+			const std::string& name,
+			const Transform& transform,
+			CollisionPrimitive* shape,
+			real mass,
+			const std::string& meshId,
+			const std::string& materialId,
+			Shader* shader);
 
-        PhysicsObject* SpawnSphere(
-            const Vector3& position,
-            real radius,
-            real mass,
-            const std::string& meshId,
-            PhysicsMaterialId materialId,
-            Shader* shader);
+		PhysicsObject* CreatePhysicsObject(
+			const std::string& name,
+			const Transform& transform,
+			CollisionPrimitive* shape,
+			real mass,
+			const std::string& meshId,
+			PhysicsMaterialId materialId,
+			Shader* shader);
 
-        PhysicsObject* SpawnCapsule(
-            const Vector3& position,
-            real radius,
-            real halfHeight,
-            real mass,
-            const std::string& meshId,
-            PhysicsMaterialId materialId);
+		PhysicsObject* SpawnBox(
+			const Vector3& position,
+			const Vector3& halfExtents,
+			real mass,
+			const std::string& meshId,
+			PhysicsMaterialId materialId,
+			Shader* shader);
 
-        PhysicsObject* SpawnCylinder(
-            const Vector3& position,
-            real radius,
-            real halfHeight,
-            real mass,
-            const std::string& meshId,
-            PhysicsMaterialId materialId);
+		PhysicsObject* SpawnSphere(
+			const Vector3& position,
+			real radius,
+			real mass,
+			const std::string& meshId,
+			PhysicsMaterialId materialId,
+			Shader* shader);
 
-        PhysicsObject* SpawnCrate(
-            const Vector3& position,
-            Shader* shader,
-            const Vector3& size = { 1.0f, 1.0f, 1.0f },
-            real mass = 10.0f);
+		PhysicsObject* SpawnCapsule(
+			const Vector3& position,
+			real radius,
+			real halfHeight,
+			real mass,
+			const std::string& meshId,
+			PhysicsMaterialId materialId);
 
-        PhysicsObject* SpawnBrick(
-            const Vector3& position,
-            Shader* shader,
-            real mass = 2.0f,
-            const Vector3& size = { 0.25f, 0.06f, 0.12f }
-        );
+		PhysicsObject* SpawnCylinder(
+			const Vector3& position,
+			real radius,
+			real halfHeight,
+			real mass,
+			const std::string& meshId,
+			PhysicsMaterialId materialId);
 
-        PhysicsObject* SpawnBarrel(
-            const Vector3& position,
-            real radius = 0.4f,
-            real height = 1.0f,
-            real mass = 15.0f);
+		PhysicsObject* SpawnCrate(
+			const Vector3& position,
+			Shader* shader,
+			const Vector3& size = { 1.0f, 1.0f, 1.0f },
+			real mass = 10.0f);
 
-        PhysicsObject* SpawnBullet(
-            const Vector3& startPos,
-            const Vector3& direction,
-            real speed,
-            real radius = 0.05f,
-            real mass = 0.1f);
+		PhysicsObject* SpawnBrick(
+			const Vector3& position,
+			Shader* shader,
+			real mass = 2.0f,
+			const Vector3& size = { 0.25f, 0.06f, 0.12f }
+		);
 
-        PhysicsObject* SpawnRocket(
-            const Vector3& startPos,
-            const Vector3& direction,
-            real speed,
-            real mass = 1.0f);
+		PhysicsObject* SpawnBarrel(
+			const Vector3& position,
+			real radius = 0.4f,
+			real height = 1.0f,
+			real mass = 15.0f);
 
-        PhysicsObject* SpawnGrenade(
-            const Vector3& startPos,
-            const Vector3& velocity,
-            Shader* shader,
-            real radius = 0.1f,
-            real mass = 0.5f);
+		PhysicsObject* SpawnBullet(
+			const Vector3& startPos,
+			const Vector3& direction,
+			real speed,
+			real radius = 0.05f,
+			real mass = 0.1f);
 
-        PhysicsObject* CreateFloor(
-            const Vector3& halfExtents,
-            Shader* shader,
-            const Vector3& center = { 0.0f, 0.0f, 0.0f });
+		PhysicsObject* SpawnRocket(
+			const Vector3& startPos,
+			const Vector3& direction,
+			real speed,
+			real mass = 1.0f);
 
-        PhysicsObject* CreateWall(
-            const Vector3& halfExtents,
-            const Vector3& center,
-            Shader* shader);
+		PhysicsObject* SpawnGrenade(
+			const Vector3& startPos,
+			const Vector3& velocity,
+			Shader* shader,
+			real radius = 0.1f,
+			real mass = 0.5f);
 
-        void BuildCrateStack(
-            const Vector3& basePos,
-            int width,
-            int height,
-            int depth,
-            const Vector3& crateSize,
-            real massPerCrate,
-            Shader* shader,
-            std::vector<PhysicsObject*>& crates);
+		PhysicsObject* CreateFloor(
+			const Vector3& halfExtents,
+			Shader* shader,
+			const Vector3& center = { 0.0f, 0.0f, 0.0f });
 
-        void BuildBrickWall(
-            const Vector3& basePos,
-            int bricksWide,
-            int bricksHigh,
-            const Vector3& brickSize,
-            real massPerBrick,
-            bool staggered,
-            std::vector<PhysicsObject*>& bricks,
-            Shader* shader);
+		PhysicsObject* CreateWall(
+			const Vector3& halfExtents,
+			const Vector3& center,
+			Shader* shader);
 
-        void BuildDominoLine(
-            const Vector3& startPos,
-            const Vector3& direction,
-            int count,
-            const Vector3& size,
-            real mass,
-            real spacing,
-            std::vector<PhysicsObject*>& dominoes);
+		void BuildCrateStack(
+			const Vector3& basePos,
+			int width,
+			int height,
+			int depth,
+			const Vector3& crateSize,
+			real massPerCrate,
+			Shader* shader,
+			std::vector<PhysicsObject*>& crates);
 
-        void Explode(
-            const Vector3& position,
-            real radius,
-            real impulseStrength);
+		void BuildBrickWall(
+			const Vector3& basePos,
+			int bricksWide,
+			int bricksHigh,
+			const Vector3& brickSize,
+			real massPerBrick,
+			bool staggered,
+			std::vector<PhysicsObject*>& bricks,
+			Shader* shader);
 
-    private:
-        SpawnContext m_Ctx;
+		void BuildDominoLine(
+			const Vector3& startPos,
+			const Vector3& direction,
+			int count,
+			const Vector3& size,
+			real mass,
+			real spacing,
+			std::vector<PhysicsObject*>& dominoes);
 
-        RigidBody* CreateRigidBody(
-            const Transform& transform,
-            real mass,
-            CollisionPrimitive* shape);
+		Ragdoll* CreateRagdoll(
+			const Vector3& basePosition);
 
-        std::string ResolveMaterialId(PhysicsMaterialId id) const;
+		void Explode(
+			const Vector3& position,
+			real radius,
+			real impulseStrength);
 
-        void ApplyRadialImpulse(
-            RigidBody* body,
-            const Vector3& explosionOrigin,
-            real radius,
-            real impulseStrength);
-    };
+	private:
+		SpawnContext m_Ctx;
+
+		RigidBody* CreateRigidBody(
+			const Transform& transform,
+			real mass,
+			CollisionPrimitive* shape);
+
+		std::string ResolveMaterialId(PhysicsMaterialId id) const;
+
+		void ApplyRadialImpulse(
+			RigidBody* body,
+			const Vector3& explosionOrigin,
+			real radius,
+			real impulseStrength);
+	};
 
 }

@@ -530,6 +530,166 @@ namespace elevate
 		}
 	}
 
+	Ragdoll* SpawnFactory::CreateRagdoll(const Vector3& basePosition)
+	{
+		Ragdoll* ragdoll = new Ragdoll();
+
+		// Helper to offset the original Millington positions by a base position.
+		auto offsetPos = [&basePosition](float x, float y, float z) -> Vector3
+			{
+				return Vector3(
+					basePosition.x + x,
+					basePosition.y + y,
+					basePosition.z + z
+				);
+			};
+
+		Bone* bones = ragdoll->bones;
+		Joint* joints = ragdoll->joints;
+
+		// Right lower leg
+		bones[0].setState(
+			offsetPos(0.0f, 0.993f, -0.5f),
+			Vector3(0.301f, 1.0f, 0.234f));
+
+		// Right upper leg
+		bones[1].setState(
+			offsetPos(0.0f, 3.159f, -0.56f),
+			Vector3(0.301f, 1.0f, 0.234f));
+
+		// Left lower leg
+		bones[2].setState(
+			offsetPos(0.0f, 0.993f, 0.5f),
+			Vector3(0.301f, 1.0f, 0.234f));
+
+		// Left upper leg
+		bones[3].setState(
+			offsetPos(0.0f, 3.15f, 0.56f),
+			Vector3(0.301f, 1.0f, 0.234f));
+
+		// Waist / pelvis
+		bones[4].setState(
+			offsetPos(-0.054f, 4.683f, 0.013f),
+			Vector3(0.415f, 0.392f, 0.690f));
+
+		// Stomach / lower torso
+		bones[5].setState(
+			offsetPos(0.043f, 5.603f, 0.013f),
+			Vector3(0.301f, 0.367f, 0.693f));
+
+		// Chest / upper torso
+		bones[6].setState(
+			offsetPos(0.0f, 6.485f, 0.013f),
+			Vector3(0.435f, 0.367f, 0.786f));
+
+		// Head / neck
+		bones[7].setState(
+			offsetPos(0.0f, 7.759f, 0.013f),
+			Vector3(0.45f, 0.598f, 0.421f));
+
+		// Pin head so the ragdoll hangs
+		bones[7].body->setMass(FLT_MAX);
+
+		// Right upper arm
+		bones[8].setState(
+			offsetPos(0.0f, 5.946f, -1.066f),
+			Vector3(0.267f, 0.888f, 0.207f));
+
+		// Right lower arm
+		bones[9].setState(
+			offsetPos(0.0f, 4.024f, -1.066f),
+			Vector3(0.267f, 0.888f, 0.207f));
+
+		// Left upper arm
+		bones[10].setState(
+			offsetPos(0.0f, 5.946f, 1.066f),
+			Vector3(0.267f, 0.888f, 0.207f));
+
+		// Left lower arm
+		bones[11].setState(
+			offsetPos(0.0f, 4.024f, 1.066f),
+			Vector3(0.267f, 0.888f, 0.207f));
+
+		// Right Knee
+		joints[0].set(
+			bones[0].body, Vector3(0.0f, 1.07f, 0.0f),
+			bones[1].body, Vector3(0.0f, -1.07f, 0.0f),
+			0.15f
+		);
+
+		// Left Knee
+		joints[1].set(
+			bones[2].body, Vector3(0.0f, 1.07f, 0.0f),
+			bones[3].body, Vector3(0.0f, -1.07f, 0.0f),
+			0.15f
+		);
+
+		// Right elbow
+		joints[2].set(
+			bones[9].body, Vector3(0.0f, 0.96f, 0.0f),
+			bones[8].body, Vector3(0.0f, -0.96f, 0.0f),
+			0.15f
+		);
+
+		// Left elbow
+		joints[3].set(
+			bones[11].body, Vector3(0.0f, 0.96f, 0.0f),
+			bones[10].body, Vector3(0.0f, -0.96f, 0.0f),
+			0.15f
+		);
+
+		// Stomach to Waist
+		joints[4].set(
+			bones[4].body, Vector3(0.054f, 0.50f, 0.0f),
+			bones[5].body, Vector3(-0.043f, -0.45f, 0.0f),
+			0.15f
+		);
+
+		// Waist to Chest
+		joints[5].set(
+			bones[5].body, Vector3(-0.043f, 0.411f, 0.0f),
+			bones[6].body, Vector3(0.0f, -0.411f, 0.0f),
+			0.15f
+		);
+
+		// Chest to Head
+		joints[6].set(
+			bones[6].body, Vector3(0.0f, 0.521f, 0.0f),
+			bones[7].body, Vector3(0.0f, -0.752f, 0.0f),
+			0.15f
+		);
+
+		// Right hip
+		joints[7].set(
+			bones[1].body, Vector3(0.0f, 1.066f, 0.0f),
+			bones[4].body, Vector3(0.0f, -0.458f, -0.5f),
+			0.15f
+		);
+
+		// Left Hip
+		joints[8].set(
+			bones[3].body, Vector3(0.0f, 1.066f, 0.0f),
+			bones[4].body, Vector3(0.0f, -0.458f, 0.5f),
+			0.105f
+		);
+
+		// Right shoulder
+		joints[9].set(
+			bones[6].body, Vector3(0.0f, 0.367f, -0.8f),
+			bones[8].body, Vector3(0.0f, 0.888f, 0.32f),
+			0.15f
+		);
+
+		// Left shoulder
+		joints[10].set(
+			bones[6].body, Vector3(0.0f, 0.367f, 0.8f),
+			bones[10].body, Vector3(0.0f, 0.888f, -0.32f),
+			0.15f
+		);
+
+		return ragdoll;
+	}
+
 	// Explosion helper
 
 	//void SpawnFactory::Explode(

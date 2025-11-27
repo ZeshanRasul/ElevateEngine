@@ -36,7 +36,7 @@ public:
         halfSize = extents;
 
         elevate::real mass = halfSize.x * halfSize.y * halfSize.z * 8.0f;
-        body->setMass(0.1f);
+        body->setMass(mass);
 
         elevate::Matrix3 tensor;
         tensor.setBlockInertiaTensor(halfSize, mass);
@@ -55,6 +55,5 @@ public:
 
     Cube* visual = nullptr;
 private:
-
 
 };

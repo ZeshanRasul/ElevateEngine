@@ -156,7 +156,7 @@
     <ClInclude Include="include\elevate\Physics\random.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Physics\bone.h">
+    <ClInclude Include="include\elevate\Physics\bone.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\elevate\Physics\block.h">

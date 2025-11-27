@@ -227,10 +227,6 @@ private:
     AmmoRound ammoPool[MaxAmmoRounds];
     int       ammoCount = 0;
 
-    Bone bones[12];
-
-    elevate::Joint joints[11];
-
     static const int MaxStackCubes = 5;
 
     elevate::CollisionBox* cStackBoxes[MaxStackCubes];
@@ -262,6 +258,8 @@ private:
 	PhysicsObject* wall3;
 	PhysicsObject* wall4;
 	PhysicsObject* floor;
+
+	std::vector<Ragdoll*> ragdolls;
 
     std::vector<DebugLine> m_DebugLines;
     GLuint m_DebugLineVAO = 0;
