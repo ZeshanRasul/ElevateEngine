@@ -551,12 +551,16 @@ void GameManager::reset()
 		2.0f,
 		false,
 		bricks,
-		&ammoShader
+		&cubeShader
 	);
+
+	brickTexture = static_cast<Cube*>(bricks[0]->mesh)->LoadTextureFromFile(
+		"C:/dev/ElevateEngine/src/Assets/Textures/Brick/TCom_Brick_Glazed2_512_albedo.png");
 
 	for (size_t i = 0; i < bricks.size(); ++i)
 	{
-		bricks[i]->mesh->SetShader(&ammoShader);
+		bricks[i]->mesh->SetShader(&cubeShader);
+		static_cast<Cube*>(bricks[i]->mesh)->SetTexture(brickTexture);
 		bricks[i]->mesh->setGameManager(this);
 		bricks[i]->mesh->SetColor(glm::vec3(0.6f, 0.4f, 0.2f));
 		gameObjects.push_back(bricks[i]->mesh);

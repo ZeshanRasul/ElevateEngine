@@ -242,6 +242,7 @@ private:
     Block blocks[9];
     Cube* cubes[9];
 	Texture blockTexture;
+    Texture brickTexture;
 
 	SpawnContext spawnContext;
 	ShapeFactory* shapeFactory;
