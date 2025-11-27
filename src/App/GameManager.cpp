@@ -133,7 +133,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	);
 	floor->mesh->setGameManager(this);
 	floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
-	static_cast<Cube*>(floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_4k_albedo.png");
+	static_cast<Cube*>(floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_512_albedo.png");
 	gameObjects.push_back(floor->mesh);
 
 	wall = spawnFactory->CreateWall(
@@ -144,7 +144,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	wall->mesh->setGameManager(this);
 	wall->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	wall->mesh->SetTexTiling(4.0f);
-	static_cast<Cube*>(wall->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_4k_albedo.png");
+	static_cast<Cube*>(wall->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	gameObjects.push_back(wall->mesh);
 
 	wall2 = spawnFactory->CreateWall(
@@ -155,7 +155,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	wall2->mesh->setGameManager(this);
 	wall2->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	wall2->mesh->SetTexTiling(4.0f);
-	static_cast<Cube*>(wall2->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_4k_albedo.png");
+	static_cast<Cube*>(wall2->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	gameObjects.push_back(wall2->mesh);
 
 	wall3 = spawnFactory->CreateWall(
@@ -166,7 +166,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	wall3->mesh->setGameManager(this);
 	wall3->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	wall3->mesh->SetTexTiling(4.0f);
-	static_cast<Cube*>(wall3->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_4k_albedo.png");
+	static_cast<Cube*>(wall3->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	gameObjects.push_back(wall3->mesh);
 
 	wall4 = spawnFactory->CreateWall(
@@ -177,7 +177,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	wall4->mesh->setGameManager(this);
 	wall4->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	wall4->mesh->SetTexTiling(4.0f);
-	static_cast<Cube*>(wall4->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_4k_albedo.png");
+	static_cast<Cube*>(wall4->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	gameObjects.push_back(wall4->mesh);
 
 	if (fpsSandboxDemo)
@@ -399,7 +399,7 @@ void GameManager::reset()
 
 	firstHit = true;
 
-	Cube* cube = new Cube(elevate::Vector3(-10, 7, 10), elevate::Vector3(5, 5, 5), &cubeShader, this);
+	Cube* cube = new Cube(elevate::Vector3(-10, 7, 10), elevate::Vector3(5, 5, 5), &ammoShader, this);
 	cube->LoadMesh();
 	cube->SetAngle(0.0f);
 	cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
@@ -469,7 +469,7 @@ void GameManager::reset()
 		elevate::Vector3 scale(renderScale.x, renderScale.y, renderScale.z);
 
 		// Render cube
-		Cube* cube = new Cube(pos, scale, &cubeShader, this);
+		Cube* cube = new Cube(pos, scale, &ammoShader, this);
 		cube->LoadMesh();
 		cube->SetAngle(0.0f);
 		cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
@@ -834,7 +834,7 @@ void GameManager::update(float deltaTime)
 		{
 			for (int i = 0; i < 8; i++)
 			{
-				Cube* c = new Cube(elevate::Vector3(3.0f, 5.0f, 3.0f), elevate::Vector3(1.0f, 1.0f, 1.0f), &cubeShader, this);
+				Cube* c = new Cube(elevate::Vector3(3.0f, 5.0f, 3.0f), elevate::Vector3(1.0f, 1.0f, 1.0f), &ammoShader, this);
 				c->LoadMesh();
 				c->SetAngle(0.0f);
 				c->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
