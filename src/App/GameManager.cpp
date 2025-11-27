@@ -38,93 +38,93 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	resolver.setIterations(256 * 4, 256 * 4);
 	glGenVertexArrays(1, &m_DebugLineVAO);
 	glGenBuffers(1, &m_DebugLineVBO);
-	
+
 	glBindVertexArray(m_DebugLineVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_DebugLineVBO);
-	
-	
+
+
 	glEnableVertexAttribArray(0); // position
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)0);
-	
+
 	glEnableVertexAttribArray(1); // color
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(sizeof(float) * 3));
-	
+
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	spawnContext.World = new World(300, 100);
-	rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f * 0.0f, 0.0f));
+	rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f * 0.25f, 0.0f));
 	shapeFactory = new elevate::ShapeFactory();
 	spawnFactory = new elevate::SpawnFactory(spawnContext);
 
-//	gameObjects.clear();
-	//gameObjects.reserve(300);
-	//gameObjects.resize(300);
+	//	gameObjects.clear();
+		//gameObjects.reserve(300);
+		//gameObjects.resize(300);
 
-	//crate = spawnFactory->SpawnCrate(
-	//	elevate::Vector3(0.0f, 0.0f, 0.0f),
-	//	&cubeShader,
-	//	elevate::Vector3(1.0f, 1.0f, 1.0f),
-	//	1.0f
-	//);
+		//crate = spawnFactory->SpawnCrate(
+		//	elevate::Vector3(0.0f, 0.0f, 0.0f),
+		//	&cubeShader,
+		//	elevate::Vector3(1.0f, 1.0f, 1.0f),
+		//	1.0f
+		//);
 
-	//crate->mesh->SetShader(&cubeShader);
-	//crate->mesh->setGameManager(this);
-	//crate->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.1f));
+		//crate->mesh->SetShader(&cubeShader);
+		//crate->mesh->setGameManager(this);
+		//crate->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.1f));
 
-	//gameObjects.push_back(crate->mesh);
+		//gameObjects.push_back(crate->mesh);
 
-	//ball = spawnFactory->SpawnGrenade(
-	//	elevate::Vector3(10.0f, 2.0, 0.0f),
-	//	elevate::Vector3(0.0f, -9.81f, 0.0f),
-	//	&cubeShader,
-	//	3.0f,
-	//	5.0f
-	//);
+		//ball = spawnFactory->SpawnGrenade(
+		//	elevate::Vector3(10.0f, 2.0, 0.0f),
+		//	elevate::Vector3(0.0f, -9.81f, 0.0f),
+		//	&cubeShader,
+		//	3.0f,
+		//	5.0f
+		//);
 
-	//ball->mesh->SetShader(&ammoShader);
-	//ball->mesh->setGameManager(this);
-	//ball->mesh->SetColor(glm::vec3(0.1f, 0.1f, 0.8f));
+		//ball->mesh->SetShader(&ammoShader);
+		//ball->mesh->setGameManager(this);
+		//ball->mesh->SetColor(glm::vec3(0.1f, 0.1f, 0.8f));
 
-	//gameObjects.push_back(ball->mesh);
+		//gameObjects.push_back(ball->mesh);
 
-	//spawnFactory->BuildCrateStack(
-	//	elevate::Vector3(-10.0f, 0.0f, 0.0f),
-	//	3,
-	//	3,
-	//	3,
-	//	elevate::Vector3(1.1f, 1.1f, 1.1f),
-	//	1.0f,
-	//	&cubeShader,
-	//	crates
-	//);
-	//
-	//for (int i = 0; i < crates.size(); ++i)
-	//{
-	//	crates[i]->mesh->SetShader(&ammoShader);
-	//	crates[i]->mesh->setGameManager(this);
-	//	crates[i]->mesh->SetColor(glm::vec3(0.3f, 0.7f, 0.2f));
-	//	gameObjects.push_back(crates[i]->mesh);
-	//}
+		//spawnFactory->BuildCrateStack(
+		//	elevate::Vector3(-10.0f, 0.0f, 0.0f),
+		//	3,
+		//	3,
+		//	3,
+		//	elevate::Vector3(1.1f, 1.1f, 1.1f),
+		//	1.0f,
+		//	&cubeShader,
+		//	crates
+		//);
+		//
+		//for (int i = 0; i < crates.size(); ++i)
+		//{
+		//	crates[i]->mesh->SetShader(&ammoShader);
+		//	crates[i]->mesh->setGameManager(this);
+		//	crates[i]->mesh->SetColor(glm::vec3(0.3f, 0.7f, 0.2f));
+		//	gameObjects.push_back(crates[i]->mesh);
+		//}
 
-	//spawnFactory->BuildBrickWall(
-	//	elevate::Vector3(0.0f, 0.0f, -10.0f),
-	//	3,
-	//	3,
-	//	elevate::Vector3(1.0f, 0.5f, 0.5f),
-	//	2.0f,
-	//	true,
-	//	bricks,
-	//	&ammoShader
-	//);
+		//spawnFactory->BuildBrickWall(
+		//	elevate::Vector3(0.0f, 0.0f, -10.0f),
+		//	3,
+		//	3,
+		//	elevate::Vector3(1.0f, 0.5f, 0.5f),
+		//	2.0f,
+		//	true,
+		//	bricks,
+		//	&ammoShader
+		//);
 
-	//for (size_t i = 0; i < bricks.size(); ++i)
-	//{
-	//	bricks[i]->mesh->SetShader(&ammoShader);
-	//	bricks[i]->mesh->setGameManager(this);
-	//	bricks[i]->mesh->SetColor(glm::vec3(0.6f, 0.4f, 0.2f));
-	//	gameObjects.push_back(bricks[i]->mesh);
-	//}
+		//for (size_t i = 0; i < bricks.size(); ++i)
+		//{
+		//	bricks[i]->mesh->SetShader(&ammoShader);
+		//	bricks[i]->mesh->setGameManager(this);
+		//	bricks[i]->mesh->SetColor(glm::vec3(0.6f, 0.4f, 0.2f));
+		//	gameObjects.push_back(bricks[i]->mesh);
+		//}
 
 	floor = spawnFactory->CreateFloor(
 		elevate::Vector3(200.0f, 1.0f, 200.0f),
@@ -402,7 +402,7 @@ void GameManager::reset()
 	// Set the first block
 	// Set the first block
 	blocks[0].halfSize = elevate::Vector3(4, 4, 4);
-	blocks[0].body->setPosition(elevate::Vector3(-10, 7, 10));
+	blocks[0].body->setPosition(elevate::Vector3(-50, 7, 50));
 	blocks[0].body->setOrientation(elevate::Quaternion(1, 0, 0, 0));
 	blocks[0].body->setVelocity(elevate::Vector3(0, 0, 0));
 	blocks[0].body->setRotation(elevate::Vector3(0, 0, 0));
@@ -418,25 +418,87 @@ void GameManager::reset()
 	blocks[0].body->setAwake(true);
 	blocks[0].body->setCanSleep(true);
 	blocks[0].exists = true;
-//	spawnContext.World->addBody(blocks[0].body);
+	//	spawnContext.World->addBody(blocks[0].body);
 
-	//	hit = false;
+		//	hit = false;
 
-		//elevate::real strength = -random.randomReal(500.0f, 1000.0f);
-		//for (unsigned i = 0; i < 12; i++)
-		//{
-		//	bones[i].body->addForceAtBodyPoint(
-		//		elevate::Vector3(strength, 0, 0), elevate::Vector3()
-		//	);
-		//}
-		//bones[6].body->addForceAtBodyPoint(
-		//	elevate::Vector3(strength, 0, random.randomBinomial(1000.0f)),
-		//	elevate::Vector3(random.randomBinomial(4.0f), random.randomBinomial(3.0f), 0)
-		//);
+			//elevate::real strength = -random.randomReal(500.0f, 1000.0f);
+			//for (unsigned i = 0; i < 12; i++)
+			//{
+			//	bones[i].body->addForceAtBodyPoint(
+			//		elevate::Vector3(strength, 0, 0), elevate::Vector3()
+			//	);
+			//}
+			//bones[6].body->addForceAtBodyPoint(
+			//	elevate::Vector3(strength, 0, random.randomBinomial(1000.0f)),
+			//	elevate::Vector3(random.randomBinomial(4.0f), random.randomBinomial(3.0f), 0)
+			//);
 
-		// Reset the contacts
+			// Reset the contacts
 
+	numStackCubes = 5; // choose 3?5 for testing
 
+	elevate::Vector3 cubeHalfSize(1.0f, 1.0f, 1.0f);
+	glm::vec3       renderScale(2.0f, 2.0f, 2.0f);
+
+	for (int i = 0; i < numStackCubes; i++)
+	{
+		gameObjects.erase(
+			std::remove(
+				gameObjects.begin(),
+				gameObjects.end(),
+				stackCubes[i]),
+			gameObjects.end()
+		);
+
+	//	rbWorld->removeBody(stackBodies[i]);
+
+		delete cStackBoxes[i];
+
+		float centerY = 2.0f + i * 2.0f;
+
+		elevate::Vector3 pos(-20.0f, centerY, -20.0f);
+		elevate::Vector3 scale(renderScale.x, renderScale.y, renderScale.z);
+
+		// Render cube
+		Cube* cube = new Cube(pos, scale, &cubeShader, this);
+		cube->LoadMesh();
+		cube->SetAngle(0.0f);
+		cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
+		cube->SetColor(glm::vec3(0.2f, 0.7f, 0.3f));
+		gameObjects.push_back(cube);
+		stackCubes[i] = cube;
+
+		// Physics body
+		elevate::RigidBody* body = new elevate::RigidBody();
+		body->setAwake(true);
+		body->setPosition(pos);
+		body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+		body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+
+		real mass = 0.2f;
+		body->setMass(mass);
+
+		elevate::Matrix3 boxInertia;
+		boxInertia.setBlockInertiaTensor(cubeHalfSize, mass);
+		body->setInertiaTensor(boxInertia);
+
+		//rbWorld->addBody(body);
+		//rbGravity->updateForce(body, 0); // or via registry below
+
+//		rbWorld->getForceRegistry().add(body, rbGravity);
+
+		stackBodies[i] = body;
+
+		// Collision box
+		elevate::CollisionBox* cBox = new elevate::CollisionBox();
+		cBox->body = body;
+		cBox->halfSize = cubeHalfSize;
+		cBox->body->calculateDerivedData();
+		cBox->calculateInternals();
+		cStackBoxes[i] = cBox;
+	}
 
 	hit = false;
 
@@ -599,6 +661,7 @@ void GameManager::update(float deltaTime)
 			if (!r.active) continue;
 			r.body->clearAccumulator();
 			r.body->calculateDerivedData();
+			rbGravity->updateForce(r.body, deltaTime);
 			r.body->integrate(deltaTime);
 			r.coll->calculateInternals();
 		}
@@ -805,7 +868,7 @@ void GameManager::generateContacts()
 				elevate::CollisionDetector::boxAndBox(*cStackBoxes[i], *cStackBoxes[j], &cData);
 			}
 
-		
+
 			elevate::Matrix4 transform, otherTransform;
 			elevate::Vector3 position, otherPosition;
 			for (Block* block = blocks; block < blocks + 9; block++)
@@ -824,7 +887,7 @@ void GameManager::generateContacts()
 			if (!r.active)
 				continue;
 
-		
+
 			for (Bone* bone = bones; bone < bones + 12; bone++)
 			{
 				if (!cData.hasMoreContacts()) return;
@@ -924,6 +987,6 @@ void GameManager::render()
 		renderer->draw(obj, view, projection);
 	}
 
-		drawDebugLines();
+	drawDebugLines();
 
 }
