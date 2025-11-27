@@ -53,7 +53,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	spawnContext.World = new World(300, 100);
-	rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f * 0.25f, 0.0f));
+	rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f * 0.5f, 0.0f));
 	shapeFactory = new elevate::ShapeFactory();
 	spawnFactory = new elevate::SpawnFactory(spawnContext);
 
@@ -68,7 +68,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	);
 	floor->mesh->setGameManager(this);
 	floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
-	static_cast<Cube*>(floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_512_albedo.png");
+	static_cast<Cube*>(floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_4k_albedo.png");
 	gameObjects.push_back(floor->mesh);
 
 	wall = spawnFactory->CreateWall(
@@ -195,14 +195,12 @@ void GameManager::reset()
 				domino->mesh),
 			gameObjects.end()
 		);
+	}
 
-		dominoes.erase(
-			std::remove(
-				dominoes.begin(),
-				dominoes.end(),
-				domino),
-			dominoes.end()
-		);
+	for (PhysicsObject* domino : dominoes)
+	{
+		delete domino->mesh;
+		delete domino;
 	}
 
 	dominoes.clear();
@@ -430,7 +428,7 @@ void GameManager::reset()
 		cube->SetAngle(0.0f);
 		cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
 		cube->SetColor(glm::vec3(0.2f, 0.7f, 0.3f));
-		crateTexture = cube->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Crate/TCom_Scifi_Panel2_512_albedo.png");
+		crateTexture = cube->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Crate/TCom_MetalSheetCladding2_Galvanized_512_albedo.png");
 		gameObjects.push_back(cube);
 		stackCubes[i] = cube;
 
@@ -537,7 +535,8 @@ void GameManager::reset()
 	);
 
 	crate->mesh->SetShader(&cubeShader);
-	static_cast<Cube*>(crate->mesh)->SetTexture(crateTexture);
+	static_cast<Cube*>(crate->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Crate/TCom_MetalThreadplate4_Aged_512_albedo.png");
+	//static_cast<Cube*>(crate->mesh)->SetTexture(crateTexture);
 	crate->mesh->setGameManager(this);
 	crate->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.1f));
 
@@ -964,7 +963,7 @@ void GameManager::generateContacts()
 
 	elevate::CollisionPlane plane;
 	plane.direction = elevate::Vector3(0, 1, 0);
-	plane.offset = -1;
+	plane.offset = 0;
 
 	cData.reset(1028);
 	cData.friction = (real)0.9;
