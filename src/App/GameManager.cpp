@@ -600,6 +600,10 @@ void GameManager::ShowLightControlWindow(DirLight& light)
 
 	ImGui::Begin("Spawner");
 	ImGui::Text("Spawn Box");
+	ImGui::InputFloat("Box Mass", &boxMass);
+	ImGui::InputFloat3("Box Size", boxSize);
+	ImGui::ColorEdit4("Box Size", boxColor);
+
 	if (ImGui::Button("Spawn Box"))
 	{
 		glm::vec3 camPos = camera->Position;
@@ -607,16 +611,16 @@ void GameManager::ShowLightControlWindow(DirLight& light)
 
 		glm::vec3 spawnPos = camPos + camFront * 6.0f;
 
-
 		PhysicsObject* box = spawnFactory->SpawnBox(
 			elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z),
-			elevate::Vector3(1.0f, 1.0f, 1.0f),
-			5.0f,
+			elevate::Vector3(boxSize[0], boxSize[1], boxSize[2]),
+			boxMass,
 			"",
 			PhysicsMaterialId::Default,
 			&ammoShader
 		);
 
+		box->mesh->SetColor(glm::vec3(boxColor[0], boxColor[1], boxColor[2]));
 		gameObjects.push_back(box->mesh);
 		runTimeBoxes.push_back(box);
 	}
@@ -1129,9 +1133,10 @@ void GameManager::generateContacts()
 		{
 			for (int j = i + 1; j < runTimeBoxes.size(); j++)
 			{
+				if (!cData.hasMoreContacts()) return;
 				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(runTimeBoxes[i]->shape), *static_cast<CollisionBox*>(runTimeBoxes[j]->shape), &cData);
 			}
-
+			if (!cData.hasMoreContacts()) return;
 			elevate::CollisionDetector::boxAndHalfSpace(*static_cast<CollisionBox*>(runTimeBoxes[i]->shape), plane, &cData);
 		}
 
@@ -1161,10 +1166,13 @@ void GameManager::generateContacts()
 		{
 			for (int j = i + 1; j < numStackCubes; ++j)
 			{
+				if (!cData.hasMoreContacts()) return;
 				elevate::CollisionDetector::boxAndBox(*cStackBoxes[i], *cStackBoxes[j], &cData);
 			}
+		}
 
-
+		for (int i = 1; i < numStackCubes; ++i)
+		{
 			elevate::Matrix4 transform, otherTransform;
 			elevate::Vector3 position, otherPosition;
 			for (Block* block = blocks; block < blocks + 9; block++)
@@ -1180,8 +1188,8 @@ void GameManager::generateContacts()
 				if (!cData.hasMoreContacts()) return;
 				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(brick->shape), *cStackBoxes[i], &cData);
 			}
-
 		}
+
 		for (int i = 0; i < crates.size(); i++)
 		{
 			if (!cData.hasMoreContacts()) return;

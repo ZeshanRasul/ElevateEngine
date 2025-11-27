@@ -262,6 +262,10 @@ private:
 	std::vector<Ragdoll*> ragdolls;
 
     std::vector<PhysicsObject*> runTimeBoxes;
+    float boxMass = 1.0f;
+    float boxSize[3] = { 1.0f, 1.0f, 1.0f };
+    float boxColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
 
     std::vector<DebugLine> m_DebugLines;
     GLuint m_DebugLineVAO = 0;
