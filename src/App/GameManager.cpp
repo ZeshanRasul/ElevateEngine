@@ -552,6 +552,12 @@ void GameManager::setUpDebugUI()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
+	ImGuiID dockspace_id = ImGui::GetID("My Dockspace");
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+
+	ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+
 }
 
 void GameManager::showDebugUI()
