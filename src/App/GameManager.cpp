@@ -9,7 +9,7 @@ DirLight dirLight = {
 		glm::vec3(-0.2f, -1.0f, -0.3f),
 
 		glm::vec3(0.15f, 0.15f, 0.15f),
-		glm::vec3(0.4f),
+		glm::vec3(0.85f),
 		glm::vec3(0.1f, 0.1f, 0.1f)
 };
 
@@ -446,10 +446,10 @@ void GameManager::reset()
 
 			// Reset the contacts
 
-	numStackCubes = 5; // choose 3?5 for testing
+	numStackCubes = 5; 
 
-	elevate::Vector3 cubeHalfSize(1.0f, 1.0f, 1.0f);
-	glm::vec3       renderScale(2.0f, 2.0f, 2.0f);
+	elevate::Vector3 cubeHalfSize(2.0f, 2.0f, 2.0f);
+	glm::vec3       renderScale(4.0f, 4.0f, 4.0f);
 
 	for (int i = 0; i < numStackCubes; i++)
 	{
@@ -465,17 +465,18 @@ void GameManager::reset()
 
 		delete cStackBoxes[i];
 
-		float centerY = 2.0f + i * 2.0f;
+		float centerY = 3.3f + i * 4.3f;
 
 		elevate::Vector3 pos(-20.0f, centerY, -20.0f);
 		elevate::Vector3 scale(renderScale.x, renderScale.y, renderScale.z);
 
 		// Render cube
-		Cube* cube = new Cube(pos, scale, &ammoShader, this);
+		Cube* cube = new Cube(pos, scale, &cubeShader, this);
 		cube->LoadMesh();
 		cube->SetAngle(0.0f);
 		cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
 		cube->SetColor(glm::vec3(0.2f, 0.7f, 0.3f));
+		cube->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Crate/TCom_Scifi_Panel2_512_albedo.png");
 		gameObjects.push_back(cube);
 		stackCubes[i] = cube;
 
@@ -487,7 +488,7 @@ void GameManager::reset()
 		body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 		body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
 
-		real mass = 0.2f;
+		real mass = 1.0f;
 		body->setMass(mass);
 
 		elevate::Matrix3 boxInertia;
