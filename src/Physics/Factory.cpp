@@ -76,16 +76,19 @@ namespace elevate
 
 		PhysicsObject* obj = new PhysicsObject();
 		obj->body = body;
+		obj->body->setPosition(transform.position);
+		obj->body->setOrientation(transform.rotation);
 		obj->shape = shape;
 		obj->meshId = meshId;
 		obj->materialId = materialId;
-
+		obj->body->calculateDerivedData();
+		obj->shape->calculateInternals();
 		if (name == "Box" || name == "Floor" || name == "Wall")
 		{
 			Cube* cube = new Cube();
 			obj->mesh = cube;
 			obj->mesh->LoadMesh();
-			obj->mesh->SetPosition(obj->body->getTransform().getAxisVector(3));
+			obj->mesh->SetPosition(transform.position);
 			obj->mesh->SetScale(Vector3(transform.scale));
 			obj->mesh->SetShader(shader);
 		}
@@ -96,8 +99,8 @@ namespace elevate
 			Sphere* sphere = new Sphere();
 			obj->mesh = sphere;
 			obj->mesh->LoadMesh();
-			obj->mesh->SetPosition(obj->body->getTransform().getAxisVector(3));
-			obj->mesh->SetScale(elevate::Vector3(transform.scale));
+			obj->mesh->SetPosition(transform.position);
+			obj->mesh->SetScale(transform.scale);
 			obj->mesh->SetShader(shader);
 		}
 
@@ -137,7 +140,7 @@ namespace elevate
 		Transform t{};
 		t.position = position;
 		t.rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
-		t.scale = { 1.0f, 1.0f, 1.0f };
+		t.scale = { halfExtents * 2};
 
 		CollisionPrimitive* shape = ShapeFactory::CreateBoxShape(*m_Ctx.World, halfExtents);
 

@@ -137,7 +137,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	wall = spawnFactory->CreateWall(
 		elevate::Vector3(1.0f, 25.0f, 200.0f),
-		elevate::Vector3(200.0f, 12.5f, 0.0f),
+		elevate::Vector3(200.0f, 25.0f, 0.0f),
 		&cubeShader
 	);
 	wall->mesh->setGameManager(this);
@@ -146,7 +146,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	wall2 = spawnFactory->CreateWall(
 		elevate::Vector3(1.0f, 25.0f, 200.0f),
-		elevate::Vector3(-200.0f, 12.5f, 0.0f),
+		elevate::Vector3(-200.0f, 25.0f, 0.0f),
 		&cubeShader
 	);
 	wall2->mesh->setGameManager(this);
@@ -155,7 +155,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	wall3 = spawnFactory->CreateWall(
 		elevate::Vector3(200.0f, 25.0f, 1.0f),
-		elevate::Vector3(0.0f, 12.5f, 200.0f),
+		elevate::Vector3(0.0f, 25.0f, 200.0f),
 		&cubeShader
 	);
 	wall3->mesh->setGameManager(this);
@@ -164,7 +164,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	wall4 = spawnFactory->CreateWall(
 		elevate::Vector3(200.0f, 25.0f, 1.0f),
-		elevate::Vector3(0.0f, 12.5f, -200.0f),
+		elevate::Vector3(0.0f, 25.0f, -200.0f),
 		&cubeShader
 	);
 	wall4->mesh->setGameManager(this);
