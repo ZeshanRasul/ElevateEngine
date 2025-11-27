@@ -584,10 +584,39 @@ void GameManager::ShowLightControlWindow(DirLight& light)
 	ImGui::ColorEdit4("Specular", (float*)&light.specular);
 
 	ImGui::End();
+
+	ImGui::Begin("Spawner");
+	ImGui::Text("Spawn Box");
+	if (ImGui::Button("Spawn Box"))
+	{
+		glm::vec3 camPos = camera->Position;
+		glm::vec3 camFront = glm::normalize(camera->Front);
+
+		glm::vec3 spawnPos = camPos + camFront * 6.0f;
+
+
+		PhysicsObject* box = spawnFactory->SpawnBox(
+			elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z),
+			elevate::Vector3(1.0f, 1.0f, 1.0f),
+			5.0f,
+			"",
+			PhysicsMaterialId::Default,
+			&ammoShader
+		);
+
+		gameObjects.push_back(box->mesh);
+		runTimeBoxes.push_back(box);
+	}
+	ImGui::End();
 }
 
 void GameManager::fireRound(AmmoType type)
 {
+	if (ImGui::GetIO().WantCaptureMouse)
+	{
+		return;
+	}
+
 	AmmoRound* round = nullptr;
 	for (int i = 0; i < ammoCount; ++i)
 	{
@@ -778,6 +807,15 @@ void GameManager::update(float deltaTime)
 			dominoes[i]->shape->calculateInternals();
 		}
 
+		for (int i = 0; i < runTimeBoxes.size(); i++)
+		{
+			runTimeBoxes[i]->body->clearAccumulator();
+			runTimeBoxes[i]->body->calculateDerivedData();
+			rbGravity->updateForce(runTimeBoxes[i]->body, deltaTime);
+			runTimeBoxes[i]->body->integrate(deltaTime);
+			runTimeBoxes[i]->shape->calculateInternals();
+		}
+
 		crate->body->clearAccumulator();
 		crate->body->calculateDerivedData();
 		rbGravity->updateForce(crate->body, deltaTime);
@@ -893,6 +931,20 @@ void GameManager::update(float deltaTime)
 				(float)dominoes[i]->body->getOrientation().k));
 		}
 
+		for (int i = 0; i < runTimeBoxes.size(); i++)
+		{
+			runTimeBoxes[i]->body->calculateDerivedData();
+			runTimeBoxes[i]->shape->calculateInternals();
+			elevate::Matrix4 t = runTimeBoxes[i]->body->getTransform();
+			elevate::Vector3 p = t.getAxisVector(3);
+			runTimeBoxes[i]->mesh->SetPosition(p);
+			runTimeBoxes[i]->mesh->SetOrientation(glm::quat(
+				(float)runTimeBoxes[i]->body->getOrientation().r,
+				(float)runTimeBoxes[i]->body->getOrientation().i,
+				(float)runTimeBoxes[i]->body->getOrientation().j,
+				(float)runTimeBoxes[i]->body->getOrientation().k));
+		}
+
 		crate->shape->calculateInternals();
 		elevate::Matrix4 t = crate->body->getTransform();
 		elevate::Vector3 p = t.getAxisVector(3);
@@ -1002,6 +1054,12 @@ void GameManager::generateContacts()
 					elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(dominoes[i]->shape), *static_cast<CollisionBox*>(dominoes[j]->shape), &cData);
 				}
 			}
+		
+			if (!cData.hasMoreContacts()) return;
+			for (int i = 0; i < runTimeBoxes.size(); i++)
+			{
+				elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(runTimeBoxes[i]->shape), *r.coll, &cData);
+			}
 
 			for (int i = 0; i < crates.size(); i++)
 			{
@@ -1052,6 +1110,29 @@ void GameManager::generateContacts()
 			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(crate->shape), *r.coll, &cData);
 
 		}
+
+		if (!cData.hasMoreContacts()) return;
+		for (int i = 0; i < runTimeBoxes.size(); i++)
+		{
+			for (int j = i + 1; j < runTimeBoxes.size(); j++)
+			{
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(runTimeBoxes[i]->shape), *static_cast<CollisionBox*>(runTimeBoxes[j]->shape), &cData);
+			}
+
+			elevate::CollisionDetector::boxAndHalfSpace(*static_cast<CollisionBox*>(runTimeBoxes[i]->shape), plane, &cData);
+		}
+
+		if (!cData.hasMoreContacts()) return;
+		for (int i = 0; i < dominoes.size(); i++)
+		{
+			for (int j = i + 1; j < dominoes.size(); j++)
+			{
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(dominoes[i]->shape), *static_cast<CollisionBox*>(dominoes[j]->shape), &cData);
+			}
+		}
+
 
 		elevate::CollisionDetector::boxAndHalfSpace(*static_cast<CollisionBox*>(crate->shape), plane, &cData);
 
@@ -1194,6 +1275,7 @@ void GameManager::generateContacts()
 		for (int i = 0; i < dominoes.size(); i++)
 		{
 			elevate::CollisionDetector::boxAndHalfSpace(*static_cast<CollisionBox*>(dominoes[i]->shape), plane, &cData);
+			elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(dominoes[i]->shape), *static_cast<CollisionBox*>(floor->shape), &cData);
 		}
 
 		buildContactDebugLines();

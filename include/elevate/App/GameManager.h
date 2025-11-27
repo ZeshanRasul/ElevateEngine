@@ -261,6 +261,8 @@ private:
 
 	std::vector<Ragdoll*> ragdolls;
 
+    std::vector<PhysicsObject*> runTimeBoxes;
+
     std::vector<DebugLine> m_DebugLines;
     GLuint m_DebugLineVAO = 0;
     GLuint m_DebugLineVBO = 0;
