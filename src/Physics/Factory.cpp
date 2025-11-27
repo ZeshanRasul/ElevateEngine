@@ -85,7 +85,7 @@ namespace elevate
 			Cube* cube = new Cube();
 			obj->mesh = cube;
 			obj->mesh->LoadMesh();
-			obj->mesh->SetPosition(obj->body->getPosition());
+			obj->mesh->SetPosition(obj->body->getTransform().getAxisVector(3));
 			obj->mesh->SetScale(Vector3(transform.scale));
 			obj->mesh->SetShader(shader);
 		}
@@ -96,7 +96,7 @@ namespace elevate
 			Sphere* sphere = new Sphere();
 			obj->mesh = sphere;
 			obj->mesh->LoadMesh();
-			obj->mesh->SetPosition(obj->body->getPosition());
+			obj->mesh->SetPosition(obj->body->getTransform().getAxisVector(3));
 			obj->mesh->SetScale(elevate::Vector3(transform.scale));
 			obj->mesh->SetShader(shader);
 		}

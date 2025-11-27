@@ -129,7 +129,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	floor = spawnFactory->CreateFloor(
 		elevate::Vector3(200.0f, 1.0f, 200.0f),
 		&cubeShader,
-		elevate::Vector3(0.0f, -10.0f, 0.0f)
+		elevate::Vector3(0.0f, -1.0f, 0.0f)
 	);
 	floor->mesh->setGameManager(this);
 	floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
@@ -887,6 +887,12 @@ void GameManager::generateContacts()
 			if (!r.active)
 				continue;
 
+			if (!cData.hasMoreContacts()) return;
+			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(wall->shape), *r.coll, &cData);
+			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(wall2->shape), *r.coll, &cData);
+			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(wall3->shape), *r.coll, &cData);
+			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(wall4->shape), *r.coll, &cData);
+			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(floor->shape), *r.coll, &cData);
 
 			for (Bone* bone = bones; bone < bones + 12; bone++)
 			{
@@ -921,6 +927,7 @@ void GameManager::generateContacts()
 
 				}
 			}
+
 		}
 		elevate::Matrix4 transform, otherTransform;
 		elevate::Vector3 position, otherPosition;
