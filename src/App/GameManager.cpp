@@ -88,27 +88,6 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	gameObjects.push_back(ball->mesh);
 
-	spawnFactory->BuildCrateStack(
-		elevate::Vector3(-10.0f, 10.0f, -40.0f),
-		3,
-		3,
-		3,
-		elevate::Vector3(3.1f, 3.1f, 3.1f),
-		1.0f,
-		&ammoShader,
-		crates
-	);
-
-	for (int i = 0; i < crates.size(); ++i)
-	{
-		crates[i]->mesh->SetShader(&cubeShader);
-		crates[i]->mesh->setGameManager(this);
-		crates[i]->mesh->SetColor(glm::vec3(0.3f, 0.7f, 0.2f));
-		static_cast<Cube*>(crates[i]->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
-
-		gameObjects.push_back(crates[i]->mesh);
-	}
-
 	spawnFactory->BuildBrickWall(
 		elevate::Vector3(0.0f, 0.0f, -10.0f),
 		3,
@@ -401,7 +380,10 @@ void GameManager::reset()
 
 	firstHit = true;
 
-	Cube* cube = new Cube(elevate::Vector3(-10, 7, 10), elevate::Vector3(5, 5, 5), &ammoShader, this);
+	elevate::Vector3 blockPos(-50, 7, 50);
+	elevate::Vector3 blockScale(15, 15, 15);
+
+	Cube* cube = new Cube(blockPos, elevate::Vector3(15, 15, 15), &ammoShader, this);
 	cube->LoadMesh();
 	cube->SetAngle(0.0f);
 	cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
@@ -411,14 +393,15 @@ void GameManager::reset()
 
 	// Set the first block
 	// Set the first block
-	blocks[0].halfSize = elevate::Vector3(4, 4, 4);
-	blocks[0].body->setPosition(elevate::Vector3(-50, 7, 50));
+	blocks[0].halfSize = blockScale * 0.5f;
+	blocks[0].body->setPosition(elevate::Vector3(blockPos));
 	blocks[0].body->setOrientation(elevate::Quaternion(1, 0, 0, 0));
 	blocks[0].body->setVelocity(elevate::Vector3(0, 0, 0));
 	blocks[0].body->setRotation(elevate::Vector3(0, 0, 0));
-	blocks[0].body->setMass(100.0f);
+	real mass = 100.0f;
+	blocks[0].body->setMass(mass);
 	elevate::Matrix3 it;
-	it.setBlockInertiaTensor(blocks[0].halfSize, 100.0f);
+	it.setBlockInertiaTensor(blocks[0].halfSize, mass);
 	blocks[0].body->setInertiaTensor(it);
 	blocks[0].body->setDamping(0.9f, 0.9f);
 	blocks[0].body->calculateDerivedData();
@@ -445,6 +428,57 @@ void GameManager::reset()
 			//);
 
 			// Reset the contacts
+
+	for (PhysicsObject* crate : crates)
+	{
+		gameObjects.erase(
+			std::remove(
+				gameObjects.begin(),
+				gameObjects.end(),
+				crate->mesh),
+			gameObjects.end()
+		);
+
+		//delete crate;
+	}
+
+
+	for (PhysicsObject* crate : crates)
+	{
+		crates.erase(
+			std::remove(
+				crates.begin(),
+				crates.end(),
+				crate),
+			crates.end()
+		);
+
+		//delete crate;
+	}
+
+	crates.clear();
+
+
+	spawnFactory->BuildCrateStack(
+		elevate::Vector3(-10.0f, 10.0f, -40.0f),
+		3,
+		3,
+		3,
+		elevate::Vector3(3.1f, 3.1f, 3.1f),
+		1.0f,
+		&ammoShader,
+		crates
+	);
+
+	for (int i = 0; i < crates.size(); ++i)
+	{
+		crates[i]->mesh->SetShader(&cubeShader);
+		crates[i]->mesh->setGameManager(this);
+		crates[i]->mesh->SetColor(glm::vec3(0.3f, 0.7f, 0.2f));
+		static_cast<Cube*>(crates[i]->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
+
+		gameObjects.push_back(crates[i]->mesh);
+	}
 
 	numStackCubes = 5; 
 
