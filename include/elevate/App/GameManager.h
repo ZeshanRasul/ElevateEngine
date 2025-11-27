@@ -241,6 +241,7 @@ private:
     unsigned fracture_contact;
     Block blocks[9];
     Cube* cubes[9];
+	Texture blockTexture;
 
 	SpawnContext spawnContext;
 	ShapeFactory* shapeFactory;

@@ -74,19 +74,6 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	gameObjects.push_back(crate->mesh);
 
-	ball = spawnFactory->SpawnGrenade(
-		elevate::Vector3(10.0f, 2.0, 0.0f),
-		elevate::Vector3(0.0f, -9.81f, 0.0f),
-		&ammoShader,
-		3.0f,
-		5.0f
-	);
-
-	ball->mesh->SetShader(&ammoShader);
-	ball->mesh->setGameManager(this);
-	ball->mesh->SetColor(glm::vec3(0.1f, 0.1f, 0.8f));
-
-	gameObjects.push_back(ball->mesh);
 
 	floor = spawnFactory->CreateFloor(
 		elevate::Vector3(200.0f, 1.0f, 200.0f),
@@ -364,8 +351,9 @@ void GameManager::reset()
 	elevate::Vector3 blockPos(-50, 25, 50);
 	elevate::Vector3 blockScale(15, 15, 15);
 
-	Cube* cube = new Cube(blockPos, elevate::Vector3(15, 15, 15), &ammoShader, this);
+	Cube* cube = new Cube(blockPos, elevate::Vector3(15, 15, 15), &cubeShader, this);
 	cube->LoadMesh();
+	blockTexture = cube->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Block/TCom_Concrete_WallAbstract_512_albedo.png");
 	cube->SetAngle(0.0f);
 	cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
 	cube->SetColor(glm::vec3(0.2f, 0.1f, 0.5f));
@@ -923,8 +911,10 @@ void GameManager::update(float deltaTime)
 		{
 			for (int i = 0; i < 8; i++)
 			{
-				Cube* c = new Cube(elevate::Vector3(3.0f, 5.0f, 3.0f), elevate::Vector3(1.0f, 1.0f, 1.0f), &ammoShader, this);
+				Cube* c = new Cube(elevate::Vector3(3.0f, 5.0f, 3.0f), elevate::Vector3(1.0f, 1.0f, 1.0f), &cubeShader, this);
 				c->LoadMesh();
+				//c->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Block/TCom_Concrete_WallAbstract_512_albedo.png");
+				c->SetTexture(blockTexture);
 				c->SetAngle(0.0f);
 				c->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
 				c->SetColor(glm::vec3(0.2f, 0.1f, 0.3f));

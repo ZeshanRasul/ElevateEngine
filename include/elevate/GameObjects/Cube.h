@@ -30,7 +30,8 @@ public:
         return texture;
     }
 
-
+    void SetTexture(Texture texture) { tex = texture; }
+    Texture GetTexture() { return tex; }
 private:
 
     float vertices[192] = {
