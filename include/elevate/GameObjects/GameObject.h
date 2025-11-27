@@ -27,6 +27,7 @@ public:
 
     virtual void Draw(glm::mat4 viewMat, glm::mat4 proj) {
         shader->use();
+        shader->setFloat("texTiling", texTiling);
         drawObject(viewMat, proj);
     }
 
@@ -63,7 +64,7 @@ public:
 
     bool isDestroyed = false;
 
-
+    void SetTexTiling(float tile) { texTiling = (GLfloat)tile; }
 
 protected:
     virtual void drawObject(glm::mat4 viewMat, glm::mat4 proj) = 0;
@@ -81,6 +82,7 @@ protected:
     class GameManager* mGameManager = nullptr;
 
 	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
+    GLfloat texTiling = 1.0f;
 
     UniformBuffer mUniformBuffer{};
 };

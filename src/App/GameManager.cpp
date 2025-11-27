@@ -143,6 +143,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	);
 	wall->mesh->setGameManager(this);
 	wall->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
+	wall->mesh->SetTexTiling(4.0f);
 	static_cast<Cube*>(wall->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_4k_albedo.png");
 	gameObjects.push_back(wall->mesh);
 
@@ -153,6 +154,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	);
 	wall2->mesh->setGameManager(this);
 	wall2->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
+	wall2->mesh->SetTexTiling(4.0f);
 	static_cast<Cube*>(wall2->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_4k_albedo.png");
 	gameObjects.push_back(wall2->mesh);
 
@@ -163,6 +165,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	);
 	wall3->mesh->setGameManager(this);
 	wall3->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
+	wall3->mesh->SetTexTiling(4.0f);
 	static_cast<Cube*>(wall3->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_4k_albedo.png");
 	gameObjects.push_back(wall3->mesh);
 
@@ -173,7 +176,8 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	);
 	wall4->mesh->setGameManager(this);
 	wall4->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
-	static_cast<Cube*>(wall4->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_4K_albedo.pngTCom_SciFiPanels09_512_albedo.png");
+	wall4->mesh->SetTexTiling(4.0f);
+	static_cast<Cube*>(wall4->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_4k_albedo.png");
 	gameObjects.push_back(wall4->mesh);
 
 	if (fpsSandboxDemo)

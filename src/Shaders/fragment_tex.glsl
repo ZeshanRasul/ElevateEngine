@@ -20,7 +20,6 @@ uniform vec3 objectColor;
 
 uniform sampler2D tex;
 
-
 void main() {
 	vec3 norm = normalize(normal);
 

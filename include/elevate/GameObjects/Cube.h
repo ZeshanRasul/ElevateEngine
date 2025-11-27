@@ -29,6 +29,8 @@ public:
 		tex = texture;
         return texture;
     }
+
+
 private:
 
     float vertices[192] = {
