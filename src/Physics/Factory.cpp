@@ -79,6 +79,7 @@ namespace elevate
 		obj->body->setPosition(transform.position);
 		obj->body->setOrientation(transform.rotation);
 		obj->shape = shape;
+		obj->shape->body = body;
 		obj->meshId = meshId;
 		obj->materialId = materialId;
 		obj->body->calculateDerivedData();
@@ -237,7 +238,7 @@ namespace elevate
 		const Vector3& size,
 		real mass)
 	{
-		Vector3 halfExtents = { size.x * 0.5f, size.y * 0.5f, size.z * 0.5f };
+		Vector3 halfExtents = { size.x, size.y, size.z};
 		return SpawnBox(
 			position,
 			halfExtents,

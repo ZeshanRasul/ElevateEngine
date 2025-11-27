@@ -57,74 +57,74 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	shapeFactory = new elevate::ShapeFactory();
 	spawnFactory = new elevate::SpawnFactory(spawnContext);
 
-	//	gameObjects.clear();
-		//gameObjects.reserve(300);
-		//gameObjects.resize(300);
+	gameObjects.clear();
+	gameObjects.reserve(300);
+	//	gameObjects.resize(300);
 
-		//crate = spawnFactory->SpawnCrate(
-		//	elevate::Vector3(0.0f, 0.0f, 0.0f),
-		//	&cubeShader,
-		//	elevate::Vector3(1.0f, 1.0f, 1.0f),
-		//	1.0f
-		//);
+	crate = spawnFactory->SpawnCrate(
+		elevate::Vector3(40.0f, 0.0f, 20.0f),
+		&cubeShader,
+		elevate::Vector3(8.0f, 4.0f, 2.0f),
+		1.0f
+	);
 
-		//crate->mesh->SetShader(&cubeShader);
-		//crate->mesh->setGameManager(this);
-		//crate->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.1f));
+	crate->mesh->SetShader(&cubeShader);
+	crate->mesh->setGameManager(this);
+	crate->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.1f));
 
-		//gameObjects.push_back(crate->mesh);
+	gameObjects.push_back(crate->mesh);
 
-		//ball = spawnFactory->SpawnGrenade(
-		//	elevate::Vector3(10.0f, 2.0, 0.0f),
-		//	elevate::Vector3(0.0f, -9.81f, 0.0f),
-		//	&cubeShader,
-		//	3.0f,
-		//	5.0f
-		//);
+	ball = spawnFactory->SpawnGrenade(
+		elevate::Vector3(10.0f, 2.0, 0.0f),
+		elevate::Vector3(0.0f, -9.81f, 0.0f),
+		&cubeShader,
+		3.0f,
+		5.0f
+	);
 
-		//ball->mesh->SetShader(&ammoShader);
-		//ball->mesh->setGameManager(this);
-		//ball->mesh->SetColor(glm::vec3(0.1f, 0.1f, 0.8f));
+	ball->mesh->SetShader(&ammoShader);
+	ball->mesh->setGameManager(this);
+	ball->mesh->SetColor(glm::vec3(0.1f, 0.1f, 0.8f));
 
-		//gameObjects.push_back(ball->mesh);
+	gameObjects.push_back(ball->mesh);
 
-		//spawnFactory->BuildCrateStack(
-		//	elevate::Vector3(-10.0f, 0.0f, 0.0f),
-		//	3,
-		//	3,
-		//	3,
-		//	elevate::Vector3(1.1f, 1.1f, 1.1f),
-		//	1.0f,
-		//	&cubeShader,
-		//	crates
-		//);
-		//
-		//for (int i = 0; i < crates.size(); ++i)
-		//{
-		//	crates[i]->mesh->SetShader(&ammoShader);
-		//	crates[i]->mesh->setGameManager(this);
-		//	crates[i]->mesh->SetColor(glm::vec3(0.3f, 0.7f, 0.2f));
-		//	gameObjects.push_back(crates[i]->mesh);
-		//}
+	spawnFactory->BuildCrateStack(
+		elevate::Vector3(-10.0f, 10.0f, -40.0f),
+		3,
+		3,
+		3,
+		elevate::Vector3(3.1f, 3.1f, 3.1f),
+		1.0f,
+		&cubeShader,
+		crates
+	);
 
-		//spawnFactory->BuildBrickWall(
-		//	elevate::Vector3(0.0f, 0.0f, -10.0f),
-		//	3,
-		//	3,
-		//	elevate::Vector3(1.0f, 0.5f, 0.5f),
-		//	2.0f,
-		//	true,
-		//	bricks,
-		//	&ammoShader
-		//);
+	for (int i = 0; i < crates.size(); ++i)
+	{
+		crates[i]->mesh->SetShader(&ammoShader);
+		crates[i]->mesh->setGameManager(this);
+		crates[i]->mesh->SetColor(glm::vec3(0.3f, 0.7f, 0.2f));
+		gameObjects.push_back(crates[i]->mesh);
+	}
 
-		//for (size_t i = 0; i < bricks.size(); ++i)
-		//{
-		//	bricks[i]->mesh->SetShader(&ammoShader);
-		//	bricks[i]->mesh->setGameManager(this);
-		//	bricks[i]->mesh->SetColor(glm::vec3(0.6f, 0.4f, 0.2f));
-		//	gameObjects.push_back(bricks[i]->mesh);
-		//}
+	spawnFactory->BuildBrickWall(
+		elevate::Vector3(0.0f, 0.0f, -10.0f),
+		3,
+		3,
+		elevate::Vector3(1.0f, 0.5f, 0.5f),
+		2.0f,
+		true,
+		bricks,
+		&ammoShader
+	);
+
+	for (size_t i = 0; i < bricks.size(); ++i)
+	{
+		bricks[i]->mesh->SetShader(&ammoShader);
+		bricks[i]->mesh->setGameManager(this);
+		bricks[i]->mesh->SetColor(glm::vec3(0.6f, 0.4f, 0.2f));
+		gameObjects.push_back(bricks[i]->mesh);
+	}
 
 	floor = spawnFactory->CreateFloor(
 		elevate::Vector3(200.0f, 1.0f, 200.0f),
@@ -451,7 +451,7 @@ void GameManager::reset()
 			gameObjects.end()
 		);
 
-	//	rbWorld->removeBody(stackBodies[i]);
+		//	rbWorld->removeBody(stackBodies[i]);
 
 		delete cStackBoxes[i];
 
@@ -567,12 +567,13 @@ void GameManager::fireRound(AmmoType type)
 	body->setPosition(elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z));
 	body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 	body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+	body->setMass(3.0f);
 	spawnContext.World->getForceRegistry().add(body, rbGravity);
 
 	real speed = 50.0f;
 	switch (type)
 	{
-	case AmmoType::Pistol: speed = 40.0f; break;
+	case AmmoType::Pistol: speed = 70.0f; break;
 	case AmmoType::Rifle:  speed = 88.0f; break;
 	case AmmoType::Rocket: speed = 22.0f; break;
 	}
@@ -696,6 +697,14 @@ void GameManager::update(float deltaTime)
 			}
 		}
 
+		for (int i = 0; i < crates.size(); ++i)
+		{
+			crates[i]->body->clearAccumulator();
+			crates[i]->body->calculateDerivedData();
+			rbGravity->updateForce(crates[i]->body, deltaTime);
+			crates[i]->body->integrate(deltaTime);
+			crates[i]->shape->calculateInternals();
+		}
 
 		generateContacts();
 
@@ -727,6 +736,20 @@ void GameManager::update(float deltaTime)
 				r.visual->SetPosition(r.body->getPosition());
 				continue;
 			}
+
+		}
+
+		for (int i = 0; i < crates.size(); i++)
+		{
+			crates[i]->shape->calculateInternals();
+			elevate::Matrix4 t = crates[i]->body->getTransform();
+			elevate::Vector3 p = t.getAxisVector(3);
+			crates[i]->mesh->SetPosition(p);
+			crates[i]->mesh->SetOrientation(glm::quat(
+				(float)crates[i]->body->getOrientation().r,
+				(float)crates[i]->body->getOrientation().i,
+				(float)crates[i]->body->getOrientation().j,
+				(float)crates[i]->body->getOrientation().k));
 		}
 
 		for (Bone* bone = bones; bone < bones + 12; bone++)
@@ -880,6 +903,11 @@ void GameManager::generateContacts()
 
 			}
 		}
+			for (int i = 0; i < crates.size(); i++)
+			{
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crates[i]->shape), *static_cast<CollisionBox*>(floor->shape), &cData);
+			}
 
 		for (int i = 0; i < ammoCount; ++i)
 		{
@@ -893,6 +921,14 @@ void GameManager::generateContacts()
 			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(wall3->shape), *r.coll, &cData);
 			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(wall4->shape), *r.coll, &cData);
 			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(floor->shape), *r.coll, &cData);
+
+
+			for (int i = 0; i < crates.size(); i++)
+			{
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(crates[i]->shape), *r.coll, &cData);
+				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crates[i]->shape), *static_cast<CollisionBox*>(floor->shape), &cData);
+			}
 
 			for (Bone* bone = bones; bone < bones + 12; bone++)
 			{
