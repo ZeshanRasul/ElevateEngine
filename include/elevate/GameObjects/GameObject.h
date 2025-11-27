@@ -7,6 +7,7 @@
 #include "OpenGL/Shader.h"
 #include "OpenGL/RenderData.h"
 #include "OpenGL/UniformBuffer.h"
+#include "OpenGL/Texture.h"
 #include "Tools/Logger.h"
 
 #include "Physics/core.h"
@@ -62,6 +63,8 @@ public:
 
     bool isDestroyed = false;
 
+
+
 protected:
     virtual void drawObject(glm::mat4 viewMat, glm::mat4 proj) = 0;
 
@@ -74,7 +77,7 @@ protected:
 
     Shader* shader;
     RenderData renderData;
-
+	Texture texture;
     class GameManager* mGameManager = nullptr;
 
 	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);

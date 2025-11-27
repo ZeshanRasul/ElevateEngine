@@ -237,6 +237,7 @@
     <None Include="src\Shaders\line_frag.glsl" />
     <None Include="src\Shaders\line_vert.glsl" />
     <None Include="src\Shaders\vertex.glsl" />
+    <None Include="src\Shaders\fragment_tex.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

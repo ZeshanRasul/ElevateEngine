@@ -20,6 +20,15 @@ public:
     void SetShader(Shader* shdr) { shader = shdr; }
 
 	Shader* GetShader() const { return shader; }
+
+    Texture LoadTextureFromFile(const std::string& filename, bool flipImage = true) {
+        Texture texture;
+        if (!texture.loadTexture(filename, flipImage)) {
+            Logger::log(1, "%s error: failed to load texture from file '%s'\n", __FUNCTION__, filename.c_str());
+        }
+		tex = texture;
+        return texture;
+    }
 private:
 
     float vertices[192] = {
@@ -84,6 +93,8 @@ private:
     GLuint mVAO;
     GLuint mVBO;
     GLuint mEBO;
+
+	Texture tex;
 
 	glm::vec3 color = glm::vec3(0.95f, 0.8f, 0.9f);
 };                  

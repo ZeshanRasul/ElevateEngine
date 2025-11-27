@@ -26,7 +26,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	ammoShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
 
-	cubeShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
+	cubeShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment_tex.glsl");
 	lineShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/line_vert.glsl", "C:/dev/ElevateEngine/src/Shaders/line_frag.glsl");
 
 	camera = new Camera(glm::vec3(18.0f, 5.0f, 18.0f), glm::vec3(0.0f, 1.0f, 0.0f), -138.0f);
@@ -63,12 +63,12 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	crate = spawnFactory->SpawnCrate(
 		elevate::Vector3(40.0f, 0.0f, 20.0f),
-		&cubeShader,
+		&ammoShader,
 		elevate::Vector3(8.0f, 4.0f, 2.0f),
 		1.0f
 	);
 
-	crate->mesh->SetShader(&cubeShader);
+	crate->mesh->SetShader(&ammoShader);
 	crate->mesh->setGameManager(this);
 	crate->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.1f));
 
@@ -77,7 +77,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	ball = spawnFactory->SpawnGrenade(
 		elevate::Vector3(10.0f, 2.0, 0.0f),
 		elevate::Vector3(0.0f, -9.81f, 0.0f),
-		&cubeShader,
+		&ammoShader,
 		3.0f,
 		5.0f
 	);
@@ -95,7 +95,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		3,
 		elevate::Vector3(3.1f, 3.1f, 3.1f),
 		1.0f,
-		&cubeShader,
+		&ammoShader,
 		crates
 	);
 
@@ -133,6 +133,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	);
 	floor->mesh->setGameManager(this);
 	floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
+	static_cast<Cube*>(floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_512_albedo.png");
 	gameObjects.push_back(floor->mesh);
 
 	wall = spawnFactory->CreateWall(
@@ -142,6 +143,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	);
 	wall->mesh->setGameManager(this);
 	wall->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
+	static_cast<Cube*>(wall->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	gameObjects.push_back(wall->mesh);
 
 	wall2 = spawnFactory->CreateWall(
@@ -151,6 +153,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	);
 	wall2->mesh->setGameManager(this);
 	wall2->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
+	static_cast<Cube*>(wall2->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	gameObjects.push_back(wall2->mesh);
 
 	wall3 = spawnFactory->CreateWall(
@@ -160,6 +163,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	);
 	wall3->mesh->setGameManager(this);
 	wall3->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
+	static_cast<Cube*>(wall3->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	gameObjects.push_back(wall3->mesh);
 
 	wall4 = spawnFactory->CreateWall(
@@ -169,6 +173,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	);
 	wall4->mesh->setGameManager(this);
 	wall4->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
+	static_cast<Cube*>(wall4->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_4K_albedo.pngTCom_SciFiPanels09_512_albedo.png");
 	gameObjects.push_back(wall4->mesh);
 
 	if (fpsSandboxDemo)

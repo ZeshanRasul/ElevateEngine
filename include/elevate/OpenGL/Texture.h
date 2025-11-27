@@ -10,8 +10,8 @@ public:
     void unbind();
     void cleanup();
 
-private:
     GLuint mTexture = 0;
+private:
     int mTexWidth = 0;
     int mTexHeight = 0;
     int mNumberOfChannels = 0;

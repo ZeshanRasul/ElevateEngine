@@ -162,6 +162,12 @@
     <ClInclude Include="include\elevate\Physics\block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\elevate\Physics\Factory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\elevate\GameObjects\Primitives.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Physics\particle.cpp">
@@ -284,11 +290,15 @@
     <ClCompile Include="src\Physics\random.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Physics\Factory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Shaders\fragment.glsl" />
     <None Include="src\Shaders\vertex.glsl" />
     <None Include="src\Shaders\line_frag.glsl" />
     <None Include="src\Shaders\line_vert.glsl" />
+    <None Include="src\Shaders\fragment_tex.glsl" />
   </ItemGroup>
 </Project>
