@@ -40,6 +40,15 @@ void InputManager::handleMouseScroll(double xOffset, double yOffset)
 
 void InputManager::processInput(GLFWwindow* window, float deltaTime)
 {
+    bool pKeyCurrentlyPressed = glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS;
+
+    if (pKeyCurrentlyPressed && !pKeyPressed)
+    {
+		mGameManager->togglePause();
+    }
+
+    pKeyPressed = pKeyCurrentlyPressed;
+
     bool spaceKeyCurrentlyPressed = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
 
     if (spaceKeyCurrentlyPressed && !spaceKeyPressed)

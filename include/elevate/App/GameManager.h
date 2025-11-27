@@ -109,6 +109,8 @@ public:
     void DoAllPairCollisions(std::vector<CollisionBody>& bodies, elevate::CollisionData& cData);
 
     void reset();
+	void togglePause() { isPaused = !isPaused; }
+
 private:
     void ShowCameraControlWindow(Camera& cam);
     void ShowLightControlWindow(DirLight& light);
@@ -178,8 +180,9 @@ private:
 	float maxDepth = 5.0f;
 	float floatingSphereVolume = 0.1f;
 	float waterDensity = 1000.0f;
-
     bool showBuoyanceDemo = false;
+
+    bool isPaused = false;
 
 	bool cubeDemo = false;
 	elevate::RigidBody* testBody = nullptr;

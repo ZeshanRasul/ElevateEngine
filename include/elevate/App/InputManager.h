@@ -46,4 +46,5 @@ private:
 	bool shiftKeyPressed = false;
 	bool leftClickPressed = false;
 	bool rKeyPressed = false;
+	bool pKeyPressed = false;
 };

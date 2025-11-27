@@ -721,10 +721,12 @@ void GameManager::ShowCameraControlWindow(Camera& cam)
 
 void GameManager::update(float deltaTime)
 {
+
 	//deltaTime = glm::clamp(deltaTime, 0.0f, 1/ 60.0f);
 //	RemoveDestroyedGameObjects();
 	inputManager->processInput(window->getWindow(), deltaTime);
 
+	if (isPaused) return;
 	//rbWorld->startFrame();
 	//rbWorld->runPhysics(1.0f / 60.0f);
 
@@ -900,43 +902,6 @@ void GameManager::update(float deltaTime)
 			(float)crate->body->getOrientation().j,
 			(float)crate->body->getOrientation().k));
 
-		for (Block* block = blocks; block < blocks + 9; block++)
-		{
-			if (block->exists)
-			{
-				block->body->calculateDerivedData();
-				block->calculateInternals();
-
-				elevate::Matrix4 t = block->getTransform();
-				elevate::Vector3 p = t.getAxisVector(3);
-
-				block->visual->SetPosition(p);
-				block->visual->SetOrientation(glm::quat(
-					(float)block->body->getOrientation().r,
-					(float)block->body->getOrientation().i,
-					(float)block->body->getOrientation().j,
-					(float)block->body->getOrientation().k));
-			}
-
-
-			/*for (Block* block = blocks; block < blocks + 9; block++)
-			{
-				if (block->exists)
-				{
-					elevate::Matrix4 t = block->getTransform();
-					elevate::Vector3 p = t.getAxisVector(3);
-
-					block->visual->SetPosition(p);
-					block->visual->SetOrientation(glm::quat(
-						(float)block->body->getOrientation().r,
-						(float)block->body->getOrientation().i,
-						(float)block->body->getOrientation().j,
-						(float)block->body->getOrientation().k));
-				}
-
-			}*/
-		}
-
 		if (hit)
 		{
 			for (int i = 0; i < 8; i++)
@@ -973,6 +938,26 @@ void GameManager::update(float deltaTime)
 
 			hit = false;
 		}
+		for (Block* block = blocks; block < blocks + 9; block++)
+		{
+			if (block->exists)
+			{
+				block->body->calculateDerivedData();
+				block->calculateInternals();
+
+				elevate::Matrix4 t = block->getTransform();
+				elevate::Vector3 p = t.getAxisVector(3);
+
+				block->visual->SetPosition(p);
+				block->visual->SetOrientation(glm::quat(
+					(float)block->body->getOrientation().r,
+					(float)block->body->getOrientation().i,
+					(float)block->body->getOrientation().j,
+					(float)block->body->getOrientation().k));
+			}
+
+		}
+
 		return;
 	}
 }
@@ -992,61 +977,6 @@ void GameManager::generateContacts()
 
 	if (fpsSandboxDemo)
 	{
-
-		elevate::CollisionDetector::boxAndHalfSpace(*static_cast<CollisionBox*>(crate->shape), plane, &cData);
-
-		for (int i = 0; i < numStackCubes; ++i)
-		{
-			elevate::CollisionDetector::boxAndHalfSpace(*cStackBoxes[i], plane, &cData);
-			if (elevate::boxAndHalfSpaceIntersect(*cStackBoxes[i], plane))
-			{
-				cStackBoxes[i]->isOverlapping = true;
-			}
-		}
-
-		for (int i = 0; i < numStackCubes; ++i)
-		{
-			for (int j = i + 1; j < numStackCubes; ++j)
-			{
-				elevate::CollisionDetector::boxAndBox(*cStackBoxes[i], *cStackBoxes[j], &cData);
-			}
-
-
-			elevate::Matrix4 transform, otherTransform;
-			elevate::Vector3 position, otherPosition;
-			for (Block* block = blocks; block < blocks + 9; block++)
-			{
-				if (!block->exists) continue;
-
-				if (!cData.hasMoreContacts()) return;
-				elevate::CollisionDetector::boxAndBox(*block, *cStackBoxes[i], &cData);
-			}
-
-			for (PhysicsObject* brick : bricks)
-			{
-				if (!cData.hasMoreContacts()) return;
-				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(brick->shape), *cStackBoxes[i], &cData);
-			}
-
-		}
-		for (int i = 0; i < crates.size(); i++)
-		{
-			if (!cData.hasMoreContacts()) return;
-			elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crates[i]->shape), *static_cast<CollisionBox*>(floor->shape), &cData);
-
-			for (int j = i + 1; j < crates.size(); j++)
-			{
-				if (!cData.hasMoreContacts()) return;
-				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crates[i]->shape), *static_cast<CollisionBox*>(crates[j]->shape), &cData);
-			}
-
-			for (PhysicsObject* brick : bricks)
-			{
-				if (!cData.hasMoreContacts()) return;
-				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(brick->shape), *static_cast<CollisionBox*>(crates[i]->shape), &cData);
-			}
-		}
-
 		for (int i = 0; i < ammoCount; ++i)
 		{
 			AmmoRound& r = ammoPool[i];
@@ -1107,6 +1037,61 @@ void GameManager::generateContacts()
 			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(crate->shape), *r.coll, &cData);
 
 		}
+
+		elevate::CollisionDetector::boxAndHalfSpace(*static_cast<CollisionBox*>(crate->shape), plane, &cData);
+
+		for (int i = 0; i < numStackCubes; ++i)
+		{
+			elevate::CollisionDetector::boxAndHalfSpace(*cStackBoxes[i], plane, &cData);
+			if (elevate::boxAndHalfSpaceIntersect(*cStackBoxes[i], plane))
+			{
+				cStackBoxes[i]->isOverlapping = true;
+			}
+		}
+
+		for (int i = 0; i < numStackCubes; ++i)
+		{
+			for (int j = i + 1; j < numStackCubes; ++j)
+			{
+				elevate::CollisionDetector::boxAndBox(*cStackBoxes[i], *cStackBoxes[j], &cData);
+			}
+
+
+			elevate::Matrix4 transform, otherTransform;
+			elevate::Vector3 position, otherPosition;
+			for (Block* block = blocks; block < blocks + 9; block++)
+			{
+				if (!block->exists) continue;
+
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::boxAndBox(*block, *cStackBoxes[i], &cData);
+			}
+
+			for (PhysicsObject* brick : bricks)
+			{
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(brick->shape), *cStackBoxes[i], &cData);
+			}
+
+		}
+		for (int i = 0; i < crates.size(); i++)
+		{
+			if (!cData.hasMoreContacts()) return;
+			elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crates[i]->shape), *static_cast<CollisionBox*>(floor->shape), &cData);
+
+			for (int j = i + 1; j < crates.size(); j++)
+			{
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crates[i]->shape), *static_cast<CollisionBox*>(crates[j]->shape), &cData);
+			}
+
+			for (PhysicsObject* brick : bricks)
+			{
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(brick->shape), *static_cast<CollisionBox*>(crates[i]->shape), &cData);
+			}
+		}
+
 		elevate::Matrix4 transform, otherTransform;
 		elevate::Vector3 position, otherPosition;
 		for (Bone* bone = bones; bone < bones + 12; bone++)
