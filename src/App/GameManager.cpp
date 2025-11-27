@@ -57,67 +57,100 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	shapeFactory = new elevate::ShapeFactory();
 	spawnFactory = new elevate::SpawnFactory(spawnContext);
 
-	crate = spawnFactory->SpawnCrate(
-		elevate::Vector3(0.0f, 5.0f, 0.0f),
+	//crate = spawnFactory->SpawnCrate(
+	//	elevate::Vector3(0.0f, 5.0f, 0.0f),
+	//	&cubeShader,
+	//	elevate::Vector3(1.0f, 1.0f, 1.0f),
+	//	1.0f
+	//);
+	//
+	//crate->mesh->SetShader(&cubeShader);
+	//crate->mesh->setGameManager(this);
+	//
+	//gameObjects.push_back(crate->mesh);
+	//
+	//ball = spawnFactory->SpawnGrenade(
+	//	elevate::Vector3(10.0f, 10.0f, 0.0f),
+	//	elevate::Vector3(0.0f, -9.81f, 0.0f),
+	//	&cubeShader,
+	//	3.0f,
+	//	5.0f
+	//);
+	//
+	//ball->mesh->SetShader(&ammoShader);
+	//ball->mesh->setGameManager(this);
+	//
+	//gameObjects.push_back(ball->mesh);
+	//
+	//spawnFactory->BuildCrateStack(
+	//	elevate::Vector3(-10.0f, 0.0f, 0.0f),
+	//	3,
+	//	3,
+	//	3,
+	//	elevate::Vector3(1.1f, 1.1f, 1.1f),
+	//	1.0f,
+	//	&cubeShader,
+	//	crates
+	//);
+	//
+	//for (int i = 0; i < crates.size(); ++i)
+	//{
+	//	crates[i]->mesh->SetShader(&ammoShader);
+	//	crates[i]->mesh->setGameManager(this);
+	//
+	//	gameObjects.push_back(crates[i]->mesh);
+	//}
+
+	//spawnFactory->BuildBrickWall(
+	//	elevate::Vector3(0.0f, 0.0f, -10.0f),
+	//	3,
+	//	3,
+	//	elevate::Vector3(1.0f, 0.5f, 0.5f),
+	//	2.0f,
+	//	true,
+	//	bricks,
+	//	&ammoShader
+	//);
+	//
+	//for (size_t i = 0; i < bricks.size(); ++i)
+	//{
+	//	bricks[i]->mesh->SetShader(&ammoShader);
+	//	bricks[i]->mesh->setGameManager(this);
+	//	gameObjects.push_back(bricks[i]->mesh);
+	//}
+
+	floor = spawnFactory->CreateFloor(
+		elevate::Vector3(200.0f, 1.0f, 200.0f),
 		&cubeShader,
-		elevate::Vector3(1.0f, 1.0f, 1.0f),
-		1.0f
+		elevate::Vector3(0.0f, -1.0f, 0.0f)
 	);
 
-	crate->mesh->SetShader(&cubeShader);
-	crate->mesh->setGameManager(this);
+	gameObjects.push_back(floor->mesh);
 
-	gameObjects.push_back(crate->mesh);
-
-	ball = spawnFactory->SpawnGrenade(
-		elevate::Vector3(10.0f, 10.0f, 0.0f),
-		elevate::Vector3(0.0f, -9.81f, 0.0f),
-		&cubeShader,
-		3.0f,
-		5.0f
+	wall = spawnFactory->CreateWall(
+		elevate::Vector3(1.0f, 25.0f, 200.0f),
+		elevate::Vector3(200.0f, 12.5f, 0.0f),
+		&cubeShader
 	);
-
-	ball->mesh->SetShader(&ammoShader);
-	ball->mesh->setGameManager(this);
-
-	gameObjects.push_back(ball->mesh);
-
-	spawnFactory->BuildCrateStack(
-		elevate::Vector3(-10.0f, 0.0f, 0.0f),
-		3,
-		3,
-		3,
-		elevate::Vector3(1.1f, 1.1f, 1.1f),
-		1.0f,
-		&cubeShader,
-		crates
+	gameObjects.push_back(wall->mesh);
+	wall2 = spawnFactory->CreateWall(
+		elevate::Vector3(1.0f, 25.0f, 200.0f),
+		elevate::Vector3(-200.0f, 12.5f, 0.0f),
+		&cubeShader
 	);
-
-	for (int i = 0; i < crates.size(); ++i)
-	{
-		crates[i]->mesh->SetShader(&ammoShader);
-		crates[i]->mesh->setGameManager(this);
-
-		gameObjects.push_back(crates[i]->mesh);
-	}
-
-	spawnFactory->BuildBrickWall(
-		elevate::Vector3(0.0f, 0.0f, -10.0f),
-		3,
-		3,
-		elevate::Vector3(1.0f, 0.5f, 0.5f),
-		2.0f,
-		true,
-		bricks,
-		&ammoShader
+	gameObjects.push_back(wall2->mesh);
+	wall3 = spawnFactory->CreateWall(
+		elevate::Vector3(200.0f, 25.0f, 1.0f),
+		elevate::Vector3(0.0f, 12.5f, 200.0f),
+		&cubeShader
 	);
-
-	for (size_t i = 0; i < bricks.size(); ++i)
-	{
-		bricks[i]->mesh->SetShader(&ammoShader);
-		bricks[i]->mesh->setGameManager(this);
-		gameObjects.push_back(bricks[i]->mesh);
-	}
+	gameObjects.push_back(wall3->mesh);
+	wall4 = spawnFactory->CreateWall(
+		elevate::Vector3(200.0f, 25.0f, 1.0f),
+		elevate::Vector3(0.0f, 12.5f, -200.0f),
+		&cubeShader
+	);
+	gameObjects.push_back(wall4->mesh);
 
 	if (fpsSandboxDemo)
 	{

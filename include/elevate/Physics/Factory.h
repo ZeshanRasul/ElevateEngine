@@ -166,11 +166,13 @@ namespace elevate
 
         PhysicsObject* CreateFloor(
             const Vector3& halfExtents,
+            Shader* shader,
             const Vector3& center = { 0.0f, 0.0f, 0.0f });
 
         PhysicsObject* CreateWall(
             const Vector3& halfExtents,
-            const Vector3& center);
+            const Vector3& center,
+            Shader* shader);
 
         void BuildCrateStack(
             const Vector3& basePos,

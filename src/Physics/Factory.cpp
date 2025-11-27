@@ -80,7 +80,7 @@ namespace elevate
 		obj->meshId = meshId;
 		obj->materialId = materialId;
 
-		if (name == "Box")
+		if (name == "Box" || name == "Floor" || name == "Wall")
 		{
 			Cube* cube = new Cube();
 			obj->mesh = cube;
@@ -363,48 +363,52 @@ namespace elevate
 
 	// Environment
 
-	//PhysicsObject* SpawnFactory::CreateFloor(
-	//	const Vector3& halfExtents,
-	//	const Vector3& center)
-	//{
-	//	// Infinite mass static body.
-	//	Transform t{};
-	//	t.position = center;
-	//	t.rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
-	//	t.scale = { 1.0f, 1.0f, 1.0f };
+	PhysicsObject* SpawnFactory::CreateFloor(
+		const Vector3& halfExtents,
+		Shader* shader,
+		const Vector3& center)
+	{
+		// Infinite mass static body.
+		Transform t{};
+		t.position = center;
+		t.rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
+		t.scale = { halfExtents * 2 };
 
-	//	CollisionPrimitive* shape = ShapeFactory::CreateBoxShape(
-	//		*m_Ctx.World, halfExtents);
+		CollisionPrimitive* shape = ShapeFactory::CreateBoxShape(
+			*m_Ctx.World, halfExtents);
 
-	//	return CreatePhysicsObject(
-	//		"Floor",
-	//		t,
-	//		shape,
-	//		0.0f, // static
-	//		"Mesh_Floor",
-	//		PhysicsMaterialId::ConcreteFloor);
-	//}
+		return CreatePhysicsObject(
+			"Floor",
+			t,
+			shape,
+			0.0f, // static
+			"Mesh_Floor",
+			PhysicsMaterialId::ConcreteFloor,
+			shader);
+	}
 
-	//PhysicsObject* SpawnFactory::CreateWall(
-	//	const Vector3& halfExtents,
-	//	const Vector3& center)
-	//{
-	//	Transform t{};
-	//	t.position = center;
-	//	t.rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
-	//	t.scale = { 1.0f, 1.0f, 1.0f };
+	PhysicsObject* SpawnFactory::CreateWall(
+		const Vector3& halfExtents,
+		const Vector3& center,
+		Shader* shader)
+	{
+		Transform t{};
+		t.position = center;
+		t.rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
+		t.scale = { halfExtents * 2 };
 
-	//	CollisionPrimitive* shape = ShapeFactory::CreateBoxShape(
-	//		*m_Ctx.World, halfExtents);
+		CollisionPrimitive* shape = ShapeFactory::CreateBoxShape(
+			*m_Ctx.World, halfExtents);
 
-	//	return CreatePhysicsObject(
-	//		"Wall",
-	//		t,
-	//		shape,
-	//		0.0f,
-	//		"Mesh_Wall",
-	//		PhysicsMaterialId::Wall);
-	//}
+		return CreatePhysicsObject(
+			"Wall",
+			t,
+			shape,
+			0.0f,
+			"Mesh_Wall",
+			PhysicsMaterialId::Wall,
+			shader);
+	}
 
 	// Scene builders
 

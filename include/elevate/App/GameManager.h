@@ -220,6 +220,11 @@ private:
     PhysicsObject* ball;
     std::vector<PhysicsObject*> crates;
     std::vector<PhysicsObject*> bricks;
+	PhysicsObject* wall;
+	PhysicsObject* wall2;
+	PhysicsObject* wall3;
+	PhysicsObject* wall4;
+	PhysicsObject* floor;
 
     std::vector<DebugLine> m_DebugLines;
     GLuint m_DebugLineVAO = 0;
