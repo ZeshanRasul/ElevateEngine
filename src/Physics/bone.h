@@ -14,7 +14,7 @@ public:
         delete body;
     }
 
-    elevate::CollisionSphere getCollisionSphere() const
+    elevate::CollisionSphere& getCollisionSphere() const
     {
         elevate::CollisionSphere sphere;
         sphere.body = body;
