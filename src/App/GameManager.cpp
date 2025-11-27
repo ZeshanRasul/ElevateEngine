@@ -101,9 +101,11 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	for (int i = 0; i < crates.size(); ++i)
 	{
-		crates[i]->mesh->SetShader(&ammoShader);
+		crates[i]->mesh->SetShader(&cubeShader);
 		crates[i]->mesh->setGameManager(this);
 		crates[i]->mesh->SetColor(glm::vec3(0.3f, 0.7f, 0.2f));
+		static_cast<Cube*>(crates[i]->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
+
 		gameObjects.push_back(crates[i]->mesh);
 	}
 
@@ -915,6 +917,12 @@ void GameManager::generateContacts()
 			{
 				if (!cData.hasMoreContacts()) return;
 				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crates[i]->shape), *static_cast<CollisionBox*>(floor->shape), &cData);
+
+				for (int j = i + 1; j < crates.size(); j++)
+				{
+					if (!cData.hasMoreContacts()) return;
+					elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crates[i]->shape), *static_cast<CollisionBox*>(crates[j]->shape), &cData);
+				}
 			}
 
 		for (int i = 0; i < ammoCount; ++i)
