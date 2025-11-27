@@ -133,42 +133,42 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	);
 	floor->mesh->setGameManager(this);
 	floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
-	static_cast<Cube*>(floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_512_albedo.png");
+	static_cast<Cube*>(floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_4k_albedo.png");
 	gameObjects.push_back(floor->mesh);
 
 	wall = spawnFactory->CreateWall(
-		elevate::Vector3(1.0f, 25.0f, 200.0f),
-		elevate::Vector3(200.0f, 25.0f, 0.0f),
+		elevate::Vector3(1.0f, 60.0f, 200.0f),
+		elevate::Vector3(200.0f, 60.0f, 0.0f),
 		&cubeShader
 	);
 	wall->mesh->setGameManager(this);
 	wall->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
-	static_cast<Cube*>(wall->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
+	static_cast<Cube*>(wall->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_4k_albedo.png");
 	gameObjects.push_back(wall->mesh);
 
 	wall2 = spawnFactory->CreateWall(
-		elevate::Vector3(1.0f, 25.0f, 200.0f),
-		elevate::Vector3(-200.0f, 25.0f, 0.0f),
+		elevate::Vector3(1.0f, 60.0f, 200.0f),
+		elevate::Vector3(-200.0f, 60.0f, 0.0f),
 		&cubeShader
 	);
 	wall2->mesh->setGameManager(this);
 	wall2->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
-	static_cast<Cube*>(wall2->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
+	static_cast<Cube*>(wall2->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_4k_albedo.png");
 	gameObjects.push_back(wall2->mesh);
 
 	wall3 = spawnFactory->CreateWall(
-		elevate::Vector3(200.0f, 25.0f, 1.0f),
-		elevate::Vector3(0.0f, 25.0f, 200.0f),
+		elevate::Vector3(200.0f, 60.0f, 1.0f),
+		elevate::Vector3(0.0f, 60.0f, 200.0f),
 		&cubeShader
 	);
 	wall3->mesh->setGameManager(this);
 	wall3->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
-	static_cast<Cube*>(wall3->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
+	static_cast<Cube*>(wall3->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_4k_albedo.png");
 	gameObjects.push_back(wall3->mesh);
 
 	wall4 = spawnFactory->CreateWall(
-		elevate::Vector3(200.0f, 25.0f, 1.0f),
-		elevate::Vector3(0.0f, 25.0f, -200.0f),
+		elevate::Vector3(200.0f, 60.0f, 1.0f),
+		elevate::Vector3(0.0f, 60.0f, -200.0f),
 		&cubeShader
 	);
 	wall4->mesh->setGameManager(this);
