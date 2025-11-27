@@ -33,9 +33,9 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	inputManager->setContext(camera, this, width, height);
 
-	contacts = new elevate::Contact[1028];
+	contacts = new elevate::Contact[2056];
 	cData.contactArray = contacts;
-	resolver.setIterations(256 * 4, 256 * 4);
+	resolver.setIterations(256 * 16, 256 * 16);
 	glGenVertexArrays(1, &m_DebugLineVAO);
 	glGenBuffers(1, &m_DebugLineVBO);
 
@@ -87,25 +87,6 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	ball->mesh->SetColor(glm::vec3(0.1f, 0.1f, 0.8f));
 
 	gameObjects.push_back(ball->mesh);
-
-	spawnFactory->BuildBrickWall(
-		elevate::Vector3(0.0f, 0.0f, -10.0f),
-		3,
-		3,
-		elevate::Vector3(1.0f, 0.5f, 0.5f),
-		2.0f,
-		true,
-		bricks,
-		&ammoShader
-	);
-
-	for (size_t i = 0; i < bricks.size(); ++i)
-	{
-		bricks[i]->mesh->SetShader(&ammoShader);
-		bricks[i]->mesh->setGameManager(this);
-		bricks[i]->mesh->SetColor(glm::vec3(0.6f, 0.4f, 0.2f));
-		gameObjects.push_back(bricks[i]->mesh);
-	}
 
 	floor = spawnFactory->CreateFloor(
 		elevate::Vector3(200.0f, 1.0f, 200.0f),
@@ -380,7 +361,7 @@ void GameManager::reset()
 
 	firstHit = true;
 
-	elevate::Vector3 blockPos(-50, 7, 50);
+	elevate::Vector3 blockPos(-50, 25, 50);
 	elevate::Vector3 blockScale(15, 15, 15);
 
 	Cube* cube = new Cube(blockPos, elevate::Vector3(15, 15, 15), &ammoShader, this);
@@ -480,7 +461,7 @@ void GameManager::reset()
 		gameObjects.push_back(crates[i]->mesh);
 	}
 
-	numStackCubes = 5; 
+	numStackCubes = 5;
 
 	elevate::Vector3 cubeHalfSize(2.0f, 2.0f, 2.0f);
 	glm::vec3       renderScale(4.0f, 4.0f, 4.0f);
@@ -543,6 +524,54 @@ void GameManager::reset()
 		cBox->body->calculateDerivedData();
 		cBox->calculateInternals();
 		cStackBoxes[i] = cBox;
+	}
+
+	for (PhysicsObject* brick : bricks)
+	{
+		gameObjects.erase(
+			std::remove(
+				gameObjects.begin(),
+				gameObjects.end(),
+				brick->mesh),
+			gameObjects.end()
+		);
+
+		//delete crate;
+	}
+
+
+	for (PhysicsObject* brick : bricks)
+	{
+		crates.erase(
+			std::remove(
+				crates.begin(),
+				crates.end(),
+				brick),
+			crates.end()
+		);
+
+		//delete crate;
+	}
+
+	bricks.clear();
+
+	spawnFactory->BuildBrickWall(
+		elevate::Vector3(0.0f, 5.75f, -80.0f),
+		15,
+		5,
+		elevate::Vector3(6.5f, 2.5f, 1.5f),
+		2.0f,
+		false,
+		bricks,
+		&ammoShader
+	);
+
+	for (size_t i = 0; i < bricks.size(); ++i)
+	{
+		bricks[i]->mesh->SetShader(&ammoShader);
+		bricks[i]->mesh->setGameManager(this);
+		bricks[i]->mesh->SetColor(glm::vec3(0.6f, 0.4f, 0.2f));
+		gameObjects.push_back(bricks[i]->mesh);
 	}
 
 	hit = false;
@@ -742,7 +771,7 @@ void GameManager::update(float deltaTime)
 			}
 		}
 
-		for (int i = 0; i < crates.size(); ++i)
+		for (int i = 0; i < crates.size(); i++)
 		{
 			crates[i]->body->clearAccumulator();
 			crates[i]->body->calculateDerivedData();
@@ -750,6 +779,16 @@ void GameManager::update(float deltaTime)
 			crates[i]->body->integrate(deltaTime);
 			crates[i]->shape->calculateInternals();
 		}
+
+		for (int i = 0; i < bricks.size(); i++)
+		{
+			bricks[i]->body->clearAccumulator();
+			bricks[i]->body->calculateDerivedData();
+			rbGravity->updateForce(bricks[i]->body, deltaTime);
+			bricks[i]->body->integrate(deltaTime);
+			bricks[i]->shape->calculateInternals();
+		}
+
 
 		generateContacts();
 
@@ -795,6 +834,19 @@ void GameManager::update(float deltaTime)
 				(float)crates[i]->body->getOrientation().i,
 				(float)crates[i]->body->getOrientation().j,
 				(float)crates[i]->body->getOrientation().k));
+		}
+
+		for (int i = 0; i < bricks.size(); i++)
+		{
+			bricks[i]->shape->calculateInternals();
+			elevate::Matrix4 t = bricks[i]->body->getTransform();
+			elevate::Vector3 p = t.getAxisVector(3);
+			bricks[i]->mesh->SetPosition(p);
+			bricks[i]->mesh->SetOrientation(glm::quat(
+				(float)bricks[i]->body->getOrientation().r,
+				(float)bricks[i]->body->getOrientation().i,
+				(float)bricks[i]->body->getOrientation().j,
+				(float)bricks[i]->body->getOrientation().k));
 		}
 
 		for (Bone* bone = bones; bone < bones + 12; bone++)
@@ -911,9 +963,9 @@ void GameManager::generateContacts()
 
 	elevate::CollisionPlane plane;
 	plane.direction = elevate::Vector3(0, 1, 0);
-	plane.offset = 0;
+	plane.offset = -1;
 
-	cData.reset(256);
+	cData.reset(1028);
 	cData.friction = (real)0.9;
 	cData.restitution = (real)0.6;
 	cData.tolerance = (real)0.1;
@@ -948,17 +1000,17 @@ void GameManager::generateContacts()
 
 			}
 		}
-			for (int i = 0; i < crates.size(); i++)
+		for (int i = 0; i < crates.size(); i++)
+		{
+			if (!cData.hasMoreContacts()) return;
+			elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crates[i]->shape), *static_cast<CollisionBox*>(floor->shape), &cData);
+
+			for (int j = i + 1; j < crates.size(); j++)
 			{
 				if (!cData.hasMoreContacts()) return;
-				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crates[i]->shape), *static_cast<CollisionBox*>(floor->shape), &cData);
-
-				for (int j = i + 1; j < crates.size(); j++)
-				{
-					if (!cData.hasMoreContacts()) return;
-					elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crates[i]->shape), *static_cast<CollisionBox*>(crates[j]->shape), &cData);
-				}
+				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crates[i]->shape), *static_cast<CollisionBox*>(crates[j]->shape), &cData);
 			}
+		}
 
 		for (int i = 0; i < ammoCount; ++i)
 		{
@@ -992,10 +1044,12 @@ void GameManager::generateContacts()
 
 			for (int i = 0; i < numStackCubes; ++i)
 			{
-				for (int j = i + 1; j < numStackCubes; ++j)
-				{
-					elevate::CollisionDetector::boxAndSphere(*cStackBoxes[i], *r.coll, &cData);
-				}
+				elevate::CollisionDetector::boxAndSphere(*cStackBoxes[i], *r.coll, &cData);
+			}
+
+			for (int i = 0; i < bricks.size(); i++)
+			{
+				elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(bricks[i]->shape), *r.coll, &cData);
 			}
 
 			elevate::Matrix4 transform, otherTransform;
@@ -1049,15 +1103,36 @@ void GameManager::generateContacts()
 			unsigned added = joint->addContact(cData.contacts, cData.contactsLeft);
 			cData.addContacts(added);
 		}
+		for (int i = 0; i < numStackCubes; ++i)
+		{
+			for (int j = i + 1; j < numStackCubes; ++j)
+			{
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::boxAndBox(*cStackBoxes[i], *cStackBoxes[j], &cData);
+			}
+		}
+
+		for (int i = 0; i < bricks.size(); i++)
+		{
+			if (!cData.hasMoreContacts()) return;
+			elevate::CollisionDetector::boxAndHalfSpace(*static_cast<CollisionBox*>(bricks[i]->shape), plane, &cData);
+		}
+
+		for (int i = 0; i < bricks.size(); i++)
+		{
+			for (int j = i + 1; j < bricks.size(); j++)
+			{
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(bricks[i]->shape), *static_cast<CollisionBox*>(bricks[j]->shape), &cData);
+			}
 
 
+		}
 
-		// Perform collision detection
 		for (Block* block = blocks; block < blocks + 9; block++)
 		{
 			if (!block->exists) continue;
 
-			// Check for collisions with the ground plane
 			if (!cData.hasMoreContacts()) return;
 			elevate::CollisionDetector::boxAndHalfSpace(*block, plane, &cData);
 
