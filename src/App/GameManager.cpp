@@ -353,7 +353,6 @@ void GameManager::reset()
 	bones[4].setState(
 		elevate::Vector3(-0.054, 4.683, 0.013),
 		elevate::Vector3(0.415, 0.392, 0.690));
-	bones[4].body->setMass(FLT_MAX);
 	bones[5].setState(
 		elevate::Vector3(0.043, 5.603, 0.013),
 		elevate::Vector3(0.301, 0.367, 0.693));
