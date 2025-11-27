@@ -200,7 +200,8 @@ namespace elevate
             int count,
             const Vector3& size,
             real mass,
-            real spacing);
+            real spacing,
+            std::vector<PhysicsObject*>& dominoes);
 
         void Explode(
             const Vector3& position,

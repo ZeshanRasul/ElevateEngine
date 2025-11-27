@@ -256,6 +256,7 @@ private:
     PhysicsObject* ball;
     std::vector<PhysicsObject*> crates;
     std::vector<PhysicsObject*> bricks;
+    std::vector<PhysicsObject*> dominoes;
 	PhysicsObject* wall;
 	PhysicsObject* wall2;
 	PhysicsObject* wall3;

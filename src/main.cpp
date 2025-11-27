@@ -3,8 +3,8 @@
 
 #include "App/App.h"
 
-const unsigned int SCREEN_WIDTH = 1920;
-const unsigned int SCREEN_HEIGHT = 1080;
+const unsigned int SCREEN_WIDTH = 2560;
+const unsigned int SCREEN_HEIGHT = 1440;
 
 int main()
 {

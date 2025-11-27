@@ -492,42 +492,43 @@ namespace elevate
 		}
 	}
 
-	//void SpawnFactory::BuildDominoLine(
-	//	const Vector3& startPos,
-	//	const Vector3& direction,
-	//	int count,
-	//	const Vector3& size,
-	//	real mass,
-	//	real spacing)
-	//{
-	//	Vector3 dirNorm = direction;
-	//	// Assume direction is already normalized for now.
+	void SpawnFactory::BuildDominoLine(
+		const Vector3& startPos,	
+		const Vector3& direction,
+		int count,
+		const Vector3& size,
+		real mass,
+		real spacing,
+		std::vector<PhysicsObject*>& dominoes)
+	{
+		Vector3 dirNorm = direction;
+		// Assume direction is already normalized for now.
 
-	//	for (int i = 0; i < count; ++i)
-	//	{
-	//		Vector3 pos =
-	//		{
-	//			startPos.x + dirNorm.x * spacing * i,
-	//			startPos.y + dirNorm.y * spacing * i,
-	//			startPos.z + dirNorm.z * spacing * i
-	//		};
+		for (int i = 0; i < count; ++i)
+		{
+			Vector3 pos =
+			{
+				startPos.x + dirNorm.x * spacing * i,
+				startPos.y + dirNorm.y * spacing * i,
+				startPos.z + dirNorm.z * spacing * i
+			};
 
-	//		// Domino is a tall thin box.
-	//		Vector3 halfExtents =
-	//		{
-	//			size.x * 0.5f,
-	//			size.y * 0.5f,
-	//			size.z * 0.5f
-	//		};
+			// Domino is a tall thin box.
+			Vector3 halfExtents =
+			{
+				size.x * 0.5f,
+				size.y * 0.5f,
+				size.z * 0.5f
+			};
 
-	//		SpawnBox(
-	//			pos,
-	//			halfExtents,
-	//			mass,
-	//			"Mesh_Domino",
-	//			PhysicsMaterialId::Default);
-	//	}
-	//}
+			dominoes.push_back(SpawnBox(
+				pos,
+				halfExtents,
+				mass,
+				"Mesh_Domino",
+				PhysicsMaterialId::Default, nullptr));
+		}
+	}
 
 	// Explosion helper
 

@@ -273,6 +273,57 @@ void GameManager::setSceneData()
 
 void GameManager::reset()
 {
+	for (PhysicsObject* domino : dominoes)
+	{
+		gameObjects.erase(
+			std::remove(
+				gameObjects.begin(),
+				gameObjects.end(),
+				domino->mesh),
+			gameObjects.end()
+		);
+
+		dominoes.erase(
+			std::remove(
+				dominoes.begin(),
+				dominoes.end(),
+				domino),
+			dominoes.end()
+		);
+	}
+
+	dominoes.clear();
+
+	spawnFactory->BuildDominoLine(
+		elevate::Vector3(75.0f, 3.5f, -150.0f),
+		elevate::Vector3(0.0f, 0.0f, 1.0f),
+		15,
+		elevate::Vector3(2.0f, 5.0f, 0.8f),
+		0.5f,
+		2.0f,
+		dominoes);
+
+	for (PhysicsObject* domino : dominoes)
+	{
+		elevate::Matrix3 tensor;
+		tensor.setBlockInertiaTensor(elevate::Vector3(2.0f, 5.0f, 0.8f), 0.5f);
+		domino->body->setInertiaTensor(tensor);		
+		domino->body->calculateDerivedData();
+		domino->shape->calculateInternals();
+
+		Cube* cube = new Cube(
+			domino->body->getTransform().getAxisVector(3),
+			elevate::Vector3(2.0f, 5.0f, 0.8f),
+			&ammoShader,
+			this);
+		cube->LoadMesh();
+		domino->mesh = cube;
+
+		domino->mesh->setGameManager(this);
+		domino->mesh->SetColor(glm::vec3(0.8f, 0.9f, 0.8f));
+		gameObjects.push_back(domino->mesh);
+	}
+
 	bones[0].setState(
 		elevate::Vector3(0, 0.993, -0.5),
 		elevate::Vector3(0.301, 1.0, 0.234));
@@ -795,6 +846,15 @@ void GameManager::update(float deltaTime)
 			bricks[i]->shape->calculateInternals();
 		}
 
+		for (int i = 0; i < dominoes.size(); i++)
+		{
+			dominoes[i]->body->clearAccumulator();
+			dominoes[i]->body->calculateDerivedData();
+			rbGravity->updateForce(dominoes[i]->body, deltaTime);
+			dominoes[i]->body->integrate(deltaTime);
+			dominoes[i]->shape->calculateInternals();
+		}
+
 		crate->body->clearAccumulator();
 		crate->body->calculateDerivedData();
 		rbGravity->updateForce(crate->body, deltaTime);
@@ -863,7 +923,7 @@ void GameManager::update(float deltaTime)
 
 		for (Bone* bone = bones; bone < bones + 12; bone++)
 		{
-			//bone->body->calculateDerivedData();
+			bone->body->calculateDerivedData();
 			bone->calculateInternals();
 			elevate::Matrix4 t = bone->body->getTransform();
 
@@ -890,6 +950,20 @@ void GameManager::update(float deltaTime)
 				(float)stackBodies[i]->getOrientation().i,
 				(float)stackBodies[i]->getOrientation().j,
 				(float)stackBodies[i]->getOrientation().k));
+		}
+
+		for (int i = 0 ; i < dominoes.size(); i++)
+		{
+			dominoes[i]->body->calculateDerivedData();
+			dominoes[i]->shape->calculateInternals();
+			elevate::Matrix4 t = dominoes[i]->body->getTransform();
+			elevate::Vector3 p = t.getAxisVector(3);
+			dominoes[i]->mesh->SetPosition(p);
+			dominoes[i]->mesh->SetOrientation(glm::quat(
+				(float)dominoes[i]->body->getOrientation().r,
+				(float)dominoes[i]->body->getOrientation().i,
+				(float)dominoes[i]->body->getOrientation().j,
+				(float)dominoes[i]->body->getOrientation().k));
 		}
 
 		crate->shape->calculateInternals();
@@ -990,6 +1064,17 @@ void GameManager::generateContacts()
 			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(wall4->shape), *r.coll, &cData);
 			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(floor->shape), *r.coll, &cData);
 
+			if (!cData.hasMoreContacts()) return;
+			for (int i = 0; i < dominoes.size(); i++)
+			{
+				elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(dominoes[i]->shape), *r.coll, &cData);
+
+				for (int j =i + 1; j < dominoes.size(); j++)
+				{
+					if (!cData.hasMoreContacts()) return;
+					elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(dominoes[i]->shape), *static_cast<CollisionBox*>(dominoes[j]->shape), &cData);
+				}
+			}
 
 			for (int i = 0; i < crates.size(); i++)
 			{
@@ -1171,6 +1256,12 @@ void GameManager::generateContacts()
 			elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crate->shape), *block, &cData);
 
 		}
+		
+		for (int i = 0; i < dominoes.size(); i++)
+		{
+			elevate::CollisionDetector::boxAndHalfSpace(*static_cast<CollisionBox*>(dominoes[i]->shape), plane, &cData);
+		}
+
 		buildContactDebugLines();
 
 	}
