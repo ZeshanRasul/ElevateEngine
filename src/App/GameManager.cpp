@@ -36,52 +36,58 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	contacts = new elevate::Contact[256];
 	cData.contactArray = contacts;
 	resolver.setIterations(256 * 4, 256 * 4);
-	glGenVertexArrays(1, &m_DebugLineVAO);
-	glGenBuffers(1, &m_DebugLineVBO);
-
-	glBindVertexArray(m_DebugLineVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_DebugLineVBO);
-
-
-	glEnableVertexAttribArray(0); // position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)0);
-
-	glEnableVertexAttribArray(1); // color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(sizeof(float) * 3));
-
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glGenVertexArrays(1, &m_DebugLineVAO);
+	//glGenBuffers(1, &m_DebugLineVBO);
+	//
+	//glBindVertexArray(m_DebugLineVAO);
+	//glBindBuffer(GL_ARRAY_BUFFER, m_DebugLineVBO);
+	//
+	//
+	//glEnableVertexAttribArray(0); // position
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)0);
+	//
+	//glEnableVertexAttribArray(1); // color
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(sizeof(float) * 3));
+	//
+	//glBindVertexArray(0);
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	rbWorld = new World(200, 100);
 	spawnContext.World = rbWorld;
 	shapeFactory = new elevate::ShapeFactory();
 	spawnFactory = new elevate::SpawnFactory(spawnContext);
 
+	gameObjects.clear();
+	gameObjects.reserve(300);
+	//gameObjects.resize(300);
+
 	//crate = spawnFactory->SpawnCrate(
-	//	elevate::Vector3(0.0f, 5.0f, 0.0f),
+	//	elevate::Vector3(0.0f, 0.0f, 0.0f),
 	//	&cubeShader,
 	//	elevate::Vector3(1.0f, 1.0f, 1.0f),
 	//	1.0f
 	//);
-	//
+
 	//crate->mesh->SetShader(&cubeShader);
 	//crate->mesh->setGameManager(this);
-	//
+	//crate->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.1f));
+
 	//gameObjects.push_back(crate->mesh);
-	//
+
 	//ball = spawnFactory->SpawnGrenade(
-	//	elevate::Vector3(10.0f, 10.0f, 0.0f),
+	//	elevate::Vector3(10.0f, 2.0, 0.0f),
 	//	elevate::Vector3(0.0f, -9.81f, 0.0f),
 	//	&cubeShader,
 	//	3.0f,
 	//	5.0f
 	//);
-	//
+
 	//ball->mesh->SetShader(&ammoShader);
 	//ball->mesh->setGameManager(this);
-	//
+	//ball->mesh->SetColor(glm::vec3(0.1f, 0.1f, 0.8f));
+
 	//gameObjects.push_back(ball->mesh);
-	//
+
 	//spawnFactory->BuildCrateStack(
 	//	elevate::Vector3(-10.0f, 0.0f, 0.0f),
 	//	3,
@@ -97,7 +103,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	//{
 	//	crates[i]->mesh->SetShader(&ammoShader);
 	//	crates[i]->mesh->setGameManager(this);
-	//
+	//	crates[i]->mesh->SetColor(glm::vec3(0.3f, 0.7f, 0.2f));
 	//	gameObjects.push_back(crates[i]->mesh);
 	//}
 
@@ -111,11 +117,12 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	//	bricks,
 	//	&ammoShader
 	//);
-	//
+
 	//for (size_t i = 0; i < bricks.size(); ++i)
 	//{
 	//	bricks[i]->mesh->SetShader(&ammoShader);
 	//	bricks[i]->mesh->setGameManager(this);
+	//	bricks[i]->mesh->SetColor(glm::vec3(0.6f, 0.4f, 0.2f));
 	//	gameObjects.push_back(bricks[i]->mesh);
 	//}
 
@@ -124,7 +131,8 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		&cubeShader,
 		elevate::Vector3(0.0f, -1.0f, 0.0f)
 	);
-
+	floor->mesh->setGameManager(this);
+	floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
 	gameObjects.push_back(floor->mesh);
 
 	wall = spawnFactory->CreateWall(
@@ -132,24 +140,35 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		elevate::Vector3(200.0f, 12.5f, 0.0f),
 		&cubeShader
 	);
+	wall->mesh->setGameManager(this);
+	wall->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	gameObjects.push_back(wall->mesh);
+
 	wall2 = spawnFactory->CreateWall(
 		elevate::Vector3(1.0f, 25.0f, 200.0f),
 		elevate::Vector3(-200.0f, 12.5f, 0.0f),
 		&cubeShader
 	);
+	wall2->mesh->setGameManager(this);
+	wall2->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	gameObjects.push_back(wall2->mesh);
+
 	wall3 = spawnFactory->CreateWall(
 		elevate::Vector3(200.0f, 25.0f, 1.0f),
 		elevate::Vector3(0.0f, 12.5f, 200.0f),
 		&cubeShader
 	);
+	wall3->mesh->setGameManager(this);
+	wall3->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	gameObjects.push_back(wall3->mesh);
+
 	wall4 = spawnFactory->CreateWall(
 		elevate::Vector3(200.0f, 25.0f, 1.0f),
 		elevate::Vector3(0.0f, 12.5f, -200.0f),
 		&cubeShader
 	);
+	wall4->mesh->setGameManager(this);
+	wall4->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	gameObjects.push_back(wall4->mesh);
 
 	if (fpsSandboxDemo)
@@ -158,85 +177,6 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		sphereDemo = false;
 
 		rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f * 0.2f, 0.0f));
-
-		numEnvBoxes = 0;
-
-		auto addEnvBox = [&](const elevate::Vector3& pos,
-			const elevate::Vector3& scale)
-			{
-				if (numEnvBoxes >= MaxEnvBoxes) return;
-
-				Cube* cube = new Cube(pos, scale, &cubeShader, this);
-				cube->LoadMesh();
-				cube->SetAngle(0.0f);
-				cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
-				cube->SetColor(glm::vec3(0.7f, 0.1f, 0.3f));
-				gameObjects.push_back(cube);
-
-				elevate::RigidBody* body = new elevate::RigidBody();
-				body->setAwake(false);
-				body->setPosition(pos);
-				body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
-				body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
-				body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
-
-				body->setMass(FLT_MAX);
-				rbWorld->addBody(body);
-
-				elevate::CollisionBox* cbox = new elevate::CollisionBox();
-				cbox->body = body;
-
-				cbox->halfSize = elevate::Vector3(
-					scale.x * 0.5f,
-					scale.y * 0.5f,
-					scale.z * 0.5f
-				);
-				cbox->isOverlapping = false;
-
-				body->calculateDerivedData();
-				cbox->calculateInternals();
-
-				envBodies[numEnvBoxes] = body;
-				envBoxes[numEnvBoxes] = cbox;
-				envCubes[numEnvBoxes] = cube;
-
-				++numEnvBoxes;
-			};
-
-		addEnvBox(
-			elevate::Vector3(0.0f, -1.0f, 0.0f),
-			elevate::Vector3(50.0f, 1.0f, 50.0f)
-		);
-
-
-		// +X wall
-		addEnvBox(
-			elevate::Vector3(25.0f, 3.0f, 0.0f),
-			elevate::Vector3(1.0f, 8.0f, 50.0f)
-		);
-
-		// -X wall
-		addEnvBox(
-			elevate::Vector3(-25.0f, 3.0f, 0.0f),
-			elevate::Vector3(1.0f, 8.0f, 50.0f)
-		);
-
-		// +Z wall
-		addEnvBox(
-			elevate::Vector3(0.0f, 3.0f, 25.0f),
-			elevate::Vector3(50.0f, 8.0f, 1.0f)
-		);
-
-		// -Z wall
-		addEnvBox(
-			elevate::Vector3(0.0f, 3.0f, -25.0f),
-			elevate::Vector3(50.0f, 8.0f, 1.0f)
-		);
-
-		addEnvBox(
-			elevate::Vector3(-13.0f, 3.0f, -13.0f),
-			elevate::Vector3(2.0f, 6.0f, 2.0f)
-		);
 
 		reset();
 
@@ -390,8 +330,6 @@ void GameManager::setSceneData()
 
 void GameManager::reset()
 {
-	return;
-
 	bones[0].setState(
 		elevate::Vector3(0, 0.993, -0.5),
 		elevate::Vector3(0.301, 1.0, 0.234));
@@ -430,6 +368,11 @@ void GameManager::reset()
 	bones[11].setState(
 		elevate::Vector3(0, 4.024, 1.066),
 		elevate::Vector3(0.267, 0.888, 0.207));
+
+	for (Bone bone : bones)
+	{
+		rbWorld->addBody(bone.body);
+	}
 
 	// Only the first block exists
 	for (Block* block = blocks; block < blocks + 9; block++)
@@ -474,6 +417,7 @@ void GameManager::reset()
 	blocks[0].body->setAwake(true);
 	blocks[0].body->setCanSleep(true);
 	blocks[0].exists = true;
+	rbWorld->addBody(blocks[0].body);
 
 	//	hit = false;
 
@@ -542,7 +486,7 @@ void GameManager::reset()
 		body->setInertiaTensor(boxInertia);
 
 		rbWorld->addBody(body);
-		rbGravity->updateForce(body, 0); // or via registry below
+	//	rbGravity->updateForce(body, 0); // or via registry below
 
 		rbWorld->getForceRegistry().add(body, rbGravity);
 
@@ -596,54 +540,54 @@ void GameManager::ShowLightControlWindow(DirLight& light)
 
 void GameManager::fireRound(AmmoType type)
 {
-	//AmmoRound* round = nullptr;
-	//for (int i = 0; i < ammoCount; ++i)
-	//{
-	//	if (!ammoPool[i].active)
-	//	{
-	//		round = &ammoPool[i];
-	//		break;
-	//	}
-	//}
+	AmmoRound* round = nullptr;
+	for (int i = 0; i < ammoCount; ++i)
+	{
+		if (!ammoPool[i].active)
+		{
+			round = &ammoPool[i];
+			break;
+		}
+	}
 
-	//if (!round)
-	//{
-	//	return;
-	//}
+	if (!round)
+	{
+		return;
+	}
 
-	//glm::vec3 camPos = camera->Position;
-	//glm::vec3 camFront = glm::normalize(camera->Front);
+	glm::vec3 camPos = camera->Position;
+	glm::vec3 camFront = glm::normalize(camera->Front);
 
-	//glm::vec3 spawnPos = camPos + camFront * 2.0f;
+	glm::vec3 spawnPos = camPos + camFront * 2.0f;
 
-	//elevate::RigidBody* body = round->body;
+	elevate::RigidBody* body = round->body;
 
-	//body->setAwake(true);
-	//body->clearAccumulator();
-	//body->setPosition(elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z));
-	//body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
-	//body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
-	//rbWorld->getForceRegistry().add(body, rbGravity);
+	body->setAwake(true);
+	body->clearAccumulator();
+	body->setPosition(elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z));
+	body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+	body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+	rbWorld->getForceRegistry().add(body, rbGravity);
 
-	//real speed = 50.0f;
-	//switch (type)
-	//{
-	//case AmmoType::Pistol: speed = 40.0f; break;
-	//case AmmoType::Rifle:  speed = 88.0f; break;
-	//case AmmoType::Rocket: speed = 22.0f; break;
-	//}
-	//elevate::Vector3 v(camFront.x * speed,
-	//	camFront.y * speed,
-	//	camFront.z * speed);
-	//body->setVelocity(v);
+	real speed = 50.0f;
+	switch (type)
+	{
+	case AmmoType::Pistol: speed = 40.0f; break;
+	case AmmoType::Rifle:  speed = 88.0f; break;
+	case AmmoType::Rocket: speed = 22.0f; break;
+	}
+	elevate::Vector3 v(camFront.x * speed,
+		camFront.y * speed,
+		camFront.z * speed);
+	body->setVelocity(v);
 
-	//body->calculateDerivedData();
-	//round->coll->calculateInternals();
+	body->calculateDerivedData();
+	round->coll->calculateInternals();
 
-	//round->active = true;
-	//round->lifetime = 5.0f;
+	round->active = true;
+	round->lifetime = 5.0f;
 
-	//round->visual->SetPosition(elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z));
+	round->visual->SetPosition(elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z));
 }
 
 void GameManager::ShowAmmoWindow()
@@ -705,19 +649,12 @@ void GameManager::update(float deltaTime)
 	//rbWorld->startFrame();
 	//rbWorld->runPhysics(1.0f / 60.0f);
 
-	if (fpsSandboxDemo)
+	if (false)
 	{
-		//rbWorld->startFrame();
-		//
-		//rbWorld->runPhysics(1.0f / 60.0f);
-		for (int b = 0; b < numEnvBoxes; ++b)
-		{
-
-			envBodies[b]->clearAccumulator();
-			envBodies[b]->calculateDerivedData();
-			envBodies[b]->integrate(deltaTime);
-			envBoxes[b]->calculateInternals();
-		}
+//		rbWorld->startFrame();
+		
+	//	rbWorld->runPhysics(1.0f / 60.0f);
+		
 
 		for (int i = 0; i < ammoCount; ++i)
 		{
@@ -759,23 +696,12 @@ void GameManager::update(float deltaTime)
 			}
 		}
 
+	//	rbWorld->runPhysics(deltaTime);
+		//generateContacts();
+		//
+		//resolver.resolveContacts(cData.contactArray, cData.contactCount, deltaTime);
 
-		generateContacts();
-
-		resolver.resolveContacts(cData.contactArray, cData.contactCount, deltaTime);
-
-		for (int b = 0; b < numEnvBoxes; ++b)
-		{
-			envBoxes[b]->calculateInternals();
-			elevate::Matrix4 t = envBodies[b]->getTransform();
-			elevate::Vector3 p = t.getAxisVector(3);
-			envCubes[b]->SetPosition(p);
-			envCubes[b]->SetOrientation(glm::quat(
-				(float)envBodies[b]->getOrientation().r,
-				(float)envBodies[b]->getOrientation().i,
-				(float)envBodies[b]->getOrientation().j,
-				(float)envBodies[b]->getOrientation().k));
-		}
+	
 
 		for (int i = 0; i < ammoCount; ++i)
 		{
@@ -897,6 +823,12 @@ void GameManager::update(float deltaTime)
 
 			blocks[0].exists = false;
 
+			for (int i = 0; i < 8; i++)
+			{
+				blocks[i + 1].exists = true;
+				rbWorld->addBody(blocks[i + 1].body);
+			}
+
 			gameObjects.erase(
 				std::remove(
 					gameObjects.begin(),
@@ -926,7 +858,7 @@ void GameManager::generateContacts()
 	cData.restitution = (real)0.6;
 	cData.tolerance = (real)0.1;
 
-	if (fpsSandboxDemo)
+	if (false)
 	{
 		for (int i = 0; i < numStackCubes; ++i)
 		{
@@ -1080,7 +1012,7 @@ void GameManager::generateContacts()
 					&cData);
 			}
 		}
-		buildContactDebugLines();
+	//	buildContactDebugLines();
 
 	}
 }
@@ -1091,6 +1023,6 @@ void GameManager::render()
 		renderer->draw(obj, view, projection);
 	}
 
-//	drawDebugLines();
+	//	drawDebugLines();
 
 }

@@ -45,6 +45,8 @@ namespace elevate {
 			maxContacts(maxContacts)
 		{
 			maxContacts = maxContacts;
+			contacts = new elevate::Contact[1028];
+			resolver.setIterations(256 * 4, 256 * 4);
 		};
 		~World() {};
 

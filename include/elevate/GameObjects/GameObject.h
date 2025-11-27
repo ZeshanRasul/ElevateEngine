@@ -55,8 +55,10 @@ public:
     void SetRotationMatrix(glm::mat4 rotMat) {
         orientation = glm::quat_cast(rotMat);
 	}
-
+	Shader* GetShader() { return shader; }
 	virtual void SetShader(Shader* shdr) { shader = shdr; }
+
+    virtual void SetColor(glm::vec3 col) { color = col; }
 
     bool isDestroyed = false;
 
@@ -70,10 +72,12 @@ protected:
     float angle;
 	glm::quat orientation;
 
-    Shader* shader = nullptr;
+    Shader* shader;
     RenderData renderData;
 
     class GameManager* mGameManager = nullptr;
+
+	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
 
     UniformBuffer mUniformBuffer{};
 };

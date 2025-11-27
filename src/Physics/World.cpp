@@ -82,15 +82,15 @@ void World::integrate(real duration)
 
 void World::runPhysics(real duration)
 {
-	BodyRegistration* reg = firstBody;
-	while (reg)
-	{
-		// Remove all forces from the accumulator
-		reg->body->integrate(duration);
-
-		// Get the next registration
-		reg = reg->next;
-	}
+	//BodyRegistration* reg = firstBody;
+	//while (reg)
+	//{
+	//	// Remove all forces from the accumulator
+	//	reg->body->integrate(duration);
+	//
+	//	// Get the next registration
+	//	reg = reg->next;
+	//}
 
 	// Generate contacts
 	unsigned usedContacts = generateContacts();

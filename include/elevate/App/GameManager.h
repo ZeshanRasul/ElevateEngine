@@ -178,7 +178,7 @@ private:
 
     void generateContacts();
 
-    bool fpsSandboxDemo = false; 
+    bool fpsSandboxDemo = true; 
 
     static const int MaxEnvBoxes = 8;
     int               numEnvBoxes = 8;
