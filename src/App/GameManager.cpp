@@ -186,6 +186,19 @@ void GameManager::setSceneData()
 
 void GameManager::reset()
 {
+	for (int i = 0; i < runTimeBoxes.size(); i++)
+	{
+		gameObjects.erase(
+			std::remove(
+				gameObjects.begin(),
+				gameObjects.end(),
+				runTimeBoxes[i]->mesh),
+			gameObjects.end()
+		);
+		delete runTimeBoxes[i]->mesh;
+		delete runTimeBoxes[i];
+	}
+
 	for (PhysicsObject* domino : dominoes)
 	{
 		gameObjects.erase(
@@ -1023,9 +1036,9 @@ void GameManager::generateContacts()
 	plane.direction = elevate::Vector3(0, 1, 0);
 	plane.offset = 0;
 
-	cData.reset(1028);
-	cData.friction = (real)0.9;
-	cData.restitution = (real)0.6;
+	cData.reset(2056);
+	cData.friction = (real)0.7;
+	cData.restitution = (real)0.2;
 	cData.tolerance = (real)0.1;
 
 	if (fpsSandboxDemo)
@@ -1116,7 +1129,6 @@ void GameManager::generateContacts()
 		{
 			for (int j = i + 1; j < runTimeBoxes.size(); j++)
 			{
-				if (!cData.hasMoreContacts()) return;
 				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(runTimeBoxes[i]->shape), *static_cast<CollisionBox*>(runTimeBoxes[j]->shape), &cData);
 			}
 
@@ -1173,7 +1185,7 @@ void GameManager::generateContacts()
 		for (int i = 0; i < crates.size(); i++)
 		{
 			if (!cData.hasMoreContacts()) return;
-			elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crates[i]->shape), *static_cast<CollisionBox*>(floor->shape), &cData);
+			elevate::CollisionDetector::boxAndHalfSpace(*static_cast<CollisionBox*>(crates[i]->shape), plane, &cData);
 
 			for (int j = i + 1; j < crates.size(); j++)
 			{
