@@ -163,6 +163,8 @@ namespace elevate {
 
 	void RigidBody::integrate(real duration)
 	{
+		if (!isAwake) return;
+
 		lastFrameAcceleration = acceleration;
 		lastFrameAcceleration.addScaledVector(forceAccum, inverseMass);
 
@@ -190,11 +192,15 @@ namespace elevate {
 			
 			if (motion < sleepEpsilon)
 			{
-				setAwake(false);
+				motion = 0.0f;
+				if (canSleep)
+				{
+					setAwake(false);
+				}
 			}
-			else if (motion > 100 * sleepEpsilon)
+			else if (motion > 10.0f * sleepEpsilon)
 			{
-				motion = 100 * sleepEpsilon;
+				motion = 10.0f * sleepEpsilon;
 			}
 		}
 	};

@@ -113,6 +113,9 @@ elevate::Vector3 elevate::Contact::calculateLocalVelocity(unsigned bodyIndex, re
 
 inline elevate::Vector3 elevate::Contact::calculateFrictionlessImpulse(elevate::Matrix3* inverseInertiaTensor)
 {
+	if (body[0]) body[0]->setAwake(true);
+	if (body[1]) body[1]->setAwake(true);
+
 	Vector3 impulseContact;
 
 	Vector3 deltaVelWorld = relativeContactPosition[0] % (contactNormal);
@@ -144,6 +147,9 @@ inline elevate::Vector3 elevate::Contact::calculateFrictionlessImpulse(elevate::
 inline
 Vector3 Contact::calculateFrictionImpulse(Matrix3* inverseInertiaTensor)
 {
+	if (body[0]) body[0]->setAwake(true);
+	if (body[1]) body[1]->setAwake(true);
+
 	Vector3 impulseContact;
 	real inverseMass = body[0]->getInverseMass();
 
@@ -222,6 +228,9 @@ Vector3 Contact::calculateFrictionImpulse(Matrix3* inverseInertiaTensor)
 }
 void elevate::Contact::applyVelocityChange(Vector3 velocityChange[2], Vector3 rotationChange[2])
 {
+	if (body[0]) body[0]->setAwake(true);
+	if (body[1]) body[1]->setAwake(true);
+
 	Matrix3 inverseInertiaTensor[2];
 	body[0]->getInverseInertiaTensorWorld(&inverseInertiaTensor[0]);
 	if (body[1])

@@ -275,9 +275,9 @@ void GameManager::reset()
 	}
 	ragdolls.clear();
 
-	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(0.0f, 2.0f, 0.0f)));
-	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(10.0f, 2.0f, 0.0f)));
-	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(20.0f, 2.0f, 0.0f)));
+//	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(0.0f, 4.0f, 0.0f)));
+	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(10.0f, 4.0f, 0.0f)));
+//	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(20.0f, 4.0f, 0.0f)));
 
 	for (Ragdoll* ragdoll : ragdolls)
 	{

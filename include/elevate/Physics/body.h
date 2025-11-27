@@ -21,7 +21,7 @@ namespace elevate {
 			, isAwake(true)
 			, motion(0.0f)
 			, canSleep(true)
-			, sleepEpsilon(0.3f)
+			, sleepEpsilon(0.7f)
 			, lastFrameAcceleration(0.0f, 0.0f, 0.0f)
 			, transformMatrix(Matrix4()) {};
 
@@ -153,7 +153,7 @@ namespace elevate {
 		bool isAwake = true;
 		real motion = 0.0f;
 		bool canSleep = true;
-		real sleepEpsilon = 10.3f;
+		real sleepEpsilon = 0.5f;
 
 		Vector3 lastFrameAcceleration;
 
