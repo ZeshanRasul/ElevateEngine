@@ -171,6 +171,9 @@
     <ClInclude Include="include\elevate\Physics\Aero.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\elevate\Physics\Demos\SceneManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Physics\particle.cpp">
@@ -297,6 +300,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Physics\Aero.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\elevate\Physics\Demos\SceneManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

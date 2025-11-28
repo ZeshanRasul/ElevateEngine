@@ -120,6 +120,7 @@ public:
     void DoAllPairCollisions(std::vector<CollisionBody>& bodies, elevate::CollisionData& cData);
 
     void reset();
+    void ResetState();
 	void togglePause() { isPaused = !isPaused; }
 
     void OnQPressed();

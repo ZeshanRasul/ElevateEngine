@@ -654,6 +654,42 @@ void GameManager::reset()
 	cData.contactCount = 0;
 }
 
+void GameManager::ResetState()
+{
+	for (GameObject* obj : gameObjects)
+	{
+		gameObjects.erase(
+			std::remove(
+				gameObjects.begin(),
+				gameObjects.end(),
+				obj),
+			gameObjects.end()
+		);
+	}
+
+	for (PhysicsObject* obj : crates)
+	{
+		delete obj;
+	}
+	for (PhysicsObject* obj : bricks)
+	{
+		delete obj;
+	}
+	for (PhysicsObject* obj : dominoes)
+	{
+		delete obj;
+	}
+
+	for (Ragdoll* ragdoll : ragdolls)
+	{
+		for (Bone& bone : ragdoll->bones)
+		{
+			delete bone.visual;
+		}
+		delete ragdoll;
+	}
+}
+
 void GameManager::OnQPressed()
 {
 	rudder_control += 0.1f;
