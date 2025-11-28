@@ -58,63 +58,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	shapeFactory = new elevate::ShapeFactory();
 	spawnFactory = new elevate::SpawnFactory(spawnContext);
 
-	gameObjects.clear();
-	gameObjects.reserve(300);
-	//	gameObjects.resize(300);
 
-	floor = spawnFactory->CreateFloor(
-		elevate::Vector3(200.0f, 1.0f, 200.0f),
-		&cubeShader,
-		elevate::Vector3(0.0f, -1.0f, 0.0f)
-	);
-	floor->mesh->setGameManager(this);
-	floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
-	static_cast<Cube*>(floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_512_albedo.png");
-	gameObjects.push_back(floor->mesh);
-
-	wall = spawnFactory->CreateWall(
-		elevate::Vector3(1.0f, 60.0f, 200.0f),
-		elevate::Vector3(200.0f, 60.0f, 0.0f),
-		&cubeShader
-	);
-	wall->mesh->setGameManager(this);
-	wall->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
-	wall->mesh->SetTexTiling(4.0f);
-	static_cast<Cube*>(wall->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
-	gameObjects.push_back(wall->mesh);
-
-	wall2 = spawnFactory->CreateWall(
-		elevate::Vector3(1.0f, 60.0f, 200.0f),
-		elevate::Vector3(-200.0f, 60.0f, 0.0f),
-		&cubeShader
-	);
-	wall2->mesh->setGameManager(this);
-	wall2->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
-	wall2->mesh->SetTexTiling(4.0f);
-	static_cast<Cube*>(wall2->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
-	gameObjects.push_back(wall2->mesh);
-
-	wall3 = spawnFactory->CreateWall(
-		elevate::Vector3(200.0f, 60.0f, 1.0f),
-		elevate::Vector3(0.0f, 60.0f, 200.0f),
-		&cubeShader
-	);
-	wall3->mesh->setGameManager(this);
-	wall3->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
-	wall3->mesh->SetTexTiling(4.0f);
-	static_cast<Cube*>(wall3->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
-	gameObjects.push_back(wall3->mesh);
-
-	wall4 = spawnFactory->CreateWall(
-		elevate::Vector3(200.0f, 60.0f, 1.0f),
-		elevate::Vector3(0.0f, 60.0f, -200.0f),
-		&cubeShader
-	);
-	wall4->mesh->setGameManager(this);
-	wall4->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
-	wall4->mesh->SetTexTiling(4.0f);
-	static_cast<Cube*>(wall4->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
-	gameObjects.push_back(wall4->mesh);
 
 	if (fpsSandboxDemo)
 	{
@@ -173,81 +117,83 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	}
 	//	ResetPlane();
 
-	AircraftVisuals part1{};
-	part1.offset = elevate::Vector3(-0.5f, 0.0f, 0.0f);
-	part1.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 0.8f, 1.0f), &ammoShader, this);
-	part1.mesh->LoadMesh();
-	part1.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
-	aircraftParts.push_back(part1);
+	//AircraftVisuals part1{};
+	//part1.offset = elevate::Vector3(-0.5f, 0.0f, 0.0f);
+	//part1.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 0.8f, 1.0f), &ammoShader, this);
+	//part1.mesh->LoadMesh();
+	//part1.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
+	//aircraftParts.push_back(part1);
 
-	AircraftVisuals part2{};
-	part2.offset = elevate::Vector3(1.0f, 0.15f, 0);
-	part2.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(2.75f, 0.5f, 0.5), &ammoShader, this);
-	part2.mesh->LoadMesh();
-	part2.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
-	aircraftParts.push_back(part2);
+	//AircraftVisuals part2{};
+	//part2.offset = elevate::Vector3(1.0f, 0.15f, 0);
+	//part2.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(2.75f, 0.5f, 0.5), &ammoShader, this);
+	//part2.mesh->LoadMesh();
+	//part2.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
+	//aircraftParts.push_back(part2);
 
-	AircraftVisuals part3{};
-	part3.offset = elevate::Vector3(0, 0.3f, 0);
-	part3.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.8f, 0.1f, 6.0f), &ammoShader, this);
-	part3.mesh->LoadMesh();
-	part3.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
-	aircraftParts.push_back(part3);
+	//AircraftVisuals part3{};
+	//part3.offset = elevate::Vector3(0, 0.3f, 0);
+	//part3.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.8f, 0.1f, 6.0f), &ammoShader, this);
+	//part3.mesh->LoadMesh();
+	//part3.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
+	//aircraftParts.push_back(part3);
 
-	AircraftVisuals part4{};
-	part4.offset = elevate::Vector3(2.0f, 0.775f, 0);
-	part4.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.75f, 1.15f, 0.1f), &ammoShader, this);
-	part4.mesh->LoadMesh();
-	part4.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
-	aircraftParts.push_back(part4);
+	//AircraftVisuals part4{};
+	//part4.offset = elevate::Vector3(2.0f, 0.775f, 0);
+	//part4.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.75f, 1.15f, 0.1f), &ammoShader, this);
+	//part4.mesh->LoadMesh();
+	//part4.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
+	//aircraftParts.push_back(part4);
 
-	AircraftVisuals part5{};
-	part5.offset = elevate::Vector3(1.9f, 0, 0);
-	part5.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.85f, 0.1f, 2.0f), &ammoShader, this);
-	part5.mesh->LoadMesh();
-	part5.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
-	aircraftParts.push_back(part5);
+	//AircraftVisuals part5{};
+	//part5.offset = elevate::Vector3(1.9f, 0, 0);
+	//part5.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.85f, 0.1f, 2.0f), &ammoShader, this);
+	//part5.mesh->LoadMesh();
+	//part5.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
+	//aircraftParts.push_back(part5);
 
-	CarVisuals carBody{};
-	carBody.offset = elevate::Vector3(0.0f, -2.5f, 0.0f);
-	carBody.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(5.0f, 2.0f, 3.2f), &ammoShader, this);
-	carBody.mesh->LoadMesh();
-	carBody.mesh->SetColor(glm::vec3(0.2f, 0.2f, 0.8f));
-	carParts.push_back(carBody);
-	CarVisuals wheelFL{};
-	wheelFL.offset = elevate::Vector3(-1.25f, -1.1f, 1.5f);
-	wheelFL.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &ammoShader, this,
-		glm::vec3(0.1f, 0.1f, 0.1f));
-	static_cast<Sphere*>(wheelFL.mesh)->GenerateSphere(0.5f, 16, 16);
-	wheelFL.mesh->LoadMesh();
-	carParts.push_back(wheelFL);
-	CarVisuals wheelFR{};
-	wheelFR.offset = elevate::Vector3(1.25f, -1.1f, 1.5f);
-	wheelFR.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &ammoShader, this,
-		glm::vec3(0.1f, 0.1f, 0.1f));
-	static_cast<Sphere*>(wheelFR.mesh)->GenerateSphere(0.5f, 16, 16);
-	wheelFR.mesh->LoadMesh();
-	carParts.push_back(wheelFR);
-	CarVisuals wheelRL{};
-	wheelRL.offset = elevate::Vector3(-1.25f, -1.1f, -1.5f);
-	wheelRL.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &ammoShader, this,
-		glm::vec3(0.1f, 0.1f, 0.1f));
-	static_cast<Sphere*>(wheelRL.mesh)->GenerateSphere(0.5f, 16, 16);
-	wheelRL.mesh->LoadMesh();
-	carParts.push_back(wheelRL);
-	CarVisuals wheelRR{};
-	wheelRR.offset = elevate::Vector3(1.25f, -1.1f, -1.5f);
-	wheelRR.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &ammoShader, this,
-		glm::vec3(0.1f, 0.1f, 0.1f));
-	static_cast<Sphere*>(wheelRR.mesh)->GenerateSphere(0.5f, 16, 16);
-	wheelRR.mesh->LoadMesh();
-	carParts.push_back(wheelRR);
+	//CarVisuals carBody{};
+	//carBody.offset = elevate::Vector3(0.0f, -2.5f, 0.0f);
+	//carBody.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(5.0f, 2.0f, 3.2f), &ammoShader, this);
+	//carBody.mesh->LoadMesh();
+	//carBody.mesh->SetColor(glm::vec3(0.2f, 0.2f, 0.8f));
+	//carParts.push_back(carBody);
+	//CarVisuals wheelFL{};
+	//wheelFL.offset = elevate::Vector3(-1.25f, -1.1f, 1.5f);
+	//wheelFL.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &ammoShader, this,
+	//	glm::vec3(0.1f, 0.1f, 0.1f));
+	//static_cast<Sphere*>(wheelFL.mesh)->GenerateSphere(0.5f, 16, 16);
+	//wheelFL.mesh->LoadMesh();
+	//carParts.push_back(wheelFL);
+	//CarVisuals wheelFR{};
+	//wheelFR.offset = elevate::Vector3(1.25f, -1.1f, 1.5f);
+	//wheelFR.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &ammoShader, this,
+	//	glm::vec3(0.1f, 0.1f, 0.1f));
+	//static_cast<Sphere*>(wheelFR.mesh)->GenerateSphere(0.5f, 16, 16);
+	//wheelFR.mesh->LoadMesh();
+	//carParts.push_back(wheelFR);
+	//CarVisuals wheelRL{};
+	//wheelRL.offset = elevate::Vector3(-1.25f, -1.1f, -1.5f);
+	//wheelRL.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &ammoShader, this,
+	//	glm::vec3(0.1f, 0.1f, 0.1f));
+	//static_cast<Sphere*>(wheelRL.mesh)->GenerateSphere(0.5f, 16, 16);
+	//wheelRL.mesh->LoadMesh();
+	//carParts.push_back(wheelRL);
+	//CarVisuals wheelRR{};
+	//wheelRR.offset = elevate::Vector3(1.25f, -1.1f, -1.5f);
+	//wheelRR.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &ammoShader, this,
+	//	glm::vec3(0.1f, 0.1f, 0.1f));
+	//static_cast<Sphere*>(wheelRR.mesh)->GenerateSphere(0.5f, 16, 16);
+	//wheelRR.mesh->LoadMesh();
+	//carParts.push_back(wheelRR);
 
-	elevate::Vector3 carPropulsion(car_throttle * 50.0f, 0, 0);
-	//car.addForce(carPropulsion);
-	carEngine->setThrottle(carPropulsion);
+	//elevate::Vector3 carPropulsion(car_throttle * 50.0f, 0, 0);
+	////car.addForce(carPropulsion);
+	//carEngine->setThrottle(carPropulsion);
 
-	spawnContext.World->getForceRegistry().add(&car, carEngine);
+	//spawnContext.World->getForceRegistry().add(&car, carEngine);
+
+
 
 
 }

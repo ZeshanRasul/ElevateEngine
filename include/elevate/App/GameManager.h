@@ -130,6 +130,28 @@ public:
     void OnDPressed();
     void OnAPressed();
 
+    void AddToGameObjects(GameObject* obj) {
+       gameObjects.push_back(obj);
+	}
+
+    std::vector<GameObject*>& GetGameObjects() {
+        return gameObjects;
+	}
+
+    PhysicsObject* wall;
+    PhysicsObject* wall2;
+    PhysicsObject* wall3;
+    PhysicsObject* wall4;
+    PhysicsObject* floor;
+    
+    SpawnContext spawnContext;
+    ShapeFactory* shapeFactory;
+    SpawnFactory* spawnFactory;
+    
+    Shader ammoShader;
+    Shader cubeShader;
+    Shader lineShader;
+
 private:
     void ShowCameraControlWindow(Camera& cam);
     void ShowLightControlWindow(DirLight& light);
@@ -146,12 +168,9 @@ private:
     Camera* camera;
 
     InputManager* inputManager;
-
     std::vector<GameObject*> gameObjects;
 
-    Shader ammoShader;
-	Shader cubeShader;
-	Shader lineShader;
+
 
     Cube* cube;
     Cube* cube2;
@@ -236,7 +255,7 @@ private:
 
     void generateContacts();
 
-    bool fpsSandboxDemo = true; 
+    bool fpsSandboxDemo = false; 
 
     static const int MaxEnvBoxes = 8;
     int               numEnvBoxes = 8;
@@ -269,22 +288,13 @@ private:
     Texture brickTexture;
     Texture crateTexture;
 
-	SpawnContext spawnContext;
-	ShapeFactory* shapeFactory;
-	SpawnFactory* spawnFactory;
-
     PhysicsObject* crate;
     PhysicsObject* ball;
     std::vector<PhysicsObject*> crates;
     std::vector<PhysicsObject*> bricks;
     std::vector<PhysicsObject*> dominoes;
-	PhysicsObject* wall;
-	PhysicsObject* wall2;
-	PhysicsObject* wall3;
-	PhysicsObject* wall4;
-	PhysicsObject* floor;
 
-	std::vector<Ragdoll*> ragdolls;
+    std::vector<Ragdoll*> ragdolls;
 
     std::vector<PhysicsObject*> runTimeBoxes;
     float boxMass = 1.0f;

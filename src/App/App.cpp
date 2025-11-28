@@ -1,5 +1,9 @@
 #include "App/App.h"
 #include "Tools/Logger.h"
+#include "Physics/Demos/SceneManager.h"
+
+GameManager* SceneManager::s_gameManager = nullptr;
+SceneType SceneManager::s_currentScene = SceneType::None; // replace 'None' with a real enum value
 
 App::App(unsigned int screenWidth, unsigned int screenHeight)
     : width(screenWidth), height(screenHeight)
@@ -21,7 +25,11 @@ App::~App()
 
 void App::run()
 {
-    while (mWindow->isOpen()) {
+
+		SceneManager::Init(mGameManager);
+		Scenes::LoadDemoShowcase(mGameManager);
+
+        while (mWindow->isOpen()) {
         currentFrame = (float)glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
