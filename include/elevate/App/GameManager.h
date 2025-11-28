@@ -157,6 +157,19 @@ public:
 
     AmmoRound ammoPool[MaxAmmoRounds];
     int       ammoCount = 0;
+
+    Cube* carBody;
+    Sphere* carWheelFL;
+    Sphere* carWheelFR;
+    Sphere* carWheelRL;
+    Sphere* carWheelRR;
+    RigidBody car;
+    CarPropulsion* carEngine;
+    std::vector<CarVisuals> carParts;
+    bool showCar = true;
+
+    float car_throttle = 0.0f;
+
 private:
     void ShowCameraControlWindow(Camera& cam);
     void ShowLightControlWindow(DirLight& light);
@@ -260,7 +273,7 @@ private:
 
     void generateContacts();
 
-    bool fpsSandboxDemo = true; 
+    bool fpsSandboxDemo = false; 
 
     static const int MaxEnvBoxes = 8;
     int               numEnvBoxes = 8;
@@ -322,18 +335,6 @@ private:
     float left_wing_control;
     float right_wing_control;
     float rudder_control;
-
-	Cube* carBody;
-	Sphere* carWheelFL;
-	Sphere* carWheelFR;
-	Sphere* carWheelRL;
-	Sphere* carWheelRR;
-    RigidBody car;
-	CarPropulsion* carEngine;
-	std::vector<CarVisuals> carParts;
-	bool showCar = false;
-
-	float car_throttle = 0.0f;
 
     float friction = 0.6f;
 	float restitution = 0.2f;

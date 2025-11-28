@@ -27,7 +27,7 @@ void App::run()
 {
 
 		SceneManager::Init(mGameManager);
-		Scenes::LoadDemoShowcase(mGameManager);
+		Scenes::LoadCarTest(mGameManager);
 
         while (mWindow->isOpen()) {
         currentFrame = (float)glfwGetTime();

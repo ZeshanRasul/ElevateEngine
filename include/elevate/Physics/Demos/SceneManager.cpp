@@ -59,7 +59,62 @@ SceneType SceneManager::GetScene(SceneType type)
 
 void Scenes::LoadCarTest(GameManager* gm)
 {
-	// Set up car scene
+	std::vector<GameObject*>& gameObjects = gm->GetGameObjects();
+
+	gameObjects.clear();
+	gameObjects.reserve(300);
+	//	gameObjects.resize(300);
+
+	gm->floor = gm->spawnFactory->CreateFloor(
+		elevate::Vector3(500.0f, 1.0f, 500.0f),
+		&gm->cubeShader,
+		elevate::Vector3(0.0f, -1.0f, 0.0f)
+	);
+	gm->floor->mesh->setGameManager(gm);
+	gm->floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
+	static_cast<Cube*>(gm->floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_512_albedo.png");
+	gameObjects.push_back(gm->floor->mesh);
+
+	CarVisuals carBody{};
+	carBody.offset = elevate::Vector3(0.0f, -2.5f, 0.0f);
+	carBody.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(5.0f, 2.0f, 3.2f), &gm->ammoShader, gm);
+	carBody.mesh->LoadMesh();
+	carBody.mesh->SetColor(glm::vec3(0.2f, 0.2f, 0.8f));
+	gm->carParts.push_back(carBody);
+	CarVisuals wheelFL{};
+	wheelFL.offset = elevate::Vector3(-1.25f, -1.1f, 1.5f);
+	wheelFL.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &gm->ammoShader, gm,
+		glm::vec3(0.1f, 0.1f, 0.1f));
+	static_cast<Sphere*>(wheelFL.mesh)->GenerateSphere(0.5f, 16, 16);
+	wheelFL.mesh->LoadMesh();
+	gm->carParts.push_back(wheelFL);
+	CarVisuals wheelFR{};
+	wheelFR.offset = elevate::Vector3(1.25f, -1.1f, 1.5f);
+	wheelFR.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &gm->ammoShader, gm,
+		glm::vec3(0.1f, 0.1f, 0.1f));
+	static_cast<Sphere*>(wheelFR.mesh)->GenerateSphere(0.5f, 16, 16);
+	wheelFR.mesh->LoadMesh();
+	gm->carParts.push_back(wheelFR);
+	CarVisuals wheelRL{};
+	wheelRL.offset = elevate::Vector3(-1.25f, -1.1f, -1.5f);
+	wheelRL.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &gm->ammoShader, gm,
+		glm::vec3(0.1f, 0.1f, 0.1f));
+	static_cast<Sphere*>(wheelRL.mesh)->GenerateSphere(0.5f, 16, 16);
+	wheelRL.mesh->LoadMesh();
+	gm->carParts.push_back(wheelRL);
+	CarVisuals wheelRR{};
+	wheelRR.offset = elevate::Vector3(1.25f, -1.1f, -1.5f);
+	wheelRR.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &gm->ammoShader, gm,
+		glm::vec3(0.1f, 0.1f, 0.1f));
+	static_cast<Sphere*>(wheelRR.mesh)->GenerateSphere(0.5f, 16, 16);
+	wheelRR.mesh->LoadMesh();
+	gm->carParts.push_back(wheelRR);
+
+	elevate::Vector3 carPropulsion(gm->car_throttle * 50.0f, 0, 0);
+	//car.addForce(carPropulsion);
+	gm->carEngine->setThrottle(carPropulsion);
+
+	gm->spawnContext.World->getForceRegistry().add(&gm->car, gm->carEngine);
 }
 
 void Scenes::LoadAeroplaneTest(GameManager* gm)

@@ -98,46 +98,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	//part5.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
 	//aircraftParts.push_back(part5);
 
-	//CarVisuals carBody{};
-	//carBody.offset = elevate::Vector3(0.0f, -2.5f, 0.0f);
-	//carBody.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(5.0f, 2.0f, 3.2f), &ammoShader, this);
-	//carBody.mesh->LoadMesh();
-	//carBody.mesh->SetColor(glm::vec3(0.2f, 0.2f, 0.8f));
-	//carParts.push_back(carBody);
-	//CarVisuals wheelFL{};
-	//wheelFL.offset = elevate::Vector3(-1.25f, -1.1f, 1.5f);
-	//wheelFL.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &ammoShader, this,
-	//	glm::vec3(0.1f, 0.1f, 0.1f));
-	//static_cast<Sphere*>(wheelFL.mesh)->GenerateSphere(0.5f, 16, 16);
-	//wheelFL.mesh->LoadMesh();
-	//carParts.push_back(wheelFL);
-	//CarVisuals wheelFR{};
-	//wheelFR.offset = elevate::Vector3(1.25f, -1.1f, 1.5f);
-	//wheelFR.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &ammoShader, this,
-	//	glm::vec3(0.1f, 0.1f, 0.1f));
-	//static_cast<Sphere*>(wheelFR.mesh)->GenerateSphere(0.5f, 16, 16);
-	//wheelFR.mesh->LoadMesh();
-	//carParts.push_back(wheelFR);
-	//CarVisuals wheelRL{};
-	//wheelRL.offset = elevate::Vector3(-1.25f, -1.1f, -1.5f);
-	//wheelRL.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &ammoShader, this,
-	//	glm::vec3(0.1f, 0.1f, 0.1f));
-	//static_cast<Sphere*>(wheelRL.mesh)->GenerateSphere(0.5f, 16, 16);
-	//wheelRL.mesh->LoadMesh();
-	//carParts.push_back(wheelRL);
-	//CarVisuals wheelRR{};
-	//wheelRR.offset = elevate::Vector3(1.25f, -1.1f, -1.5f);
-	//wheelRR.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &ammoShader, this,
-	//	glm::vec3(0.1f, 0.1f, 0.1f));
-	//static_cast<Sphere*>(wheelRR.mesh)->GenerateSphere(0.5f, 16, 16);
-	//wheelRR.mesh->LoadMesh();
-	//carParts.push_back(wheelRR);
 
-	//elevate::Vector3 carPropulsion(car_throttle * 50.0f, 0, 0);
-	////car.addForce(carPropulsion);
-	//carEngine->setThrottle(carPropulsion);
-
-	//spawnContext.World->getForceRegistry().add(&car, carEngine);
 
 
 
