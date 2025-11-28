@@ -128,6 +128,16 @@ void InputManager::processInput(GLFWwindow* window, float deltaTime)
 
     rKeyPressed = rKeyCurrentlyPressed;
 
+
+    static bool qPrev = false, ePrev = false, wPrev = false, sPrev = false, dPrev = false, aPrev = false;
+
+    if (IsKeyPressedOnce(window, GLFW_KEY_Q, qPrev)) mGameManager->OnQPressed();
+    if (IsKeyPressedOnce(window, GLFW_KEY_E, ePrev)) mGameManager->OnEPressed();
+    if (IsKeyPressedOnce(window, GLFW_KEY_W, wPrev)) mGameManager->OnWPressed();
+    if (IsKeyPressedOnce(window, GLFW_KEY_S, sPrev)) mGameManager->OnSPressed();
+    if (IsKeyPressedOnce(window, GLFW_KEY_D, dPrev)) mGameManager->OnDPressed();
+    if (IsKeyPressedOnce(window, GLFW_KEY_A, aPrev)) mGameManager->OnAPressed();
+
 }
 
 void InputManager::setContext(Camera* cam, GameManager* gameMgr, unsigned int width, unsigned int height)

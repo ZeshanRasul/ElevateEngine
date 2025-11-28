@@ -21,6 +21,7 @@
 #include "Physics/joints.h"
 #include "Physics/random.h"
 #include "Physics/block.h"
+#include "Physics/Aero.h"
 
 struct DebugLine
 {
@@ -110,6 +111,13 @@ public:
 
     void reset();
 	void togglePause() { isPaused = !isPaused; }
+
+    void OnQPressed();
+    void OnEPressed();
+    void OnWPressed();
+    void OnSPressed();
+    void OnDPressed();
+    void OnAPressed();
 
 private:
     void ShowCameraControlWindow(Camera& cam);
@@ -276,6 +284,21 @@ private:
     float sphereRadius = 1.0f;
     float sphereMass = 1.0f;
     float sphereColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+    AeroControl left_wing;
+    AeroControl right_wing;
+    AeroControl rudder;
+    Aero tail;
+    RigidBody aircraft;
+    elevate::Vector3 windspeed;
+	std::vector<Cube*> aircraftParts;
+
+
+    void ResetPlane();
+
+    float left_wing_control;
+    float right_wing_control;
+    float rudder_control;
 
     float friction = 0.6f;
 	float restitution = 0.2f;

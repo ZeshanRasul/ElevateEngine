@@ -31,6 +31,16 @@ public:
 	bool isCameraControlled() { return controlCamera; }
     void setContext(Camera* cam, class GameManager* gameMgr, unsigned int width, unsigned int height);
 
+    bool IsKeyPressedOnce(GLFWwindow* window, int key, bool& prevState)
+    {
+        bool curr = glfwGetKey(window, key) == GLFW_PRESS;
+
+        bool pressedOnce = curr && !prevState;
+        prevState = curr;
+
+        return pressedOnce;
+    }
+
 private:
     Camera* camera;
 	class GameManager* mGameManager;
