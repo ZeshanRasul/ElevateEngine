@@ -170,56 +170,8 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 		}
 
 	}
+	//	ResetPlane();
 
-	right_wing.tensor = elevate::Matrix3(0, 0, 0, -1, -0.5f, 0, 0, 0, 0);
-
-	right_wing.minTensor = elevate::Matrix3(0, 0, 0, -0.995f, -0.5f, 0, 0, 0, 0);
-	right_wing.maxTensor = elevate::Matrix3(0, 0, 0, -1.005f, -0.5f, 0, 0, 0, 0);
-	right_wing.position = elevate::Vector3(-1.0f, 0.0f, 2.0f);
-	right_wing.windspeed = &windspeed;
-
-	left_wing.tensor = elevate::Matrix3(0, 0, 0, -1, -0.5f, 0, 0, 0, 0);
-	left_wing.minTensor = elevate::Matrix3(0, 0, 0, -0.995f, -0.5f, 0, 0, 0, 0);
-	left_wing.maxTensor = elevate::Matrix3(0, 0, 0, -1.005f, -0.5f, 0, 0, 0, 0);
-	left_wing.position = elevate::Vector3(-1.0f, 0.0f, -2.0f);
-	left_wing.windspeed = &windspeed;
-
-	rudder.tensor = elevate::Matrix3(0, 0, 0, 0, 0, 0, 0, 0, 0);
-	rudder.minTensor = elevate::Matrix3(0, 0, 0, 0, 0, 0, 0.01f, 0, 0);
-	rudder.maxTensor = elevate::Matrix3(0, 0, 0, 0, 0, 0, -0.01f, 0, 0);
-	rudder.position = elevate::Vector3(2.0f, 0.5f, 0);
-	rudder.windspeed = &windspeed;
-
-	tail.tensor = elevate::Matrix3(0, 0, 0, -1, -0.5f, 0, 0, 0, -0.1f);
-	tail.position = elevate::Vector3(2.0f, 0, 0);
-	tail.windspeed = &windspeed;
-
-	left_wing_control = 0;
-	right_wing_control = 0;
-	rudder_control = 0;
-
-	windspeed = elevate::Vector3(0, 0, 0);
-
-	// Set up the aircraft rigid body.
-	ResetPlane();
-
-	aircraft.setMass(2.5f);
-	elevate::Matrix3 it;
-	it.setBlockInertiaTensor(elevate::Vector3(2, 1, 1), 1);
-	aircraft.setInertiaTensor(it);
-
-	aircraft.setDamping(0.8f, 0.8f);
-
-	aircraft.setAcceleration(elevate::Vector3::GRAVITY);
-	aircraft.calculateDerivedData();
-
-	aircraft.setAwake(true);
-	aircraft.setCanSleep(false);
-
-	rbRegistry.add(&aircraft, &left_wing);
-	rbRegistry.add(&aircraft, &right_wing);
-	rbRegistry.add(&aircraft, &rudder);
-	rbRegistry.add(&aircraft, &tail);
 
 	Cube* part1 = new Cube(elevate::Vector3(-0.5f, 0, 0), elevate::Vector3(2.0f, 0.8f, 1.0f), &ammoShader, this);
 	part1->LoadMesh();
@@ -795,6 +747,17 @@ void GameManager::ShowSpawnObjectWindow()
 {
 	ImGui::Begin("Spawner");
 
+	ImGui::Text("Spawn Aeroplane");
+	if (ImGui::Button("Spawn Aeroplane"))
+	{
+		glm::vec3 camPos = camera->Position;
+		glm::vec3 camFront = glm::normalize(camera->Front);
+		glm::vec3 spawnPos = camPos + camFront * 10.0f;
+		ResetPlane();
+	}
+
+	ImGui::Checkbox("Aeroplane Physics Enabled", &showPlane);
+
 	ImGui::Text("Spawn Box");
 	ImGui::InputFloat("Box Mass", &boxMass);
 	ImGui::InputFloat3("Box Size", boxSize);
@@ -1025,7 +988,7 @@ void GameManager::update(float deltaTime)
 	elevate::Vector3 propulsion(-10.0f, 0, 0);
 	propulsion = aircraft.getTransform().transformDirection(propulsion);
 	aircraft.addForce(propulsion);
-	
+
 	// Add the forces acting on the aircraft.
 	rbRegistry.updateForces(deltaTime);
 
@@ -1041,7 +1004,7 @@ void GameManager::update(float deltaTime)
 
 		if (aircraft.getVelocity().y < -10.0f)
 		{
-		//	ResetPlane();
+			ResetPlane();
 		}
 	}
 
@@ -1078,10 +1041,13 @@ void GameManager::update(float deltaTime)
 		(float)aircraft.getOrientation().i,
 		(float)aircraft.getOrientation().j,
 		(float)aircraft.getOrientation().k));
-	
-	camera->Position = glm::vec3(aircraft.getPosition().x + 15.0f, aircraft.getPosition().y + 5.0f, aircraft.getPosition().z);
-	camera->Front = glm::normalize(glm::vec3(aircraft.getPosition().x, aircraft.getPosition().y, aircraft.getPosition().z) - camera->Position);
-	view = camera->GetViewMatrix();
+
+	if (showPlane)
+	{
+		camera->Position = glm::vec3(aircraft.getPosition().x + 15.0f, aircraft.getPosition().y + 5.0f, aircraft.getPosition().z);
+		camera->Front = glm::normalize(glm::vec3(aircraft.getPosition().x, aircraft.getPosition().y, aircraft.getPosition().z) - camera->Position);
+		view = camera->GetViewMatrix();
+	}
 
 	if (fpsSandboxDemo)
 	{
@@ -1699,6 +1665,56 @@ void GameManager::ResetPlane()
 	left_wing_control = 0.0f;
 	right_wing_control = 0.0f;
 
+	right_wing.tensor = elevate::Matrix3(0, 0, 0, -1, -0.5f, 0, 0, 0, 0);
+
+	right_wing.minTensor = elevate::Matrix3(0, 0, 0, -0.995f, -0.5f, 0, 0, 0, 0);
+	right_wing.maxTensor = elevate::Matrix3(0, 0, 0, -1.005f, -0.5f, 0, 0, 0, 0);
+	right_wing.position = elevate::Vector3(-1.0f, 0.0f, 2.0f);
+	right_wing.windspeed = &windspeed;
+
+	left_wing.tensor = elevate::Matrix3(0, 0, 0, -1, -0.5f, 0, 0, 0, 0);
+	left_wing.minTensor = elevate::Matrix3(0, 0, 0, -0.995f, -0.5f, 0, 0, 0, 0);
+	left_wing.maxTensor = elevate::Matrix3(0, 0, 0, -1.005f, -0.5f, 0, 0, 0, 0);
+	left_wing.position = elevate::Vector3(-1.0f, 0.0f, -2.0f);
+	left_wing.windspeed = &windspeed;
+
+	rudder.tensor = elevate::Matrix3(0, 0, 0, 0, 0, 0, 0, 0, 0);
+	rudder.minTensor = elevate::Matrix3(0, 0, 0, 0, 0, 0, 0.01f, 0, 0);
+	rudder.maxTensor = elevate::Matrix3(0, 0, 0, 0, 0, 0, -0.01f, 0, 0);
+	rudder.position = elevate::Vector3(2.0f, 0.5f, 0);
+	rudder.windspeed = &windspeed;
+
+	tail.tensor = elevate::Matrix3(0, 0, 0, -1, -0.5f, 0, 0, 0, -0.1f);
+	tail.position = elevate::Vector3(2.0f, 0, 0);
+	tail.windspeed = &windspeed;
+
+	left_wing_control = 0;
+	right_wing_control = 0;
+	rudder_control = 0;
+
+	windspeed = elevate::Vector3(0, 0, 0);
+
+	// Set up the aircraft rigid body.
+
+	aircraft.setMass(2.5f);
+	elevate::Matrix3 it;
+	it.setBlockInertiaTensor(elevate::Vector3(2, 1, 1), 1);
+	aircraft.setInertiaTensor(it);
+
+	aircraft.setDamping(0.8f, 0.8f);
+
+	aircraft.setAcceleration(elevate::Vector3::GRAVITY);
+	aircraft.calculateDerivedData();
+
+	aircraft.setAwake(true);
+	aircraft.setCanSleep(false);
+
+	rbRegistry.add(&aircraft, &left_wing);
+	rbRegistry.add(&aircraft, &right_wing);
+	rbRegistry.add(&aircraft, &rudder);
+	rbRegistry.add(&aircraft, &tail);
+
+
 }
 void GameManager::render()
 {
@@ -1706,9 +1722,12 @@ void GameManager::render()
 		renderer->draw(obj, view, projection);
 	}
 
-	for (auto part : aircraftParts)
+	if (showPlane)
 	{
-		renderer->draw(part, view, projection);
+		for (auto part : aircraftParts)
+		{
+			renderer->draw(part, view, projection);
+		}
 	}
 
 	drawDebugLines();

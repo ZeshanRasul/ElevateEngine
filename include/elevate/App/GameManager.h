@@ -292,7 +292,7 @@ private:
     RigidBody aircraft;
     elevate::Vector3 windspeed;
 	std::vector<Cube*> aircraftParts;
-
+	bool showPlane = false;
 
     void ResetPlane();
 
