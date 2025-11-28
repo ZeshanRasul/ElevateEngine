@@ -5,6 +5,7 @@
 #include "Physics/body.h"
 
 namespace elevate {
+
 	struct CollisionData
 	{
 
@@ -16,11 +17,12 @@ namespace elevate {
 
 		unsigned contactCount;
 
-		real friction;
+		real friction = 0.7f;
 
-		real restitution;
+		real restitution = 0.3f;
 
-		real tolerance;
+		real tolerance = 0.1f;
+
 		bool hasMoreContacts() const
 		{
 			return contactsLeft > 0;

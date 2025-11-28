@@ -272,6 +272,16 @@ private:
     float boxSize[3] = { 1.0f, 1.0f, 1.0f };
     float boxColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
+    std::vector<PhysicsObject*> runTimeSpheres;
+    float sphereRadius = 1.0f;
+    float sphereMass = 1.0f;
+    float sphereColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+    float friction = 0.6f;
+	float restitution = 0.2f;
+	float tolerance = 0.1f;
+
+	float groundPlaneOffset = 0.0f;
 
     float fps;
     float avgFps;

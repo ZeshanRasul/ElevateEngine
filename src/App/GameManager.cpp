@@ -198,6 +198,19 @@ void GameManager::reset()
 		delete runTimeBoxes[i]->mesh;
 		delete runTimeBoxes[i];
 	}
+	
+	for (int i = 0; i < runTimeSpheres.size(); i++)
+	{
+		gameObjects.erase(
+			std::remove(
+				gameObjects.begin(),
+				gameObjects.end(),
+				runTimeSpheres[i]->mesh),
+			gameObjects.end()
+		);
+		delete runTimeSpheres[i]->mesh;
+		delete runTimeSpheres[i];
+	}
 
 	for (PhysicsObject* domino : dominoes)
 	{
@@ -600,12 +613,6 @@ void GameManager::ShowLightControlWindow(DirLight& light)
 	ImGui::ColorEdit4("Specular", (float*)&light.specular);
 
 	ImGui::End();
-
-	ImGui::Begin("Spawner");
-	ImGui::Text("Spawn Box");
-	ImGui::InputFloat("Box Mass", &boxMass);
-	ImGui::InputFloat3("Box Size", boxSize);
-	ImGui::ColorEdit4("Box Size", boxColor);
 }
 
 void GameManager::fireRound(AmmoType type)
@@ -678,6 +685,13 @@ void GameManager::ShowBuoyancyWindow()
 
 void GameManager::ShowSpawnObjectWindow()
 {
+	ImGui::Begin("Spawner");
+
+	ImGui::Text("Spawn Box");
+	ImGui::InputFloat("Box Mass", &boxMass);
+	ImGui::InputFloat3("Box Size", boxSize);
+	ImGui::ColorEdit4("Box Size", boxColor);
+
 	if (ImGui::Button("Spawn Box"))
 	{
 		glm::vec3 camPos = camera->Position;
@@ -698,6 +712,31 @@ void GameManager::ShowSpawnObjectWindow()
 		gameObjects.push_back(box->mesh);
 		runTimeBoxes.push_back(box);
 	}
+	ImGui::Text("Spawn Sphere");
+	ImGui::InputFloat("Sphere Radius", &sphereRadius);
+	ImGui::InputFloat("Sphere Mass", &sphereMass);
+	ImGui::ColorEdit4("Sphere Color", sphereColor);
+
+	if (ImGui::Button("Spawn Sphere"))
+	{
+		glm::vec3 camPos = camera->Position;
+		glm::vec3 camFront = glm::normalize(camera->Front);
+
+		glm::vec3 spawnPos = camPos + camFront * 6.0f;
+
+		PhysicsObject* sphere = spawnFactory->SpawnSphere(
+			elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z),
+			sphereRadius,
+			sphereMass,
+			"",
+			PhysicsMaterialId::Default,
+			&ammoShader
+		);
+
+		sphere->mesh->SetColor(glm::vec3(sphereColor[0], sphereColor[1], sphereColor[2]));
+		gameObjects.push_back(sphere->mesh);
+		runTimeSpheres.push_back(sphere);
+	}
 	ImGui::End();
 }
 
@@ -717,8 +756,8 @@ void GameManager::ShowEngineWindow()
 
 	if (ImGui::Button("Step"))
 	{
-				isPaused = true;
-				update(1.0f / 60.0f);
+		isPaused = true;
+		update(1.0f / 60.0f);
 	}
 
 	ImGui::Checkbox("Enable Gravity", &enableGravity);
@@ -726,6 +765,16 @@ void GameManager::ShowEngineWindow()
 	ImGui::End();
 
 	ImGui::Begin("Physics Properties");
+
+	ImGui::SliderFloat("Friction", (float*)&friction, 0.0f, 1.0f);
+	ImGui::SliderFloat("Restitution", (float*)&restitution, 0.0f, 1.0f);
+	ImGui::SliderFloat("Tolerance", (float*)&tolerance, 0.0f, 1.0f);
+
+	cData.friction = friction;
+	cData.restitution = restitution;
+	cData.tolerance = tolerance;
+
+	ImGui::SliderFloat("Ground Plane OFfset", (float*)&groundPlaneOffset, -200.0f, 200.0f);
 
 	ImGui::SliderFloat3("Gravity", gravity, -100.0f, 100.0f);
 
@@ -904,11 +953,24 @@ void GameManager::update(float deltaTime)
 
 		for (int i = 0; i < runTimeBoxes.size(); i++)
 		{
+			if (!runTimeBoxes[i]) continue;
+
 			runTimeBoxes[i]->body->clearAccumulator();
 			runTimeBoxes[i]->body->calculateDerivedData();
 			rbGravity->updateForce(runTimeBoxes[i]->body, deltaTime);
 			runTimeBoxes[i]->body->integrate(deltaTime);
 			runTimeBoxes[i]->shape->calculateInternals();
+		}
+
+		for (int i = 0; i < runTimeSpheres.size(); i++)
+		{
+			if (!runTimeSpheres[i]) continue;
+
+			runTimeSpheres[i]->body->clearAccumulator();
+			runTimeSpheres[i]->body->calculateDerivedData();
+			rbGravity->updateForce(runTimeSpheres[i]->body, deltaTime);
+			runTimeSpheres[i]->body->integrate(deltaTime);
+			runTimeSpheres[i]->shape->calculateInternals();
 		}
 
 		crate->body->clearAccumulator();
@@ -1040,6 +1102,20 @@ void GameManager::update(float deltaTime)
 				(float)runTimeBoxes[i]->body->getOrientation().k));
 		}
 
+		for (int i = 0; i < runTimeSpheres.size(); i++)
+		{
+			runTimeSpheres[i]->body->calculateDerivedData();
+			runTimeSpheres[i]->shape->calculateInternals();
+			elevate::Matrix4 t = runTimeSpheres[i]->body->getTransform();
+			elevate::Vector3 p = t.getAxisVector(3);
+			runTimeSpheres[i]->mesh->SetPosition(p);
+			runTimeSpheres[i]->mesh->SetOrientation(glm::quat(
+				(float)runTimeSpheres[i]->body->getOrientation().r,
+				(float)runTimeSpheres[i]->body->getOrientation().i,
+				(float)runTimeSpheres[i]->body->getOrientation().j,
+				(float)runTimeSpheres[i]->body->getOrientation().k));
+		}
+
 		crate->shape->calculateInternals();
 		elevate::Matrix4 t = crate->body->getTransform();
 		elevate::Vector3 p = t.getAxisVector(3);
@@ -1119,12 +1195,9 @@ void GameManager::generateContacts()
 
 	elevate::CollisionPlane plane;
 	plane.direction = elevate::Vector3(0, 1, 0);
-	plane.offset = 0;
+	plane.offset = groundPlaneOffset;
 
 	cData.reset(2056);
-	cData.friction = (real)0.7;
-	cData.restitution = (real)0.2;
-	cData.tolerance = (real)0.1;
 
 	if (fpsSandboxDemo)
 	{
@@ -1157,6 +1230,12 @@ void GameManager::generateContacts()
 			{
 				if (!cData.hasMoreContacts()) return;
 				elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(runTimeBoxes[i]->shape), *r.coll, &cData);
+			}
+
+			for (int i = 0; i < runTimeSpheres.size(); i++)
+			{
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::sphereAndSphere(*static_cast<CollisionSphere*>(runTimeSpheres[i]->shape), *r.coll, &cData);
 			}
 
 			for (int i = 0; i < crates.size(); i++)
@@ -1224,6 +1303,17 @@ void GameManager::generateContacts()
 			}
 			if (!cData.hasMoreContacts()) return;
 			elevate::CollisionDetector::boxAndHalfSpace(*static_cast<CollisionBox*>(runTimeBoxes[i]->shape), plane, &cData);
+		}
+
+		for (int i = 0; i < runTimeSpheres.size(); i++)
+		{
+			if (!cData.hasMoreContacts()) return;
+			elevate::CollisionDetector::sphereAndHalfSpace(*static_cast<CollisionSphere*>(runTimeSpheres[i]->shape), plane, &cData);
+			for (int j = i + 1; j < runTimeSpheres.size(); j++)
+			{
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::sphereAndSphere(*static_cast<CollisionSphere*>(runTimeSpheres[i]->shape), *static_cast<CollisionSphere*>(runTimeSpheres[j]->shape), &cData);
+			}
 		}
 
 		if (!cData.hasMoreContacts()) return;
