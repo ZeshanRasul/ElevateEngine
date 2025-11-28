@@ -198,7 +198,7 @@ void GameManager::reset()
 		delete runTimeBoxes[i]->mesh;
 		delete runTimeBoxes[i];
 	}
-	
+
 	for (int i = 0; i < runTimeSpheres.size(); i++)
 	{
 		gameObjects.erase(
@@ -737,7 +737,33 @@ void GameManager::ShowSpawnObjectWindow()
 		gameObjects.push_back(sphere->mesh);
 		runTimeSpheres.push_back(sphere);
 	}
+
+
+	if (ImGui::Button("Spawn Ragdoll"))
+	{
+		glm::vec3 camPos = camera->Position;
+		glm::vec3 camFront = glm::normalize(camera->Front);
+
+		glm::vec3 spawnPos = camPos + camFront * 6.0f;
+
+		Ragdoll* ragdoll = spawnFactory->CreateRagdoll(
+			elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z)
+		);
+
+		for (Bone& bone : ragdoll->bones)
+		{
+			Cube* c = new Cube(bone.getTransform().getAxisVector(3), bone.halfSize * 2, &ammoShader, this);
+			c->LoadMesh();
+			c->SetColor(glm::vec3(0.9f, 0.3f, 0.4f));
+			bone.visual = c;
+			gameObjects.push_back(c);
+		}
+
+		ragdolls.push_back(ragdoll);
+	}
+
 	ImGui::End();
+
 }
 
 void GameManager::ShowEngineWindow()

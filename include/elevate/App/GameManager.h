@@ -169,7 +169,7 @@ private:
 	elevate::ParticleSpring* bungeeFG1;
     elevate::ParticleGravity* gravityFG;
     elevate::ParticleGravity* pushForce;
-
+    bool isHidden = false;
     float pushDirX = 0;
 
     Line* lineab;
