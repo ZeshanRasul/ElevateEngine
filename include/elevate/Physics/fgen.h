@@ -44,6 +44,10 @@ public:
 	};
 
 	virtual void updateForce(RigidBody* RigidBody, real duration);
+
+	void setGravity(const Vector3& gravity) {
+		this->gravity = gravity;
+	}
 };
 
 class Spring : public RigidBodyForceGenerator {

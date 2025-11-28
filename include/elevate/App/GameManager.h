@@ -117,6 +117,7 @@ private:
     void ShowAmmoWindow();
 	void ShowBuoyancyWindow();
 	void ShowSpawnObjectWindow();
+	void ShowEngineWindow();
 	void ShowPerformanceWindow();
 	void CalculatePerformanceMetrics(float deltaTime);
     void RemoveDestroyedGameObjects();
@@ -185,6 +186,8 @@ private:
     bool showBuoyanceDemo = false;
 
     bool isPaused = false;
+	bool singleStep = false;
+    bool enableGravity = true;
 
 	bool cubeDemo = false;
 	elevate::RigidBody* testBody = nullptr;
@@ -192,6 +195,7 @@ private:
     World* rbWorld;
 	ForceRegistry rbRegistry;
 	Gravity* rbGravity;
+    float gravity[3]  = { 0.0f, -9.81f * 0.5f, 0.0f };
 
 	bool sphereDemo = false;
 	Sphere* sphere = nullptr;

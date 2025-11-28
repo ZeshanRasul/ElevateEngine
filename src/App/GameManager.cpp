@@ -579,6 +579,7 @@ void GameManager::showDebugUI()
 	ShowCameraControlWindow(*camera);
 	ShowSpawnObjectWindow();
 	ShowPerformanceWindow();
+	ShowEngineWindow();
 }
 
 void GameManager::renderDebugUI()
@@ -700,6 +701,37 @@ void GameManager::ShowSpawnObjectWindow()
 	ImGui::End();
 }
 
+void GameManager::ShowEngineWindow()
+{
+	ImGui::Begin("Simulation Controls");
+
+	if (ImGui::Button("Pause Simulation"))
+	{
+		isPaused = !isPaused;
+	}
+
+	if (ImGui::Button("Reset Simulation"))
+	{
+		reset();
+	}
+
+	if (ImGui::Button("Step"))
+	{
+				isPaused = true;
+				update(1.0f / 60.0f);
+	}
+
+	ImGui::Checkbox("Enable Gravity", &enableGravity);
+
+	ImGui::End();
+
+	ImGui::Begin("Physics Properties");
+
+	ImGui::SliderFloat3("Gravity", gravity, -100.0f, 100.0f);
+
+	ImGui::End();
+}
+
 void GameManager::ShowPerformanceWindow()
 {
 	ImGui::Begin("Performance");
@@ -780,6 +812,15 @@ void GameManager::update(float deltaTime)
 	inputManager->processInput(window->getWindow(), deltaTime);
 
 	if (isPaused) return;
+
+	if (!enableGravity)
+	{
+		rbGravity->setGravity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+	}
+	else
+	{
+		rbGravity->setGravity(elevate::Vector3(gravity[0], gravity[1], gravity[2]));
+	}
 	//rbWorld->startFrame();
 	//rbWorld->runPhysics(1.0f / 60.0f);
 
