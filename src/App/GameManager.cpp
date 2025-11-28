@@ -275,9 +275,9 @@ void GameManager::reset()
 	}
 	ragdolls.clear();
 
-	//	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(0.0f, 4.0f, 0.0f)));
+	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(0.0f, 4.0f, 0.0f)));
 	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(10.0f, 4.0f, 0.0f)));
-	//	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(20.0f, 4.0f, 0.0f)));
+	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(20.0f, 4.0f, 0.0f)));
 
 	for (Ragdoll* ragdoll : ragdolls)
 	{
@@ -577,6 +577,8 @@ void GameManager::showDebugUI()
 {
 	ShowLightControlWindow(dirLight);
 	ShowCameraControlWindow(*camera);
+	ShowSpawnObjectWindow();
+	ShowPerformanceWindow();
 }
 
 void GameManager::renderDebugUI()
@@ -603,28 +605,6 @@ void GameManager::ShowLightControlWindow(DirLight& light)
 	ImGui::InputFloat("Box Mass", &boxMass);
 	ImGui::InputFloat3("Box Size", boxSize);
 	ImGui::ColorEdit4("Box Size", boxColor);
-
-	if (ImGui::Button("Spawn Box"))
-	{
-		glm::vec3 camPos = camera->Position;
-		glm::vec3 camFront = glm::normalize(camera->Front);
-
-		glm::vec3 spawnPos = camPos + camFront * 6.0f;
-
-		PhysicsObject* box = spawnFactory->SpawnBox(
-			elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z),
-			elevate::Vector3(boxSize[0], boxSize[1], boxSize[2]),
-			boxMass,
-			"",
-			PhysicsMaterialId::Default,
-			&ammoShader
-		);
-
-		box->mesh->SetColor(glm::vec3(boxColor[0], boxColor[1], boxColor[2]));
-		gameObjects.push_back(box->mesh);
-		runTimeBoxes.push_back(box);
-	}
-	ImGui::End();
 }
 
 void GameManager::fireRound(AmmoType type)
@@ -693,6 +673,63 @@ void GameManager::ShowAmmoWindow()
 void GameManager::ShowBuoyancyWindow()
 {
 
+}
+
+void GameManager::ShowSpawnObjectWindow()
+{
+	if (ImGui::Button("Spawn Box"))
+	{
+		glm::vec3 camPos = camera->Position;
+		glm::vec3 camFront = glm::normalize(camera->Front);
+
+		glm::vec3 spawnPos = camPos + camFront * 6.0f;
+
+		PhysicsObject* box = spawnFactory->SpawnBox(
+			elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z),
+			elevate::Vector3(boxSize[0], boxSize[1], boxSize[2]),
+			boxMass,
+			"",
+			PhysicsMaterialId::Default,
+			&ammoShader
+		);
+
+		box->mesh->SetColor(glm::vec3(boxColor[0], boxColor[1], boxColor[2]));
+		gameObjects.push_back(box->mesh);
+		runTimeBoxes.push_back(box);
+	}
+	ImGui::End();
+}
+
+void GameManager::ShowPerformanceWindow()
+{
+	ImGui::Begin("Performance");
+
+	ImGui::Text("FPS: %.1f", fps);
+	ImGui::Text("Avg FPS: %.1f", avgFps);
+	ImGui::Text("Frame Time: %.1f ms", frameTimeMs);
+	ImGui::Text("Elapsed Time: %.1f s", timeElapsed);
+
+	ImGui::End();
+
+}
+
+void GameManager::CalculatePerformanceMetrics(float deltaTime)
+{
+	fps = 1.0f / deltaTime;
+
+	fpsSum += fps;
+	frameCount++;
+
+	if (frameCount == numFramesAvg)
+	{
+		avgFps = fpsSum / numFramesAvg;
+		fpsSum = 0.0f;
+		frameCount = 0;
+	}
+
+	frameTimeMs = deltaTime * 1000.0f;
+
+	timeElapsed += deltaTime;
 }
 
 void GameManager::RemoveDestroyedGameObjects()
@@ -1028,8 +1065,11 @@ void GameManager::update(float deltaTime)
 
 		}
 
-		return;
 	}
+
+	CalculatePerformanceMetrics(deltaTime);
+	return;
+
 }
 
 void GameManager::generateContacts()

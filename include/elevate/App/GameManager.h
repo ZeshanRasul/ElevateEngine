@@ -116,7 +116,9 @@ private:
     void ShowLightControlWindow(DirLight& light);
     void ShowAmmoWindow();
 	void ShowBuoyancyWindow();
-
+	void ShowSpawnObjectWindow();
+	void ShowPerformanceWindow();
+	void CalculatePerformanceMetrics(float deltaTime);
     void RemoveDestroyedGameObjects();
 
     Renderer* renderer;
@@ -266,6 +268,14 @@ private:
     float boxSize[3] = { 1.0f, 1.0f, 1.0f };
     float boxColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
+
+    float fps;
+    float avgFps;
+	float frameTimeMs;
+    float frameCount;
+	float timeElapsed;
+    float fpsSum;
+    int numFramesAvg = 100;
 
     std::vector<DebugLine> m_DebugLines;
     GLuint m_DebugLineVAO = 0;
