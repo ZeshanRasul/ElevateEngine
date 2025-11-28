@@ -238,6 +238,8 @@ public:
     Cube* stackCubes[MaxStackCubes];
     int                    numStackCubes = 0;
 
+    std::vector<std::vector<PhysicsObject*>> crateStacks;
+
 private:
     void ShowCameraControlWindow(Camera& cam);
     void ShowLightControlWindow(DirLight& light);
@@ -364,6 +366,14 @@ private:
     float sphereRadius = 1.0f;
     float sphereMass = 1.0f;
     float sphereColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+	int stackWidth = 3;
+	int stackHeight = 3;
+	int stackDepth = 3;
+	float stackBoxSize[3] = { 1.0f, 1.0f, 1.0f };
+	float stackCrateMass = 2.0f;
+	int stackIndex = 0;
+
 
     AeroControl left_wing;
     AeroControl right_wing;

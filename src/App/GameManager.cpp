@@ -781,6 +781,7 @@ void GameManager::ShowSpawnObjectWindow()
 		glm::vec3 camFront = glm::normalize(camera->Front);
 		glm::vec3 spawnPos = camPos + camFront * 10.0f;
 		ResetPlane();
+		showPlane = true;
 	}
 
 	ImGui::Checkbox("Aeroplane Physics Enabled", &showPlane);
@@ -859,6 +860,48 @@ void GameManager::ShowSpawnObjectWindow()
 		}
 
 		ragdolls.push_back(ragdoll);
+	}
+
+	ImGui::Text("Spawn Crate Stack");
+	ImGui::InputInt("Stack Width", &stackWidth);
+	ImGui::InputInt("Stack Height", &stackHeight);
+	ImGui::InputInt("Stack Depth", &stackDepth);
+	ImGui::InputFloat3("Crate Size", stackBoxSize);
+	ImGui::InputFloat("Crate Mass", &stackCrateMass);
+
+	if (ImGui::Button("Spawn Crate Stack"))
+	{
+	//	crateStacks.resize(stackIndex + 1);
+		crateStacks.reserve(stackIndex + 1);
+	//	crateStacks[stackIndex].resize(stackWidth * stackHeight * stackDepth);
+		crateStacks.push_back(std::vector<PhysicsObject*>());
+		crateStacks[stackIndex].reserve(stackWidth * stackHeight * stackDepth);
+		glm::vec3 camPos = camera->Position;
+		glm::vec3 camFront = glm::normalize(camera->Front);
+
+		glm::vec3 spawnPos = camPos + camFront * 6.0f;
+
+		spawnFactory->BuildCrateStack(
+			elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z),
+			stackWidth,
+			stackHeight,
+			stackDepth,
+			elevate::Vector3(stackBoxSize[0], stackBoxSize[1], stackBoxSize[2]),
+			stackCrateMass,
+			&ammoShader,
+			crateStacks[stackIndex++]
+		);
+
+		//crateStacks[stackIndex - 1].reserve(stackWidth * stackHeight * stackDepth);
+	//	crateStacks[stackIndex - 1].resize(stackWidth * stackHeight * stackDepth);
+		for (int i = 0; i < crateStacks[stackIndex - 1].size(); i++)
+		{
+			crateStacks[stackIndex - 1][i]->mesh->SetShader(&cubeShader);
+			crateStacks[stackIndex - 1][i]->mesh->setGameManager(this);
+			crateStacks[stackIndex - 1][i]->mesh->SetColor(glm::vec3(0.3f, 0.7f, 0.2f));
+			static_cast<Cube*>(crateStacks[stackIndex - 1][i]->mesh)->SetTexture(crateTexture);
+			gameObjects.push_back(crateStacks[stackIndex - 1][i]->mesh);
+		}
 	}
 
 	ImGui::End();
