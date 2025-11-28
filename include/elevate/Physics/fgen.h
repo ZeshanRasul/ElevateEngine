@@ -70,3 +70,22 @@ public:
 
 	virtual void updateForce(RigidBody* RigidBody, real duration);
 };
+
+class CarPropulsion : public RigidBodyForceGenerator {
+private:
+	Vector3 throttleForce;
+
+public:
+	CarPropulsion(const Vector3& throttleForce)
+		:throttleForce(throttleForce) {
+	};
+
+	virtual void updateForce(RigidBody* RigidBody, real duration)
+	{
+		RigidBody->addForce(throttleForce);
+	}
+
+	void setThrottle(const Vector3& throttleForce) {
+		this->throttleForce = throttleForce;
+	}
+};

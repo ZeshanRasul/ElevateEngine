@@ -75,10 +75,14 @@ struct CollisionBody
     elevate::CollisionPlane* plane = nullptr;
 };
 
-
 struct AircraftVisuals {
     elevate::Vector3 offset;
     Cube* mesh;
+};
+
+struct CarVisuals {
+	elevate::Vector3 offset;
+	GameObject* mesh;
 };
 
 class GameManager {
@@ -298,13 +302,25 @@ private:
     RigidBody aircraft;
     elevate::Vector3 windspeed;
 	std::vector<AircraftVisuals> aircraftParts;
-	bool showPlane = true;
+	bool showPlane = false;
 
     void ResetPlane();
 
     float left_wing_control;
     float right_wing_control;
     float rudder_control;
+
+	Cube* carBody;
+	Sphere* carWheelFL;
+	Sphere* carWheelFR;
+	Sphere* carWheelRL;
+	Sphere* carWheelRR;
+    RigidBody car;
+	CarPropulsion* carEngine;
+	std::vector<CarVisuals> carParts;
+	bool showCar = false;
+
+	float car_throttle = 0.0f;
 
     float friction = 0.6f;
 	float restitution = 0.2f;

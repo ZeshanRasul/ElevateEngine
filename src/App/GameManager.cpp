@@ -54,6 +54,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	spawnContext.World = new World(300, 100);
 	rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f * 0.5f, 0.0f));
+	carEngine = new CarPropulsion(elevate::Vector3(0.0f, 0.0f, 0.0f));
 	shapeFactory = new elevate::ShapeFactory();
 	spawnFactory = new elevate::SpawnFactory(spawnContext);
 
@@ -178,34 +179,77 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	part1.mesh->LoadMesh();
 	part1.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
 	aircraftParts.push_back(part1);
-	
+
 	AircraftVisuals part2{};
 	part2.offset = elevate::Vector3(1.0f, 0.15f, 0);
 	part2.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(2.75f, 0.5f, 0.5), &ammoShader, this);
 	part2.mesh->LoadMesh();
 	part2.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
 	aircraftParts.push_back(part2);
-	
+
 	AircraftVisuals part3{};
 	part3.offset = elevate::Vector3(0, 0.3f, 0);
 	part3.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.8f, 0.1f, 6.0f), &ammoShader, this);
 	part3.mesh->LoadMesh();
 	part3.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
 	aircraftParts.push_back(part3);
-	
+
 	AircraftVisuals part4{};
 	part4.offset = elevate::Vector3(2.0f, 0.775f, 0);
 	part4.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.75f, 1.15f, 0.1f), &ammoShader, this);
 	part4.mesh->LoadMesh();
 	part4.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
 	aircraftParts.push_back(part4);
-	
+
 	AircraftVisuals part5{};
 	part5.offset = elevate::Vector3(1.9f, 0, 0);
 	part5.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.85f, 0.1f, 2.0f), &ammoShader, this);
 	part5.mesh->LoadMesh();
 	part5.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
 	aircraftParts.push_back(part5);
+
+	CarVisuals carBody{};
+	carBody.offset = elevate::Vector3(0.0f, -2.5f, 0.0f);
+	carBody.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(5.0f, 2.0f, 3.2f), &ammoShader, this);
+	carBody.mesh->LoadMesh();
+	carBody.mesh->SetColor(glm::vec3(0.2f, 0.2f, 0.8f));
+	carParts.push_back(carBody);
+	CarVisuals wheelFL{};
+	wheelFL.offset = elevate::Vector3(-1.25f, -1.1f, 1.5f);
+	wheelFL.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &ammoShader, this,
+		glm::vec3(0.1f, 0.1f, 0.1f));
+	static_cast<Sphere*>(wheelFL.mesh)->GenerateSphere(0.5f, 16, 16);
+	wheelFL.mesh->LoadMesh();
+	carParts.push_back(wheelFL);
+	CarVisuals wheelFR{};
+	wheelFR.offset = elevate::Vector3(1.25f, -1.1f, 1.5f);
+	wheelFR.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &ammoShader, this,
+		glm::vec3(0.1f, 0.1f, 0.1f));
+	static_cast<Sphere*>(wheelFR.mesh)->GenerateSphere(0.5f, 16, 16);
+	wheelFR.mesh->LoadMesh();
+	carParts.push_back(wheelFR);
+	CarVisuals wheelRL{};
+	wheelRL.offset = elevate::Vector3(-1.25f, -1.1f, -1.5f);
+	wheelRL.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &ammoShader, this,
+		glm::vec3(0.1f, 0.1f, 0.1f));
+	static_cast<Sphere*>(wheelRL.mesh)->GenerateSphere(0.5f, 16, 16);
+	wheelRL.mesh->LoadMesh();
+	carParts.push_back(wheelRL);
+	CarVisuals wheelRR{};
+	wheelRR.offset = elevate::Vector3(1.25f, -1.1f, -1.5f);
+	wheelRR.mesh = new Sphere(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 2.0f, 1.0f), &ammoShader, this,
+		glm::vec3(0.1f, 0.1f, 0.1f));
+	static_cast<Sphere*>(wheelRR.mesh)->GenerateSphere(0.5f, 16, 16);
+	wheelRR.mesh->LoadMesh();
+	carParts.push_back(wheelRR);
+
+	elevate::Vector3 carPropulsion(car_throttle * 50.0f, 0, 0);
+	//car.addForce(carPropulsion);
+	carEngine->setThrottle(carPropulsion);
+
+	spawnContext.World->getForceRegistry().add(&car, carEngine);
+
+
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
@@ -622,14 +666,30 @@ void GameManager::OnEPressed()
 
 void GameManager::OnWPressed()
 {
-	left_wing_control += 0.1f;
-	right_wing_control += 0.1f;
+	if (showPlane)
+	{
+		left_wing_control += 0.1f;
+		right_wing_control += 0.1f;
+	}
+
+	if (showCar)
+	{
+		car_throttle += 0.1f * 50;
+	}
 }
 
 void GameManager::OnSPressed()
 {
-	left_wing_control -= 0.1f;
-	right_wing_control -= 0.1f;
+	if (showPlane)
+	{
+		left_wing_control -= 0.1f;
+		right_wing_control -= 0.1f;
+	}
+
+	if (showCar)
+	{
+		car_throttle -= 0.1f * 50;
+	}
 }
 
 void GameManager::OnDPressed()
@@ -768,6 +828,7 @@ void GameManager::ShowSpawnObjectWindow()
 	}
 
 	ImGui::Checkbox("Aeroplane Physics Enabled", &showPlane);
+	ImGui::Checkbox("Car Physics Enabled", &showCar);
 
 	ImGui::Text("Spawn Box");
 	ImGui::InputFloat("Box Mass", &boxMass);
@@ -1012,14 +1073,14 @@ void GameManager::update(float deltaTime)
 	if (pos.y < 0.0f)
 	{
 		pos.y = 0.0f;
-	//	aircraft.setPosition(pos);
+		//	aircraft.setPosition(pos);
 
 		if (aircraft.getVelocity().y < -10.0f)
 		{
 			ResetPlane();
 		}
 	}
-	
+
 	aircraft.getTransform();
 	for (AircraftVisuals& part : aircraftParts)
 	{
@@ -1036,6 +1097,30 @@ void GameManager::update(float deltaTime)
 	{
 		camera->Position = glm::vec3(aircraft.getPosition().x + 15.0f, aircraft.getPosition().y + 5.0f, aircraft.getPosition().z);
 		camera->Front = glm::normalize(glm::vec3(aircraft.getPosition().x, aircraft.getPosition().y, aircraft.getPosition().z) - camera->Position);
+		view = camera->GetViewMatrix();
+	}
+
+	//	car.setPosition(elevate::Vector3(20.0f, 2.0f, -90.0f));
+	car.clearAccumulator();
+	car.addForce(elevate::Vector3(car_throttle, 0, 0));
+	car.calculateDerivedData();
+	rbRegistry.updateForces(deltaTime);
+	car.integrate(deltaTime);
+	car.getTransform();
+	for (CarVisuals part : carParts)
+	{
+		elevate::Vector3 worldPos = car.getPointInWorldSpace(part.offset);
+		part.mesh->SetPosition(worldPos);
+		part.mesh->SetOrientation(glm::quat(
+			(float)car.getOrientation().r,
+			(float)car.getOrientation().i,
+			(float)car.getOrientation().j,
+			(float)car.getOrientation().k));
+	}
+	if (showCar)
+	{
+		camera->Position = glm::vec3(car.getPosition().x + 15.0f, car.getPosition().y + 5.0f, car.getPosition().z);
+		camera->Front = glm::normalize(glm::vec3(car.getPosition().x, car.getPosition().y, car.getPosition().z) - camera->Position);
 		view = camera->GetViewMatrix();
 	}
 
@@ -1719,7 +1804,13 @@ void GameManager::render()
 			renderer->draw(part.mesh, view, projection);
 		}
 	}
-
+	if (showCar)
+	{
+		for (CarVisuals part : carParts)
+		{
+			renderer->draw(part.mesh, view, projection);
+		}
+	}
 	drawDebugLines();
 
 }
