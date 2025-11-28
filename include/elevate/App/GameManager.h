@@ -122,9 +122,9 @@ public:
         delete camera;
         for (auto it = gameObjects.begin(); it != gameObjects.end(); ) {
             if (*it) {
-                delete* it;            
+                delete* it;
             }
-            it = gameObjects.erase(it); 
+            it = gameObjects.erase(it);
         }
         delete inputManager;
     }
@@ -150,7 +150,7 @@ public:
 
     void reset();
     void ResetState();
-	void togglePause() { isPaused = !isPaused; }
+    void togglePause() { isPaused = !isPaused; }
 
     void OnQPressed();
     void OnEPressed();
@@ -162,23 +162,23 @@ public:
     void OnLeftClick();
 
     void AddToGameObjects(GameObject* obj) {
-       gameObjects.push_back(obj);
-	}
+        gameObjects.push_back(obj);
+    }
 
     std::vector<GameObject*>& GetGameObjects() {
         return gameObjects;
-	}
+    }
 
     PhysicsObject* wall;
     PhysicsObject* wall2;
     PhysicsObject* wall3;
     PhysicsObject* wall4;
     PhysicsObject* floor;
-    
+
     SpawnContext spawnContext;
     ShapeFactory* shapeFactory;
     SpawnFactory* spawnFactory;
-    
+
     Shader ammoShader;
     Shader cubeShader;
     Shader lineShader;
@@ -204,8 +204,8 @@ public:
     float car_throttle = 0.0f;
     bool fpsSandboxDemo = false;
 
-	SceneType currentScene = SceneType::DemoShowcase;
-	int selectedIndex = 7;
+    SceneType currentScene = SceneType::DemoShowcase;
+    int selectedIndex = 7;
 
 
     bool hit;
@@ -244,22 +244,22 @@ private:
     void ShowCameraControlWindow(Camera& cam);
     void ShowLightControlWindow(DirLight& light);
     void ShowAmmoWindow();
-	void ShowBuoyancyWindow();
-	void ShowSpawnObjectWindow();
-	void ShowEngineWindow();
-	void ShowPerformanceWindow();
-	void CalculatePerformanceMetrics(float deltaTime);
+    void ShowBuoyancyWindow();
+    void ShowSpawnObjectWindow();
+    void ShowEngineWindow();
+    void ShowPerformanceWindow();
+    void CalculatePerformanceMetrics(float deltaTime);
     void RemoveDestroyedGameObjects();
 
-	std::vector<SceneType> sceneTypes = {  
-		SceneType::Empty,
-		SceneType::Car,
-		SceneType::Aeroplane,
-		SceneType::Ragdoll,
-		SceneType::FractureWall,
-		SceneType::DominoChain,
-		SceneType::DemoShowcase
-	};
+    std::vector<SceneType> sceneTypes = {
+        SceneType::Empty,
+        SceneType::Car,
+        SceneType::Aeroplane,
+        SceneType::Ragdoll,
+        SceneType::FractureWall,
+        SceneType::DominoChain,
+        SceneType::DemoShowcase
+    };
 
     Renderer* renderer;
     Window* window;
@@ -295,14 +295,14 @@ private:
     glm::mat4 projection = glm::mat4(1.0f);
     const static unsigned ammoRounds = 16;
 
-	FloatingSphere* Sphere0;
-	FloatingSphere* Sphere1;
-	FloatingSphere* Sphere2;
+    FloatingSphere* Sphere0;
+    FloatingSphere* Sphere1;
+    FloatingSphere* Sphere2;
     std::vector<FloatingSphere*> spheres;
-	elevate::ParticleForceRegistry registry;
-	elevate::ParticleAnchoredSpring* springFG;
-	elevate::ParticleSpring* bungeeFG;
-	elevate::ParticleSpring* bungeeFG1;
+    elevate::ParticleForceRegistry registry;
+    elevate::ParticleAnchoredSpring* springFG;
+    elevate::ParticleSpring* bungeeFG;
+    elevate::ParticleSpring* bungeeFG1;
     elevate::ParticleGravity* gravityFG;
     elevate::ParticleGravity* pushForce;
     bool isHidden = false;
@@ -314,41 +314,41 @@ private:
     glm::vec3 anchorPos = glm::vec3(0.0f);
     std::vector<Line*> lines;
 
-	float floatingSphereMass = 2.0f;
-	float waterHeight = 10.0f;
-	float maxDepth = 5.0f;
-	float floatingSphereVolume = 0.1f;
-	float waterDensity = 1000.0f;
+    float floatingSphereMass = 2.0f;
+    float waterHeight = 10.0f;
+    float maxDepth = 5.0f;
+    float floatingSphereVolume = 0.1f;
+    float waterDensity = 1000.0f;
     bool showBuoyanceDemo = false;
 
     bool isPaused = false;
-	bool singleStep = false;
+    bool singleStep = false;
     bool enableGravity = true;
 
-	bool cubeDemo = false;
-	elevate::RigidBody* testBody = nullptr;
-	elevate::RigidBody* testBody2 = nullptr;
+    bool cubeDemo = false;
+    elevate::RigidBody* testBody = nullptr;
+    elevate::RigidBody* testBody2 = nullptr;
     World* rbWorld;
-	ForceRegistry rbRegistry;
-	Gravity* rbGravity;
-    float gravity[3]  = { 0.0f, -9.81f, 0.0f };
+    ForceRegistry rbRegistry;
+    Gravity* rbGravity;
+    float gravity[3] = { 0.0f, -9.81f, 0.0f };
 
-	bool sphereDemo = false;
-	Sphere* sphere = nullptr;
-	Sphere* sphere2 = nullptr;
-	elevate::RigidBody* sphereBody = nullptr;
-	elevate::RigidBody* sphereBody2 = nullptr;
+    bool sphereDemo = false;
+    Sphere* sphere = nullptr;
+    Sphere* sphere2 = nullptr;
+    elevate::RigidBody* sphereBody = nullptr;
+    elevate::RigidBody* sphereBody2 = nullptr;
 
     elevate::RigidBody* planeBody = nullptr;
 
     elevate::Contact* contacts;
     elevate::CollisionData cData;
     elevate::ContactResolver resolver;
-	elevate::CollisionSphere* cSpheres[2];
-	elevate::CollisionSphere* cSphere0;
-	elevate::CollisionSphere* cSphere1;
-	elevate::CollisionBox* cBox0;
-	elevate::CollisionBox* cBox1;
+    elevate::CollisionSphere* cSpheres[2];
+    elevate::CollisionSphere* cSphere0;
+    elevate::CollisionSphere* cSphere1;
+    elevate::CollisionBox* cBox0;
+    elevate::CollisionBox* cBox1;
     elevate::CollisionPlane* cPlane;
 
     void generateContacts();
@@ -367,13 +367,20 @@ private:
     float sphereMass = 1.0f;
     float sphereColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	int stackWidth = 3;
-	int stackHeight = 3;
-	int stackDepth = 3;
-	float stackBoxSize[3] = { 1.0f, 1.0f, 1.0f };
-	float stackCrateMass = 2.0f;
-	int stackIndex = 0;
+    int stackWidth = 3;
+    int stackHeight = 3;
+    int stackDepth = 3;
+    float stackBoxSize[3] = { 1.0f, 1.0f, 1.0f };
+    float stackCrateMass = 2.0f;
+    int stackIndex = 0;
 
+    int wallWidth = 5;
+    int wallHeight = 5;
+    int wallIndex = 0;
+    float brickSizeInput[3] = {1.0f, 1.0f, 1.0f};
+	bool isStaggered = true;
+	float brickMass = 2.0f;
+	std::vector<std::vector<PhysicsObject*>> runtimeWalls;
 
     AeroControl left_wing;
     AeroControl right_wing;

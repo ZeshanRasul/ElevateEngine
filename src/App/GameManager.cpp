@@ -396,6 +396,40 @@ void GameManager::ResetState()
 		delete runTimeBoxes[i];
 	}
 
+	for (int i = 0; i < crateStacks.size(); i++)
+	{
+		for (int j = 0; j < crateStacks[i].size(); j++)
+		{
+			gameObjects.erase(
+				std::remove(
+					gameObjects.begin(),
+					gameObjects.end(),
+					crateStacks[i][j]->mesh),
+				gameObjects.end()
+			);
+			delete crateStacks[i][j]->mesh;
+			delete crateStacks[i][j];
+		}
+	}
+
+	for (int i = 0; i < runtimeWalls.size(); i++)
+	{
+		for (int j = 0; j < runtimeWalls[i].size(); j++)
+		{
+			gameObjects.erase(
+				std::remove(
+					gameObjects.begin(),
+					gameObjects.end(),
+					runtimeWalls[i][j]->mesh),
+				gameObjects.end()
+			);
+			delete runtimeWalls[i][j]->mesh;
+			delete runtimeWalls[i][j];
+		}
+	}
+
+
+
 	for (int i = 0; i < runTimeSpheres.size(); i++)
 	{
 		gameObjects.erase(
@@ -871,9 +905,9 @@ void GameManager::ShowSpawnObjectWindow()
 
 	if (ImGui::Button("Spawn Crate Stack"))
 	{
-	//	crateStacks.resize(stackIndex + 1);
 		crateStacks.reserve(stackIndex + 1);
-	//	crateStacks[stackIndex].resize(stackWidth * stackHeight * stackDepth);
+
+
 		crateStacks.push_back(std::vector<PhysicsObject*>());
 		crateStacks[stackIndex].reserve(stackWidth * stackHeight * stackDepth);
 		glm::vec3 camPos = camera->Position;
@@ -892,8 +926,6 @@ void GameManager::ShowSpawnObjectWindow()
 			crateStacks[stackIndex++]
 		);
 
-		//crateStacks[stackIndex - 1].reserve(stackWidth * stackHeight * stackDepth);
-	//	crateStacks[stackIndex - 1].resize(stackWidth * stackHeight * stackDepth);
 		for (int i = 0; i < crateStacks[stackIndex - 1].size(); i++)
 		{
 			crateStacks[stackIndex - 1][i]->mesh->SetShader(&cubeShader);
@@ -901,6 +933,47 @@ void GameManager::ShowSpawnObjectWindow()
 			crateStacks[stackIndex - 1][i]->mesh->SetColor(glm::vec3(0.3f, 0.7f, 0.2f));
 			static_cast<Cube*>(crateStacks[stackIndex - 1][i]->mesh)->SetTexture(crateTexture);
 			gameObjects.push_back(crateStacks[stackIndex - 1][i]->mesh);
+		}
+	}
+
+	ImGui::Text("Spawn Brick Wall");
+	ImGui::InputInt("Wall Width", &wallWidth);
+	ImGui::InputInt("Wall Height", &wallHeight);
+	ImGui::InputFloat3("Brick Size", brickSizeInput);
+	ImGui::Checkbox("Is Staggered?", &isStaggered);
+	ImGui::InputFloat("Brick Mass", &brickMass);
+
+	const elevate::Vector3 brickSize = elevate::Vector3(brickSizeInput[0], brickSizeInput[1], brickSizeInput[2]);
+
+	if (ImGui::Button("Spawn Brick Wall"))
+	{
+		runtimeWalls.reserve(wallIndex + 1);
+
+		runtimeWalls.push_back(std::vector<PhysicsObject*>());
+		runtimeWalls[wallIndex].reserve(wallWidth * wallHeight);
+		glm::vec3 camPos = camera->Position;
+		glm::vec3 camFront = glm::normalize(camera->Front);
+
+		glm::vec3 spawnPos = camPos + camFront * 6.0f;
+
+		spawnFactory->BuildBrickWall(
+			elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z),
+			wallWidth,
+			wallHeight,
+			brickSize,
+			brickMass,
+			isStaggered,
+			runtimeWalls[wallIndex++],
+			&cubeShader
+		);
+
+		for (int i = 0; i < runtimeWalls[wallIndex - 1].size(); i++)
+		{
+			runtimeWalls[wallIndex - 1][i]->mesh->SetShader(&cubeShader);
+			runtimeWalls[wallIndex - 1][i]->mesh->setGameManager(this);
+			runtimeWalls[wallIndex - 1][i]->mesh->SetColor(glm::vec3(0.3f, 0.7f, 0.2f));
+			static_cast<Cube*>(runtimeWalls[wallIndex - 1][i]->mesh)->SetTexture(brickTexture);
+			gameObjects.push_back(runtimeWalls[wallIndex - 1][i]->mesh);
 		}
 	}
 
