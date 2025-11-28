@@ -72,6 +72,76 @@ void GameManager::setSceneData()
 
 void GameManager::reset()
 {
+	if (currentScene == SceneType::Aeroplane)
+	{
+		ResetPlane();
+		return;
+	}
+	else if (currentScene == SceneType::Car)
+	{
+		car_throttle = 0.0f;
+		car.setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		car.setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		car.setPosition(elevate::Vector3(0.0f, 2.0f, 0.0f));
+		return;
+	}
+
+	ResetState();
+
+	floor = spawnFactory->CreateFloor(
+		elevate::Vector3(200.0f, 1.0f, 200.0f),
+		&cubeShader,
+		elevate::Vector3(0.0f, -1.0f, 0.0f)
+	);
+	floor->mesh->setGameManager(this);
+	floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
+	static_cast<Cube*>(floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_4k_albedo.png");
+	gameObjects.push_back(floor->mesh);
+
+	wall = spawnFactory->CreateWall(
+		elevate::Vector3(1.0f, 60.0f, 200.0f),
+		elevate::Vector3(200.0f, 60.0f, 0.0f),
+		&cubeShader
+	);
+	wall->mesh->setGameManager(this);
+	wall->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
+	wall->mesh->SetTexTiling(4.0f);
+	static_cast<Cube*>(wall->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
+	gameObjects.push_back(wall->mesh);
+
+	wall2 = spawnFactory->CreateWall(
+		elevate::Vector3(1.0f, 60.0f, 200.0f),
+		elevate::Vector3(-200.0f, 60.0f, 0.0f),
+		&cubeShader
+	);
+	wall2->mesh->setGameManager(this);
+	wall2->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
+	wall2->mesh->SetTexTiling(4.0f);
+	static_cast<Cube*>(wall2->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
+	gameObjects.push_back(wall2->mesh);
+
+	wall3 = spawnFactory->CreateWall(
+		elevate::Vector3(200.0f, 60.0f, 1.0f),
+		elevate::Vector3(0.0f, 60.0f, 200.0f),
+		&cubeShader
+	);
+	wall3->mesh->setGameManager(this);
+	wall3->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
+	wall3->mesh->SetTexTiling(4.0f);
+	static_cast<Cube*>(wall3->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
+	gameObjects.push_back(wall3->mesh);
+
+	wall4 = spawnFactory->CreateWall(
+		elevate::Vector3(200.0f, 60.0f, 1.0f),
+		elevate::Vector3(0.0f, 60.0f, -200.0f),
+		&cubeShader
+	);
+	wall4->mesh->setGameManager(this);
+	wall4->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
+	wall4->mesh->SetTexTiling(4.0f);
+	static_cast<Cube*>(wall4->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
+	gameObjects.push_back(wall4->mesh);
+
 	spawnFactory->BuildDominoLine(
 		elevate::Vector3(75.0f, 3.5f, -150.0f),
 		elevate::Vector3(0.0f, 0.0f, 1.0f),
@@ -307,11 +377,11 @@ void GameManager::ResetState()
 
 	cData.contactCount = 0;
 
+	//ResetPlane();
 	showPlane = false;
 	showCar = false;
 	fpsSandboxDemo = false;
 
-	ResetPlane();
 
 	for (int i = 0; i < runTimeBoxes.size(); i++)
 	{
@@ -505,8 +575,31 @@ void GameManager::ResetState()
 			gameObjects.end()
 		);
 	}
-}
 
+	switch (currentScene)
+	{
+	case SceneType::DemoShowcase:
+	{
+		//reset();
+		fpsSandboxDemo = true;
+		break;
+	}
+	case SceneType::Aeroplane:
+	{
+		ResetPlane();
+		showPlane = true;
+		break;
+	}
+	case SceneType::Car:
+	{
+		car_throttle = 0.0f;
+		showCar = true;
+		break;
+	}
+	default:
+		break;
+	};
+}
 void GameManager::OnQPressed()
 {
 	rudder_control += 0.1f;
@@ -806,10 +899,6 @@ void GameManager::ShowEngineWindow()
 	{
 		reset();
 
-		if (showPlane)
-		{
-			ResetPlane();
-		}
 	}
 
 	if (ImGui::Button("Step"))
@@ -954,12 +1043,12 @@ void GameManager::update(float deltaTime)
 	right_wing.setControl(glm::clamp(right_wing_control, -1.0f, 1.0f));
 	rudder.setControl(glm::clamp(rudder_control, -1.0f, 1.0f));
 
-//	aircraft.addForce(elevate::Vector3(gravity[0], gravity[1], gravity[2]));
-//	aircraft.calculateDerivedData();
-	// Add the forces acting on the aircraft.
+	//	aircraft.addForce(elevate::Vector3(gravity[0], gravity[1], gravity[2]));
+	//	aircraft.calculateDerivedData();
+		// Add the forces acting on the aircraft.
 	rbRegistry.updateForces(deltaTime);
-//	rbGravity->updateForce(&aircraft, deltaTime);
-	// Update the aircraft's physics.
+	//	rbGravity->updateForce(&aircraft, deltaTime);
+		// Update the aircraft's physics.
 	aircraft.integrate(deltaTime);
 
 	aircraft.getTransform();
@@ -1671,7 +1760,7 @@ void GameManager::ResetPlane()
 	part5.mesh->LoadMesh();
 	part5.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
 	aircraftParts.push_back(part5);
-	
+
 	aircraft.setPosition(elevate::Vector3(0, 0, 0));
 	aircraft.setOrientation(elevate::Quaternion(1, 0, 0, 0));
 

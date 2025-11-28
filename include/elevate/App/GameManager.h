@@ -206,6 +206,38 @@ public:
 
 	SceneType currentScene = SceneType::DemoShowcase;
 	int selectedIndex = 7;
+
+
+    bool hit;
+    bool firstHit = true;
+    bool ball_active;
+    unsigned fracture_contact;
+    Block blocks[9];
+    Cube* cubes[9];
+    Texture blockTexture;
+    Texture brickTexture;
+    Texture crateTexture;
+
+    PhysicsObject* crate;
+    PhysicsObject* ball;
+    std::vector<PhysicsObject*> crates;
+    std::vector<PhysicsObject*> bricks;
+    std::vector<PhysicsObject*> dominoes;
+
+    std::vector<Ragdoll*> ragdolls;
+
+    static const int MaxEnvBoxes = 8;
+    int               numEnvBoxes = 8;
+    elevate::CollisionBox* envBoxes[MaxEnvBoxes];
+    elevate::RigidBody* envBodies[MaxEnvBoxes];
+    Cube* envCubes[MaxEnvBoxes];
+    static const int MaxStackCubes = 5;
+
+    elevate::CollisionBox* cStackBoxes[MaxStackCubes];
+    elevate::RigidBody* stackBodies[MaxStackCubes];
+    Cube* stackCubes[MaxStackCubes];
+    int                    numStackCubes = 0;
+
 private:
     void ShowCameraControlWindow(Camera& cam);
     void ShowLightControlWindow(DirLight& light);
@@ -319,41 +351,9 @@ private:
 
     void generateContacts();
 
-    static const int MaxEnvBoxes = 8;
-    int               numEnvBoxes = 8;
+
 
     Random random;
-
-    elevate::CollisionBox* envBoxes[MaxEnvBoxes];
-    elevate::RigidBody* envBodies[MaxEnvBoxes];
-    Cube* envCubes[MaxEnvBoxes];
-
-
-
-    static const int MaxStackCubes = 5;
-
-    elevate::CollisionBox* cStackBoxes[MaxStackCubes];
-    elevate::RigidBody* stackBodies[MaxStackCubes];
-    Cube* stackCubes[MaxStackCubes];
-    int                    numStackCubes = 0;
-
-    bool hit;
-    bool firstHit = true;
-    bool ball_active;
-    unsigned fracture_contact;
-    Block blocks[9];
-    Cube* cubes[9];
-	Texture blockTexture;
-    Texture brickTexture;
-    Texture crateTexture;
-
-    PhysicsObject* crate;
-    PhysicsObject* ball;
-    std::vector<PhysicsObject*> crates;
-    std::vector<PhysicsObject*> bricks;
-    std::vector<PhysicsObject*> dominoes;
-
-    std::vector<Ragdoll*> ragdolls;
 
     std::vector<PhysicsObject*> runTimeBoxes;
     float boxMass = 1.0f;

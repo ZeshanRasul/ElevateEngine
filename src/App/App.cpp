@@ -2,7 +2,7 @@
 #include "Tools/Logger.h"
 
 GameManager* SceneManager::s_gameManager = nullptr;
-SceneType SceneManager::s_currentScene = SceneType::Aeroplane;
+SceneType SceneManager::s_currentScene = SceneType::DemoShowcase;
 
 App::App(unsigned int screenWidth, unsigned int screenHeight)
     : width(screenWidth), height(screenHeight)
@@ -37,6 +37,7 @@ void App::run()
 
         if(SceneManager::s_currentScene != mGameManager->currentScene)
         {
+            mGameManager->ResetState();
             SceneManager::LoadScene(mGameManager->currentScene);
             SceneManager::s_currentScene = mGameManager->currentScene;
 		}
