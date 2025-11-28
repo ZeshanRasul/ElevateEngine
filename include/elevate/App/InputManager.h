@@ -28,7 +28,7 @@ public:
     void handleMouseScroll(double xOffset, double yOffset);
     void processInput(GLFWwindow* window, float deltaTime);
 
-
+	bool isCameraControlled() { return controlCamera; }
     void setContext(Camera* cam, class GameManager* gameMgr, unsigned int width, unsigned int height);
 
 private:

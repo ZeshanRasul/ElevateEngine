@@ -68,7 +68,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	);
 	floor->mesh->setGameManager(this);
 	floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
-	static_cast<Cube*>(floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_4k_albedo.png");
+	static_cast<Cube*>(floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_512_albedo.png");
 	gameObjects.push_back(floor->mesh);
 
 	wall = spawnFactory->CreateWall(
@@ -629,7 +629,7 @@ void GameManager::ShowLightControlWindow(DirLight& light)
 
 void GameManager::fireRound(AmmoType type)
 {
-	if (ImGui::GetIO().WantCaptureMouse)
+	if (!inputManager->isCameraControlled() && ImGui::GetIO().WantCaptureMouse)
 	{
 		return;
 	}
@@ -667,7 +667,7 @@ void GameManager::fireRound(AmmoType type)
 	real speed = 50.0f;
 	switch (type)
 	{
-	case AmmoType::Pistol: speed = 70.0f; break;
+	case AmmoType::Pistol: speed = 50.0f; break;
 	case AmmoType::Rifle:  speed = 88.0f; break;
 	case AmmoType::Rocket: speed = 22.0f; break;
 	}
