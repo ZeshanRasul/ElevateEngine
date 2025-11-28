@@ -61,6 +61,10 @@ void Scenes::LoadCarTest(GameManager* gm)
 {
 	std::vector<GameObject*>& gameObjects = gm->GetGameObjects();
 
+
+	gm->ResetState();
+	gm->showCar = true;
+
 	gameObjects.clear();
 	gameObjects.reserve(300);
 	//	gameObjects.resize(300);
@@ -119,7 +123,27 @@ void Scenes::LoadCarTest(GameManager* gm)
 
 void Scenes::LoadAeroplaneTest(GameManager* gm)
 {
-	// Set up aeroplane scene
+	std::vector<GameObject*>& gameObjects = gm->GetGameObjects();
+
+
+	gm->ResetState();
+	gm->showPlane = true;
+
+	gameObjects.clear();
+	gameObjects.reserve(300);
+	//	gameObjects.resize(300);
+
+	gm->floor = gm->spawnFactory->CreateFloor(
+		elevate::Vector3(500.0f, 1.0f, 500.0f),
+		&gm->cubeShader,
+		elevate::Vector3(0.0f, -1.0f, 0.0f)
+	);
+	gm->floor->mesh->setGameManager(gm);
+	gm->floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
+	static_cast<Cube*>(gm->floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_512_albedo.png");
+	gameObjects.push_back(gm->floor->mesh);
+
+	gm->ResetPlane();
 }
 
 void Scenes::LoadRagdollTest(GameManager* gm)
@@ -141,6 +165,10 @@ void Scenes::LoadDemoShowcase(GameManager* gm)
 {
 	std::vector<GameObject*>& gameObjects = gm->GetGameObjects();
 
+
+	gm->ResetState();
+
+	gm->fpsSandboxDemo = true;
 	gameObjects.clear();
 	gameObjects.reserve(300);
 	//	gameObjects.resize(300);

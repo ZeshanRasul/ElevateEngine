@@ -23,6 +23,19 @@
 #include "Physics/block.h"
 #include "Physics/Aero.h"
 
+enum class SceneType
+{
+    None,
+    Empty,
+    Car,
+    Aeroplane,
+    Ragdoll,
+    FractureWall,
+    DominoChain,
+    DemoShowcase,
+    Count
+};
+
 struct DebugLine
 {
     glm::vec3 p0;
@@ -166,9 +179,15 @@ public:
     RigidBody car;
     CarPropulsion* carEngine;
     std::vector<CarVisuals> carParts;
-    bool showCar = true;
+    bool showCar = false;
+
+    bool showPlane = false;
+    void ResetPlane();
 
     float car_throttle = 0.0f;
+    bool fpsSandboxDemo = false;
+
+	SceneType currentScene = SceneType::DemoShowcase;
 
 private:
     void ShowCameraControlWindow(Camera& cam);
@@ -273,8 +292,6 @@ private:
 
     void generateContacts();
 
-    bool fpsSandboxDemo = false; 
-
     static const int MaxEnvBoxes = 8;
     int               numEnvBoxes = 8;
 
@@ -328,9 +345,6 @@ private:
     RigidBody aircraft;
     elevate::Vector3 windspeed;
 	std::vector<AircraftVisuals> aircraftParts;
-	bool showPlane = false;
-
-    void ResetPlane();
 
     float left_wing_control;
     float right_wing_control;

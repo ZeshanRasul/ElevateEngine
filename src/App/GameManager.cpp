@@ -57,52 +57,6 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	carEngine = new CarPropulsion(elevate::Vector3(0.0f, 0.0f, 0.0f));
 	shapeFactory = new elevate::ShapeFactory();
 	spawnFactory = new elevate::SpawnFactory(spawnContext);
-
-
-
-
-	//	ResetPlane();
-
-	//AircraftVisuals part1{};
-	//part1.offset = elevate::Vector3(-0.5f, 0.0f, 0.0f);
-	//part1.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 0.8f, 1.0f), &ammoShader, this);
-	//part1.mesh->LoadMesh();
-	//part1.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
-	//aircraftParts.push_back(part1);
-
-	//AircraftVisuals part2{};
-	//part2.offset = elevate::Vector3(1.0f, 0.15f, 0);
-	//part2.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(2.75f, 0.5f, 0.5), &ammoShader, this);
-	//part2.mesh->LoadMesh();
-	//part2.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
-	//aircraftParts.push_back(part2);
-
-	//AircraftVisuals part3{};
-	//part3.offset = elevate::Vector3(0, 0.3f, 0);
-	//part3.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.8f, 0.1f, 6.0f), &ammoShader, this);
-	//part3.mesh->LoadMesh();
-	//part3.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
-	//aircraftParts.push_back(part3);
-
-	//AircraftVisuals part4{};
-	//part4.offset = elevate::Vector3(2.0f, 0.775f, 0);
-	//part4.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.75f, 1.15f, 0.1f), &ammoShader, this);
-	//part4.mesh->LoadMesh();
-	//part4.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
-	//aircraftParts.push_back(part4);
-
-	//AircraftVisuals part5{};
-	//part5.offset = elevate::Vector3(1.9f, 0, 0);
-	//part5.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.85f, 0.1f, 2.0f), &ammoShader, this);
-	//part5.mesh->LoadMesh();
-	//part5.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
-	//aircraftParts.push_back(part5);
-
-
-
-
-
-
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
@@ -118,53 +72,6 @@ void GameManager::setSceneData()
 
 void GameManager::reset()
 {
-	ResetPlane();
-
-	for (int i = 0; i < runTimeBoxes.size(); i++)
-	{
-		gameObjects.erase(
-			std::remove(
-				gameObjects.begin(),
-				gameObjects.end(),
-				runTimeBoxes[i]->mesh),
-			gameObjects.end()
-		);
-		delete runTimeBoxes[i]->mesh;
-		delete runTimeBoxes[i];
-	}
-
-	for (int i = 0; i < runTimeSpheres.size(); i++)
-	{
-		gameObjects.erase(
-			std::remove(
-				gameObjects.begin(),
-				gameObjects.end(),
-				runTimeSpheres[i]->mesh),
-			gameObjects.end()
-		);
-		delete runTimeSpheres[i]->mesh;
-		delete runTimeSpheres[i];
-	}
-
-	for (PhysicsObject* domino : dominoes)
-	{
-		gameObjects.erase(
-			std::remove(
-				gameObjects.begin(),
-				gameObjects.end(),
-				domino->mesh),
-			gameObjects.end()
-		);
-	}
-
-	for (PhysicsObject* domino : dominoes)
-	{
-		delete domino->mesh;
-		delete domino;
-	}
-
-	dominoes.clear();
-
 	spawnFactory->BuildDominoLine(
 		elevate::Vector3(75.0f, 3.5f, -150.0f),
 		elevate::Vector3(0.0f, 0.0f, 1.0f),
@@ -195,32 +102,7 @@ void GameManager::reset()
 		gameObjects.push_back(domino->mesh);
 	}
 
-	for (Ragdoll* ragdoll : ragdolls)
-	{
-		for (Bone& bone : ragdoll->bones)
-		{
-			if (bone.visual)
-			{
-				gameObjects.erase(
-					std::remove(
-						gameObjects.begin(),
-						gameObjects.end(),
-						bone.visual),
-					gameObjects.end()
-				);
-			}
 
-			delete bone.visual;
-			bone.visual = nullptr;
-
-		}
-	}
-
-	for (Ragdoll* ragdoll : ragdolls)
-	{
-		delete ragdoll;
-	}
-	ragdolls.clear();
 
 	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(0.0f, 4.0f, 0.0f)));
 	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(10.0f, 4.0f, 0.0f)));
@@ -237,22 +119,6 @@ void GameManager::reset()
 			bone.visual = c;
 			gameObjects.push_back(c);
 		}
-	}
-
-	// Only the first block exists
-	for (Block* block = blocks; block < blocks + 9; block++)
-	{
-		if (!block->exists)
-			continue;
-		block->exists = false;
-
-		gameObjects.erase(
-			std::remove(
-				gameObjects.begin(),
-				gameObjects.end(),
-				block->visual),
-			gameObjects.end()
-		);
 	}
 
 	firstHit = true;
@@ -307,34 +173,7 @@ void GameManager::reset()
 
 			// Reset the contacts
 
-	for (PhysicsObject* crate : crates)
-	{
-		gameObjects.erase(
-			std::remove(
-				gameObjects.begin(),
-				gameObjects.end(),
-				crate->mesh),
-			gameObjects.end()
-		);
 
-		//delete crate;
-	}
-
-
-	for (PhysicsObject* crate : crates)
-	{
-		crates.erase(
-			std::remove(
-				crates.begin(),
-				crates.end(),
-				crate),
-			crates.end()
-		);
-
-		//delete crate;
-	}
-
-	crates.clear();
 
 
 	spawnFactory->BuildCrateStack(
@@ -365,13 +204,7 @@ void GameManager::reset()
 
 	for (int i = 0; i < numStackCubes; i++)
 	{
-		gameObjects.erase(
-			std::remove(
-				gameObjects.begin(),
-				gameObjects.end(),
-				stackCubes[i]),
-			gameObjects.end()
-		);
+
 
 		//	rbWorld->removeBody(stackBodies[i]);
 
@@ -423,34 +256,7 @@ void GameManager::reset()
 		cStackBoxes[i] = cBox;
 	}
 
-	for (PhysicsObject* brick : bricks)
-	{
-		gameObjects.erase(
-			std::remove(
-				gameObjects.begin(),
-				gameObjects.end(),
-				brick->mesh),
-			gameObjects.end()
-		);
 
-		//delete crate;
-	}
-
-
-	for (PhysicsObject* brick : bricks)
-	{
-		crates.erase(
-			std::remove(
-				crates.begin(),
-				crates.end(),
-				brick),
-			crates.end()
-		);
-
-		//delete crate;
-	}
-
-	bricks.clear();
 
 	spawnFactory->BuildBrickWall(
 		elevate::Vector3(0.0f, 5.75f, -80.0f),
@@ -475,17 +281,7 @@ void GameManager::reset()
 		gameObjects.push_back(bricks[i]->mesh);
 	}
 
-	if (crate != nullptr)
-	{
-		gameObjects.erase(
-			std::remove(
-				gameObjects.begin(),
-				gameObjects.end(),
-				crate->mesh),
-			gameObjects.end()
-		);
-		delete crate;
-	}
+
 
 	crate = spawnFactory->SpawnCrate(
 		elevate::Vector3(40.0f, 1.5f, 20.0f),
@@ -502,13 +298,125 @@ void GameManager::reset()
 
 	gameObjects.push_back(crate->mesh);
 
-	hit = false;
 
-	cData.contactCount = 0;
 }
 
 void GameManager::ResetState()
 {
+	hit = false;
+
+	cData.contactCount = 0;
+
+	showPlane = false;
+	showCar = false;
+	fpsSandboxDemo = false;
+
+	ResetPlane();
+
+	for (int i = 0; i < runTimeBoxes.size(); i++)
+	{
+		gameObjects.erase(
+			std::remove(
+				gameObjects.begin(),
+				gameObjects.end(),
+				runTimeBoxes[i]->mesh),
+			gameObjects.end()
+		);
+		delete runTimeBoxes[i]->mesh;
+		delete runTimeBoxes[i];
+	}
+
+	for (int i = 0; i < runTimeSpheres.size(); i++)
+	{
+		gameObjects.erase(
+			std::remove(
+				gameObjects.begin(),
+				gameObjects.end(),
+				runTimeSpheres[i]->mesh),
+			gameObjects.end()
+		);
+		delete runTimeSpheres[i]->mesh;
+		delete runTimeSpheres[i];
+	}
+
+	for (PhysicsObject* domino : dominoes)
+	{
+		gameObjects.erase(
+			std::remove(
+				gameObjects.begin(),
+				gameObjects.end(),
+				domino->mesh),
+			gameObjects.end()
+		);
+	}
+
+	for (PhysicsObject* domino : dominoes)
+	{
+		delete domino->mesh;
+		delete domino;
+	}
+
+	dominoes.clear();
+
+	for (Ragdoll* ragdoll : ragdolls)
+	{
+		for (Bone& bone : ragdoll->bones)
+		{
+			if (bone.visual)
+			{
+				gameObjects.erase(
+					std::remove(
+						gameObjects.begin(),
+						gameObjects.end(),
+						bone.visual),
+					gameObjects.end()
+				);
+			}
+
+			delete bone.visual;
+			bone.visual = nullptr;
+
+		}
+	}
+
+	for (Ragdoll* ragdoll : ragdolls)
+	{
+		delete ragdoll;
+	}
+	ragdolls.clear();
+
+	// Only the first block exists
+	for (Block* block = blocks; block < blocks + 9; block++)
+	{
+		if (!block->exists)
+			continue;
+		block->exists = false;
+
+		gameObjects.erase(
+			std::remove(
+				gameObjects.begin(),
+				gameObjects.end(),
+				block->visual),
+			gameObjects.end()
+		);
+	}
+	for (int i = 0; i < numStackCubes; i++)
+	{
+		delete cStackBoxes[i];
+	}
+
+	if (crate != nullptr)
+	{
+		gameObjects.erase(
+			std::remove(
+				gameObjects.begin(),
+				gameObjects.end(),
+				crate->mesh),
+			gameObjects.end()
+		);
+		delete crate;
+	}
+
 	for (GameObject* obj : gameObjects)
 	{
 		gameObjects.erase(
@@ -519,15 +427,60 @@ void GameManager::ResetState()
 			gameObjects.end()
 		);
 	}
+	for (PhysicsObject* crate : crates)
+	{
+		gameObjects.erase(
+			std::remove(
+				gameObjects.begin(),
+				gameObjects.end(),
+				crate->mesh),
+			gameObjects.end()
+		);
 
-	for (PhysicsObject* obj : crates)
-	{
-		delete obj;
+		//delete crate;
 	}
-	for (PhysicsObject* obj : bricks)
+
+
+	for (PhysicsObject* crate : crates)
 	{
-		delete obj;
+		crates.erase(
+			std::remove(
+				crates.begin(),
+				crates.end(),
+				crate),
+			crates.end()
+		);
+
+		//delete crate;
 	}
+
+	crates.clear();
+	for (PhysicsObject* brick : bricks)
+	{
+		gameObjects.erase(
+			std::remove(
+				gameObjects.begin(),
+				gameObjects.end(),
+				brick->mesh),
+			gameObjects.end()
+		);
+
+	}
+
+
+	for (PhysicsObject* brick : bricks)
+	{
+		crates.erase(
+			std::remove(
+				crates.begin(),
+				crates.end(),
+				brick),
+			crates.end()
+		);
+
+	}
+
+	bricks.clear();
 	for (PhysicsObject* obj : dominoes)
 	{
 		delete obj;
@@ -540,6 +493,17 @@ void GameManager::ResetState()
 			delete bone.visual;
 		}
 		delete ragdoll;
+	}
+
+	for (int i = 0; i < numStackCubes; i++)
+	{
+		gameObjects.erase(
+			std::remove(
+				gameObjects.begin(),
+				gameObjects.end(),
+				stackCubes[i]),
+			gameObjects.end()
+		);
 	}
 }
 
@@ -1625,6 +1589,42 @@ void GameManager::generateContacts()
 }
 void GameManager::ResetPlane()
 {
+
+	AircraftVisuals part1{};
+	part1.offset = elevate::Vector3(-0.5f, 0.0f, 0.0f);
+	part1.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 0.8f, 1.0f), &ammoShader, this);
+	part1.mesh->LoadMesh();
+	part1.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
+	aircraftParts.push_back(part1);
+
+	AircraftVisuals part2{};
+	part2.offset = elevate::Vector3(1.0f, 0.15f, 0);
+	part2.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(2.75f, 0.5f, 0.5), &ammoShader, this);
+	part2.mesh->LoadMesh();
+	part2.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
+	aircraftParts.push_back(part2);
+
+	AircraftVisuals part3{};
+	part3.offset = elevate::Vector3(0, 0.3f, 0);
+	part3.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.8f, 0.1f, 6.0f), &ammoShader, this);
+	part3.mesh->LoadMesh();
+	part3.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
+	aircraftParts.push_back(part3);
+
+	AircraftVisuals part4{};
+	part4.offset = elevate::Vector3(2.0f, 0.775f, 0);
+	part4.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.75f, 1.15f, 0.1f), &ammoShader, this);
+	part4.mesh->LoadMesh();
+	part4.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
+	aircraftParts.push_back(part4);
+
+	AircraftVisuals part5{};
+	part5.offset = elevate::Vector3(1.9f, 0, 0);
+	part5.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.85f, 0.1f, 2.0f), &ammoShader, this);
+	part5.mesh->LoadMesh();
+	part5.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
+	aircraftParts.push_back(part5);
+
 	aircraft.setPosition(elevate::Vector3(0, 10, 0));
 	aircraft.setOrientation(elevate::Quaternion(1, 0, 0, 0));
 

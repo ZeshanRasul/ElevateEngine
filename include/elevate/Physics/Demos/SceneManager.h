@@ -1,19 +1,6 @@
 #pragma once
 #include "App/GameManager.h"
 
-enum class SceneType
-{
-	None,
-	Empty,
-	Car,
-	Aeroplane,
-	Ragdoll,
-	FractureWall,
-	DominoChain,
-	DemoShowcase,
-	Count
-};
-
 namespace Scenes
 {
 	void LoadCarTest(GameManager* gm);
@@ -33,6 +20,6 @@ public:
 	static SceneType GetScene(SceneType type);
 
 	static GameManager* s_gameManager;
-private:
 	static SceneType s_currentScene;
+private:
 };

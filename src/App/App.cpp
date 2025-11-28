@@ -1,9 +1,8 @@
 #include "App/App.h"
 #include "Tools/Logger.h"
-#include "Physics/Demos/SceneManager.h"
 
 GameManager* SceneManager::s_gameManager = nullptr;
-SceneType SceneManager::s_currentScene = SceneType::None; // replace 'None' with a real enum value
+SceneType SceneManager::s_currentScene = SceneType::Aeroplane;
 
 App::App(unsigned int screenWidth, unsigned int screenHeight)
     : width(screenWidth), height(screenHeight)
@@ -27,12 +26,20 @@ void App::run()
 {
 
 		SceneManager::Init(mGameManager);
-		Scenes::LoadCarTest(mGameManager);
+		mGameManager->currentScene = SceneManager::s_currentScene
+            ;
+		SceneManager::LoadScene(mGameManager->currentScene);
 
         while (mWindow->isOpen()) {
         currentFrame = (float)glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+
+        if(SceneManager::s_currentScene != mGameManager->currentScene)
+        {
+            SceneManager::LoadScene(mGameManager->currentScene);
+            SceneManager::s_currentScene = mGameManager->currentScene;
+		}
 
         mGameManager->setUpDebugUI();
         mGameManager->showDebugUI();

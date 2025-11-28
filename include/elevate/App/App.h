@@ -2,6 +2,7 @@
 
 #include "Window/Window.h"
 #include "App/GameManager.h"
+#include "Physics/Demos/SceneManager.h"
 
 class App {
 public:
@@ -22,4 +23,5 @@ private:
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
 	float currentFrame = 0.0f;
+	SceneType currentScene = SceneType::DemoShowcase;
 };
