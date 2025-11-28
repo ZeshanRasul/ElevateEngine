@@ -262,7 +262,7 @@ void GameManager::reset()
 					gameObjects.end()
 				);
 			}
-			
+
 			delete bone.visual;
 			bone.visual = nullptr;
 
@@ -275,9 +275,9 @@ void GameManager::reset()
 	}
 	ragdolls.clear();
 
-//	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(0.0f, 4.0f, 0.0f)));
+	//	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(0.0f, 4.0f, 0.0f)));
 	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(10.0f, 4.0f, 0.0f)));
-//	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(20.0f, 4.0f, 0.0f)));
+	//	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(20.0f, 4.0f, 0.0f)));
 
 	for (Ragdoll* ragdoll : ragdolls)
 	{
@@ -510,7 +510,7 @@ void GameManager::reset()
 		15,
 		5,
 		elevate::Vector3(6.5f, 2.5f, 1.5f),
-		2.0f,
+		0.5f,
 		false,
 		bricks,
 		&cubeShader
@@ -1060,9 +1060,9 @@ void GameManager::generateContacts()
 			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(wall4->shape), *r.coll, &cData);
 			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(floor->shape), *r.coll, &cData);
 
-			if (!cData.hasMoreContacts()) return;
 			for (int i = 0; i < dominoes.size(); i++)
 			{
+				if (!cData.hasMoreContacts()) return;
 				elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(dominoes[i]->shape), *r.coll, &cData);
 
 				for (int j = i + 1; j < dominoes.size(); j++)
@@ -1071,10 +1071,10 @@ void GameManager::generateContacts()
 					elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(dominoes[i]->shape), *static_cast<CollisionBox*>(dominoes[j]->shape), &cData);
 				}
 			}
-		
-			if (!cData.hasMoreContacts()) return;
+
 			for (int i = 0; i < runTimeBoxes.size(); i++)
 			{
+				if (!cData.hasMoreContacts()) return;
 				elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(runTimeBoxes[i]->shape), *r.coll, &cData);
 			}
 
@@ -1082,6 +1082,7 @@ void GameManager::generateContacts()
 			{
 				if (!cData.hasMoreContacts()) return;
 				elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(crates[i]->shape), *r.coll, &cData);
+				if (!cData.hasMoreContacts()) return;
 				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crates[i]->shape), *static_cast<CollisionBox*>(floor->shape), &cData);
 			}
 
@@ -1089,21 +1090,24 @@ void GameManager::generateContacts()
 			{
 				for (Bone* bone = ragdoll->bones; bone < ragdoll->bones + 12; bone++)
 				{
-					if (!cData.hasMoreContacts()) return;
 
+					if (!cData.hasMoreContacts()) return;
 					elevate::CollisionSphere boneSphere = bone->getCollisionSphere();
 
+					if (!cData.hasMoreContacts()) return;
 					elevate::CollisionDetector::sphereAndSphere(boneSphere, *r.coll, &cData);
 				};
 			}
 
 			for (int i = 0; i < numStackCubes; ++i)
 			{
+				if (!cData.hasMoreContacts()) return;
 				elevate::CollisionDetector::boxAndSphere(*cStackBoxes[i], *r.coll, &cData);
 			}
 
 			for (int i = 0; i < bricks.size(); i++)
 			{
+				if (!cData.hasMoreContacts()) return;
 				elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(bricks[i]->shape), *r.coll, &cData);
 			}
 
@@ -1124,6 +1128,7 @@ void GameManager::generateContacts()
 				}
 			}
 
+			if (!cData.hasMoreContacts()) return;
 			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(crate->shape), *r.coll, &cData);
 
 		}
