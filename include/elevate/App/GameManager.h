@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 #include "OpenGL/Renderer.h"
 #include "OpenGL/RenderData.h"
@@ -35,6 +36,21 @@ enum class SceneType
     DemoShowcase,
     Count
 };
+
+static const char* SceneTypeToString(SceneType type)
+{
+    switch (type)
+    {
+    case SceneType::Empty:        return "Empty";
+    case SceneType::Car:          return "Car";
+    case SceneType::Aeroplane:    return "Aeroplane";
+    case SceneType::Ragdoll:      return "Ragdoll";
+    case SceneType::FractureWall: return "Fracture Wall";
+    case SceneType::DominoChain:  return "Domino Chain";
+    case SceneType::DemoShowcase: return "Demo Showcase";
+    default:                      return "None";
+    }
+}
 
 struct DebugLine
 {
@@ -188,7 +204,7 @@ public:
     bool fpsSandboxDemo = false;
 
 	SceneType currentScene = SceneType::DemoShowcase;
-
+	int selectedIndex = 7;
 private:
     void ShowCameraControlWindow(Camera& cam);
     void ShowLightControlWindow(DirLight& light);
@@ -199,6 +215,16 @@ private:
 	void ShowPerformanceWindow();
 	void CalculatePerformanceMetrics(float deltaTime);
     void RemoveDestroyedGameObjects();
+
+	std::vector<SceneType> sceneTypes = {  
+		SceneType::Empty,
+		SceneType::Car,
+		SceneType::Aeroplane,
+		SceneType::Ragdoll,
+		SceneType::FractureWall,
+		SceneType::DominoChain,
+		SceneType::DemoShowcase
+	};
 
     Renderer* renderer;
     Window* window;

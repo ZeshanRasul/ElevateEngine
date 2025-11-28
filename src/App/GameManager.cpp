@@ -400,22 +400,22 @@ void GameManager::ResetState()
 			gameObjects.end()
 		);
 	}
-	for (int i = 0; i < numStackCubes; i++)
-	{
-		delete cStackBoxes[i];
-	}
+	//for (int i = 0; i < cStackBoxes->size(); i++)
+	//{
+	//	delete cStackBoxes[i];
+	//}
 
-	if (crate != nullptr)
-	{
-		gameObjects.erase(
-			std::remove(
-				gameObjects.begin(),
-				gameObjects.end(),
-				crate->mesh),
-			gameObjects.end()
-		);
-		delete crate;
-	}
+	//if (crate)
+	//{
+	//	gameObjects.erase(
+	//		std::remove(
+	//			gameObjects.begin(),
+	//			gameObjects.end(),
+	//			crate->mesh),
+	//		gameObjects.end()
+	//	);
+	//	delete crate;
+	//}
 
 	for (GameObject* obj : gameObjects)
 	{
@@ -770,6 +770,27 @@ void GameManager::ShowSpawnObjectWindow()
 void GameManager::ShowEngineWindow()
 {
 	ImGui::Begin("Simulation Controls");
+
+	const char* preview = SceneTypeToString(currentScene);
+
+	if (ImGui::BeginCombo("combo", "Demo Scene")) {
+		for (int i = 0; i < sceneTypes.size(); ++i) {
+			SceneType type = sceneTypes[i];
+			bool isSelected = (currentScene == type);
+
+			if (ImGui::Selectable(SceneTypeToString(type), isSelected))
+			{
+				currentScene = type;
+				selectedIndex = i;
+			}
+
+			if (isSelected)
+			{
+				ImGui::SetItemDefaultFocus();
+			}
+		}
+		ImGui::EndCombo();
+	}
 
 	if (ImGui::Button("Pause Simulation"))
 	{
