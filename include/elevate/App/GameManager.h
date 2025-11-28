@@ -104,9 +104,10 @@ struct CollisionBody
     elevate::CollisionPlane* plane = nullptr;
 };
 
-struct AircraftVisuals {
+struct AircraftParts {
     elevate::Vector3 offset;
     Cube* mesh;
+    CollisionBox* coll;
 };
 
 struct CarVisuals {
@@ -401,7 +402,7 @@ private:
     Aero tail;
     RigidBody aircraft;
     elevate::Vector3 windspeed;
-	std::vector<AircraftVisuals> aircraftParts;
+	std::vector<AircraftParts> aircraftParts;
 
     float left_wing_control;
     float right_wing_control;
