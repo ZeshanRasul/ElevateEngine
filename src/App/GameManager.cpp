@@ -1235,7 +1235,7 @@ void GameManager::update(float deltaTime)
 	//rbWorld->startFrame();
 	//rbWorld->runPhysics(1.0f / 60.0f);
 
-	physicsTime = glfwGetTime();
+	physicsTime = (float)glfwGetTime();
 
 	aircraft.clearAccumulator();
 
@@ -1418,6 +1418,51 @@ void GameManager::update(float deltaTime)
 		crate->body->integrate(deltaTime);
 		crate->shape->calculateInternals();
 
+		for (int i = 0; i < crateStacks.size(); i++)
+		{
+			for (int j = 0; j < crateStacks[i].size(); j++)
+			{
+				crateStacks[i][j]->body->clearAccumulator();
+				crateStacks[i][j]->body->calculateDerivedData();
+				rbGravity->updateForce(crateStacks[i][j]->body, deltaTime);
+				crateStacks[i][j]->body->integrate(deltaTime);
+				crateStacks[i][j]->shape->calculateInternals();
+			}
+		}
+
+		for (int i = 0; i < runtimeWalls.size(); i++)
+		{
+			for (int j = 0; j < runtimeWalls[i].size(); j++)
+			{
+				runtimeWalls[i][j]->body->clearAccumulator();
+				runtimeWalls[i][j]->body->calculateDerivedData();
+				rbGravity->updateForce(runtimeWalls[i][j]->body, deltaTime);
+				runtimeWalls[i][j]->body->integrate(deltaTime);
+				runtimeWalls[i][j]->shape->calculateInternals();
+			}
+		}	
+
+		for (int i = 0; i < runtimeDominoLines.size(); i++)
+		{
+			for (int j = 0; j < runtimeDominoLines[i].size(); j++)
+			{
+				runtimeDominoLines[i][j]->body->clearAccumulator();
+				runtimeDominoLines[i][j]->body->calculateDerivedData();
+				rbGravity->updateForce(runtimeDominoLines[i][j]->body, deltaTime);
+				runtimeDominoLines[i][j]->body->integrate(deltaTime);
+				runtimeDominoLines[i][j]->shape->calculateInternals();
+			}
+		}
+
+		for (int i = 0; i < runtimeFractureBlocks.size(); i++)
+		{
+			if (!runtimeFractureBlocks[i].exists) continue;
+			runtimeFractureBlocks[i].body->clearAccumulator();
+			runtimeFractureBlocks[i].body->calculateDerivedData();
+			rbGravity->updateForce(runtimeFractureBlocks[i].body, deltaTime);
+			runtimeFractureBlocks[i].body->integrate(deltaTime);
+			runtimeFractureBlocks[i].calculateInternals();
+		}
 
 		generateContacts();
 
@@ -1555,6 +1600,72 @@ void GameManager::update(float deltaTime)
 				(float)runTimeSpheres[i]->body->getOrientation().k));
 		}
 
+		for (int i = 0; i < crateStacks.size(); i++)
+		{
+			for (int j = 0; j < crateStacks[i].size(); j++)
+			{
+				crateStacks[i][j]->body->calculateDerivedData();
+				crateStacks[i][j]->shape->calculateInternals();
+				elevate::Matrix4 t = crateStacks[i][j]->body->getTransform();
+				elevate::Vector3 p = t.getAxisVector(3);
+				crateStacks[i][j]->mesh->SetPosition(p);
+				crateStacks[i][j]->mesh->SetOrientation(glm::quat(
+					(float)crateStacks[i][j]->body->getOrientation().r,
+					(float)crateStacks[i][j]->body->getOrientation().i,
+					(float)crateStacks[i][j]->body->getOrientation().j,
+					(float)crateStacks[i][j]->body->getOrientation().k));
+			}
+		}
+
+		for (int i = 0; i < runtimeWalls.size(); i++)
+		{
+			for (int j = 0; j < runtimeWalls[i].size(); j++)
+			{
+				runtimeWalls[i][j]->body->calculateDerivedData();
+				runtimeWalls[i][j]->shape->calculateInternals();
+				elevate::Matrix4 t = runtimeWalls[i][j]->body->getTransform();
+				elevate::Vector3 p = t.getAxisVector(3);
+				runtimeWalls[i][j]->mesh->SetPosition(p);
+				runtimeWalls[i][j]->mesh->SetOrientation(glm::quat(
+					(float)runtimeWalls[i][j]->body->getOrientation().r,
+					(float)runtimeWalls[i][j]->body->getOrientation().i,
+					(float)runtimeWalls[i][j]->body->getOrientation().j,
+					(float)runtimeWalls[i][j]->body->getOrientation().k));
+			}
+		}
+
+		for (int i = 0; i < runtimeDominoLines.size(); i++)
+		{
+			for (int j = 0; j < runtimeDominoLines[i].size(); j++)
+			{
+				runtimeDominoLines[i][j]->body->calculateDerivedData();
+				runtimeDominoLines[i][j]->shape->calculateInternals();
+				elevate::Matrix4 t = runtimeDominoLines[i][j]->body->getTransform();
+				elevate::Vector3 p = t.getAxisVector(3);
+				runtimeDominoLines[i][j]->mesh->SetPosition(p);
+				runtimeDominoLines[i][j]->mesh->SetOrientation(glm::quat(
+					(float)runtimeDominoLines[i][j]->body->getOrientation().r,
+					(float)runtimeDominoLines[i][j]->body->getOrientation().i,
+					(float)runtimeDominoLines[i][j]->body->getOrientation().j,
+					(float)runtimeDominoLines[i][j]->body->getOrientation().k));
+			}
+		}
+
+		for (int i = 0; i < runtimeFractureBlocks.size(); i++)
+		{
+			if (!runtimeFractureBlocks[i].exists) continue;
+			runtimeFractureBlocks[i].body->calculateDerivedData();
+			runtimeFractureBlocks[i].calculateInternals();
+			elevate::Matrix4 t = runtimeFractureBlocks[i].body->getTransform();
+			elevate::Vector3 p = t.getAxisVector(3);
+			runtimeFractureBlocks[i].visual->SetPosition(p);
+			runtimeFractureBlocks[i].visual->SetOrientation(glm::quat(
+				(float)runtimeFractureBlocks[i].body->getOrientation().r,
+				(float)runtimeFractureBlocks[i].body->getOrientation().i,
+				(float)runtimeFractureBlocks[i].body->getOrientation().j,
+				(float)runtimeFractureBlocks[i].body->getOrientation().k));
+		}
+
 		crate->shape->calculateInternals();
 		elevate::Matrix4 t = crate->body->getTransform();
 		elevate::Vector3 p = t.getAxisVector(3);
@@ -1623,7 +1734,7 @@ void GameManager::update(float deltaTime)
 
 	}
 
-	physicsTime = glfwGetTime() - physicsTime;
+	physicsTime = (float)glfwGetTime() - physicsTime;
 
 	CalculatePerformanceMetrics(deltaTime);
 	return;
@@ -1666,11 +1777,43 @@ void GameManager::generateContacts()
 					elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(dominoes[i]->shape), *static_cast<CollisionBox*>(dominoes[j]->shape), &cData);
 				}
 			}
-
+		
 			for (int i = 0; i < runTimeBoxes.size(); i++)
 			{
 				if (!cData.hasMoreContacts()) return;
 				elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(runTimeBoxes[i]->shape), *r.coll, &cData);
+			}
+			for (int i = 0; i < runtimeFractureBlocks.size(); i++)
+			{
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(&runtimeFractureBlocks[i]), *r.coll, &cData);
+			}
+
+			for (int i = 0; i < crateStacks.size(); i++)
+			{
+				for (int j = 0; j < crateStacks[i].size(); j++)
+				{
+					if (!cData.hasMoreContacts()) return;
+					elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(crateStacks[i][j]->shape), *r.coll, &cData);
+				}
+			}
+
+			for (int i = 0; i < runtimeWalls.size(); i++)
+			{
+				for (int j = 0; j < runtimeWalls[i].size(); j++)
+				{
+					if (!cData.hasMoreContacts()) return;
+					elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(runtimeWalls[i][j]->shape), *r.coll, &cData);
+				}
+			}
+
+			for (int i = 0; i < runtimeDominoLines.size(); i++)
+			{
+				for (int j = 0; j < runtimeDominoLines[i].size(); j++)
+				{
+					if (!cData.hasMoreContacts()) return;
+					elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(runtimeDominoLines[i][j]->shape), *r.coll, &cData);
+				}
 			}
 
 			for (int i = 0; i < runTimeSpheres.size(); i++)
@@ -1907,6 +2050,59 @@ void GameManager::generateContacts()
 
 			elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crate->shape), *block, &cData);
 
+		}
+
+		for (int i = 0; i < runtimeFractureBlocks.size(); i++)
+		{
+			if (!cData.hasMoreContacts()) return;
+			elevate::CollisionDetector::boxAndHalfSpace(*static_cast<CollisionBox*>(&runtimeFractureBlocks[i]), plane, &cData);
+			for (int j = i + 1; j < runtimeFractureBlocks.size(); j++)
+			{
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(&runtimeFractureBlocks[i]), *static_cast<CollisionBox*>(&runtimeFractureBlocks[j]), &cData);
+			}
+		}
+
+		for (int i = 0; i < crateStacks.size(); i++)
+		{
+			for (int j = 0; j < crateStacks[i].size(); j++)
+			{
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::boxAndHalfSpace(*static_cast<CollisionBox*>(crateStacks[i][j]->shape), plane, &cData);
+				for (int k = j + 1; k < crateStacks[i].size(); k++)
+				{
+					if (!cData.hasMoreContacts()) return;
+					elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(crateStacks[i][j]->shape), *static_cast<CollisionBox*>(crateStacks[i][k]->shape), &cData);
+				}
+			}
+		}
+
+		for (int i = 0; i < runtimeWalls.size(); i++)
+		{
+			for (int j = 0; j < runtimeWalls[i].size(); j++)
+			{
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::boxAndHalfSpace(*static_cast<CollisionBox*>(runtimeWalls[i][j]->shape), plane, &cData);
+				for (int k = j + 1; k < runtimeWalls[i].size(); k++)
+				{
+					if (!cData.hasMoreContacts()) return;
+					elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(runtimeWalls[i][j]->shape), *static_cast<CollisionBox*>(runtimeWalls[i][k]->shape), &cData);
+				}
+			}
+		}
+
+		for (int i = 0; i < runtimeDominoLines.size(); i++)
+		{
+			for (int j = 0; j < runtimeDominoLines[i].size(); j++)
+			{
+				if (!cData.hasMoreContacts()) return;
+				elevate::CollisionDetector::boxAndHalfSpace(*static_cast<CollisionBox*>(runtimeDominoLines[i][j]->shape), plane, &cData);
+				for (int k = j + 1; k < runtimeDominoLines[i].size(); k++)
+				{
+					if (!cData.hasMoreContacts()) return;
+					elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(runtimeDominoLines[i][j]->shape), *static_cast<CollisionBox*>(runtimeDominoLines[i][k]->shape), &cData);
+				}
+			}
 		}
 
 		for (int i = 0; i < dominoes.size(); i++)
