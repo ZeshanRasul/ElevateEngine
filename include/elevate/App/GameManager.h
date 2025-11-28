@@ -390,6 +390,11 @@ private:
 	int dominoLineIndex = 0;
 	std::vector<std::vector<PhysicsObject*>> runtimeDominoLines;
 
+    float blockPos[3] = { -50.0f, 25.0f, 50.0f };
+    float blockScale[3] = { 15.0f, 15.0f, 15.0f };
+    float blockMass = 85.0f;
+	std::vector<Block> runtimeFractureBlocks;
+
     AeroControl left_wing;
     AeroControl right_wing;
     AeroControl rudder;

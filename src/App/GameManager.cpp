@@ -191,7 +191,7 @@ void GameManager::reset()
 		}
 	}
 
-	firstHit = true;
+	firstHit = false;
 
 	elevate::Vector3 blockPos(-50, 25, 50);
 	elevate::Vector3 blockScale(15, 15, 15);
@@ -1006,7 +1006,7 @@ void GameManager::ShowSpawnObjectWindow()
 			dominoMass,
 			dominoSpacing,
 			runtimeDominoLines[dominoLineIndex++]
-			);
+		);
 
 		for (int i = 0; i < runtimeDominoLines[dominoLineIndex - 1].size(); i++)
 		{
@@ -1017,6 +1017,47 @@ void GameManager::ShowSpawnObjectWindow()
 		}
 	}
 
+
+	ImGui::Text("Spawn Fracture Box");
+	ImGui::InputFloat3("Block Position", blockPos);
+	ImGui::InputFloat3("Block Size", blockScale);
+	ImGui::InputFloat("Block Mass", &blockMass);
+
+	if (ImGui::Button("Spawn Fracture Box"))
+	{
+		elevate::Vector3 pos(blockPos[0], blockPos[1], blockPos[2]);
+		elevate::Vector3 scale(blockScale[0], blockScale[1], blockScale[2]);
+
+		Block block;
+		Cube* cube = new Cube(pos, scale, &cubeShader, this);
+		cube->LoadMesh();
+		cube->SetTexture(blockTexture);
+		cube->SetAngle(0.0f);
+		cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
+		cube->SetColor(glm::vec3(0.2f, 0.1f, 0.5f));
+		block.visual = cube;
+		gameObjects.push_back(cube);
+
+		block.halfSize = scale * 0.5f;
+		block.body->setPosition(pos);
+		block.body->setOrientation(elevate::Quaternion(1, 0, 0, 0));
+		block.body->setVelocity(elevate::Vector3(0, 0, 0));
+		block.body->setRotation(elevate::Vector3(0, 0, 0));
+		block.body->setMass(blockMass);
+		elevate::Matrix3 it;
+		it.setBlockInertiaTensor(block.halfSize, blockMass);
+		block.body->setInertiaTensor(it);
+		block.body->setDamping(0.9f, 0.9f);
+		block.body->calculateDerivedData();
+		block.calculateInternals();
+
+		block.body->setAcceleration(elevate::Vector3::GRAVITY);
+		block.body->setAwake(true);
+		block.body->setCanSleep(true);
+		block.exists = true;
+
+		runtimeFractureBlocks.push_back(block);
+	}
 	ImGui::End();
 
 }
