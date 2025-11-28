@@ -158,6 +158,7 @@ public:
     void OnSPressed();
     void OnDPressed();
     void OnAPressed();
+    void OnZPressed();
     void OnLeftClick();
 
     void AddToGameObjects(GameObject* obj) {
@@ -296,7 +297,7 @@ private:
     World* rbWorld;
 	ForceRegistry rbRegistry;
 	Gravity* rbGravity;
-    float gravity[3]  = { 0.0f, -9.81f * 0.5f, 0.0f };
+    float gravity[3]  = { 0.0f, -9.81f, 0.0f };
 
 	bool sphereDemo = false;
 	Sphere* sphere = nullptr;
