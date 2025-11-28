@@ -977,6 +977,46 @@ void GameManager::ShowSpawnObjectWindow()
 		}
 	}
 
+	ImGui::Text("Spawn Domino Line");
+	ImGui::InputFloat3("Line Direction", lineDirectionInput);
+	ImGui::InputFloat3("Domino Size", dominoSizeInput);
+	ImGui::InputInt("Domino Count", &dominoCount);
+	ImGui::InputFloat("Domino Mass", &dominoMass);
+	ImGui::InputFloat("Domino Spacing", &dominoSpacing);
+
+	const elevate::Vector3 dominoDirection = elevate::Vector3(lineDirectionInput[0], lineDirectionInput[1], lineDirectionInput[2]);
+	const elevate::Vector3 dominoSize = elevate::Vector3(dominoSizeInput[0], dominoSizeInput[1], dominoSizeInput[2]);
+
+	if (ImGui::Button("Spawn Domino Line"))
+	{
+		runtimeDominoLines.reserve(dominoLineIndex + 1);
+
+		runtimeDominoLines.push_back(std::vector<PhysicsObject*>());
+		runtimeDominoLines[dominoLineIndex].reserve(dominoCount);
+		glm::vec3 camPos = camera->Position;
+		glm::vec3 camFront = glm::normalize(camera->Front);
+
+		glm::vec3 spawnPos = camPos + camFront * 6.0f;
+
+		spawnFactory->BuildDominoLine(
+			elevate::Vector3(spawnPos.x, spawnPos.y, spawnPos.z),
+			elevate::Vector3(dominoDirection.x, dominoDirection.y, dominoDirection.z),
+			dominoCount,
+			elevate::Vector3(dominoSize.x, dominoSize.y, dominoSize.z),
+			dominoMass,
+			dominoSpacing,
+			runtimeDominoLines[dominoLineIndex++]
+			);
+
+		for (int i = 0; i < runtimeDominoLines[dominoLineIndex - 1].size(); i++)
+		{
+			runtimeDominoLines[dominoLineIndex - 1][i]->mesh->SetShader(&ammoShader);
+			runtimeDominoLines[dominoLineIndex - 1][i]->mesh->setGameManager(this);
+			runtimeDominoLines[dominoLineIndex - 1][i]->mesh->SetColor(glm::vec3(0.8f, 0.7f, 0.8f));
+			gameObjects.push_back(runtimeDominoLines[dominoLineIndex - 1][i]->mesh);
+		}
+	}
+
 	ImGui::End();
 
 }
@@ -987,7 +1027,7 @@ void GameManager::ShowEngineWindow()
 
 	const char* preview = SceneTypeToString(currentScene);
 
-	if (ImGui::BeginCombo("combo", "Demo Scene")) {
+	if (ImGui::BeginCombo("combo", preview)) {
 		for (int i = 0; i < sceneTypes.size(); ++i) {
 			SceneType type = sceneTypes[i];
 			bool isSelected = (currentScene == type);
@@ -1062,6 +1102,8 @@ void GameManager::ShowPerformanceWindow()
 
 	ImGui::Text("FPS: %.1f", fps);
 	ImGui::Text("Avg FPS: %.1f", avgFps);
+	ImGui::Text("Physics Time: %.1f ms", physicsTime);
+	ImGui::Text("Average Physics Time: %.1f ms", physicsTimeAvg);
 	ImGui::Text("Frame Time: %.1f ms", frameTimeMs);
 	ImGui::Text("Elapsed Time: %.1f s", timeElapsed);
 
@@ -1072,13 +1114,16 @@ void GameManager::ShowPerformanceWindow()
 void GameManager::CalculatePerformanceMetrics(float deltaTime)
 {
 	fps = 1.0f / deltaTime;
+	physicsTime = physicsTime * 1000.0f;
 
 	fpsSum += fps;
+	physicsTimeSum += physicsTime;
 	frameCount++;
 
 	if (frameCount == numFramesAvg)
 	{
 		avgFps = fpsSum / numFramesAvg;
+		physicsTimeAvg = physicsTimeSum / numFramesAvg;
 		fpsSum = 0.0f;
 		frameCount = 0;
 	}
@@ -1086,6 +1131,7 @@ void GameManager::CalculatePerformanceMetrics(float deltaTime)
 	frameTimeMs = deltaTime * 1000.0f;
 
 	timeElapsed += deltaTime;
+	physicsTime = 0.0f;
 }
 
 void GameManager::RemoveDestroyedGameObjects()
@@ -1147,6 +1193,8 @@ void GameManager::update(float deltaTime)
 	}
 	//rbWorld->startFrame();
 	//rbWorld->runPhysics(1.0f / 60.0f);
+
+	physicsTime = glfwGetTime();
 
 	aircraft.clearAccumulator();
 
@@ -1533,6 +1581,8 @@ void GameManager::update(float deltaTime)
 		}
 
 	}
+
+	physicsTime = glfwGetTime() - physicsTime;
 
 	CalculatePerformanceMetrics(deltaTime);
 	return;

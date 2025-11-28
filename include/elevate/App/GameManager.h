@@ -382,6 +382,14 @@ private:
 	float brickMass = 2.0f;
 	std::vector<std::vector<PhysicsObject*>> runtimeWalls;
 
+    float lineDirectionInput[3] = {1.0f, 1.0f, 1.0f};
+    float dominoSizeInput[3] = {1.0f, 1.0f, 1.0f};
+	int dominoCount = 10;
+	float dominoMass = 2.0f;
+	float dominoSpacing = 2.0f;
+	int dominoLineIndex = 0;
+	std::vector<std::vector<PhysicsObject*>> runtimeDominoLines;
+
     AeroControl left_wing;
     AeroControl right_wing;
     AeroControl rudder;
@@ -407,6 +415,9 @@ private:
 	float timeElapsed;
     float fpsSum;
     int numFramesAvg = 100;
+    float physicsTime;
+    float physicsTimeSum;
+    float physicsTimeAvg;
 
     std::vector<DebugLine> m_DebugLines;
     GLuint m_DebugLineVAO = 0;
