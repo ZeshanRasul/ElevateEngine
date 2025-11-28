@@ -129,6 +129,7 @@ public:
     void OnSPressed();
     void OnDPressed();
     void OnAPressed();
+    void OnLeftClick();
 
     void AddToGameObjects(GameObject* obj) {
        gameObjects.push_back(obj);
@@ -152,6 +153,10 @@ public:
     Shader cubeShader;
     Shader lineShader;
 
+    static const int MaxAmmoRounds = 32;
+
+    AmmoRound ammoPool[MaxAmmoRounds];
+    int       ammoCount = 0;
 private:
     void ShowCameraControlWindow(Camera& cam);
     void ShowLightControlWindow(DirLight& light);
@@ -255,7 +260,7 @@ private:
 
     void generateContacts();
 
-    bool fpsSandboxDemo = false; 
+    bool fpsSandboxDemo = true; 
 
     static const int MaxEnvBoxes = 8;
     int               numEnvBoxes = 8;
@@ -266,10 +271,7 @@ private:
     elevate::RigidBody* envBodies[MaxEnvBoxes];
     Cube* envCubes[MaxEnvBoxes];
 
-    static const int MaxAmmoRounds = 32;
 
-    AmmoRound ammoPool[MaxAmmoRounds];
-    int       ammoCount = 0;
 
     static const int MaxStackCubes = 5;
 

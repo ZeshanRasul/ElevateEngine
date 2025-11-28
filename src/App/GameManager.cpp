@@ -60,61 +60,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 
 
-	if (fpsSandboxDemo)
-	{
-		cubeDemo = false;
-		sphereDemo = false;
 
-
-		reset();
-
-		ammoCount = MaxAmmoRounds;
-
-		for (int i = 0; i < ammoCount; ++i)
-		{
-			elevate::Vector3 startPos(0.0f, -100.0f, 0.0f); // far below world
-
-			elevate::Vector3 scale(1.0f, 1.0f, 1.0f);
-			Sphere* s = new Sphere(startPos, scale, &ammoShader, this,
-				glm::vec3(0.9f, 0.1f, 0.1f));
-			s->GenerateSphere(0.5f, 16, 16);
-			s->LoadMesh();
-			gameObjects.push_back(s);
-
-			elevate::RigidBody* body = new elevate::RigidBody();
-			body->setAwake(false);
-			body->setPosition(startPos);
-			body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
-			body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
-			body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
-
-			real mass = 1.7f;
-			body->setMass(mass);
-			body->setDamping(0.97f, 0.97f);
-
-			real r = 0.5f;
-			real coeff = (real)0.4f * mass * r * r;
-			elevate::Matrix3 inertia;
-			inertia.setInertiaTensorCoeffs(coeff, coeff, coeff);
-			body->setInertiaTensor(inertia);
-
-			//spawnContext.World->addBody(body);
-			//spawnContext.World->getForceRegistry().add(body, rbGravity);
-
-			elevate::CollisionSphere* cs = new elevate::CollisionSphere();
-			cs->body = body;
-			cs->radius = r;
-			cs->body->calculateDerivedData();
-			cs->calculateInternals();
-
-			ammoPool[i].visual = s;
-			ammoPool[i].body = body;
-			ammoPool[i].coll = cs;
-			ammoPool[i].active = false;
-			ammoPool[i].lifetime = 0.0f;
-		}
-
-	}
 	//	ResetPlane();
 
 	//AircraftVisuals part1{};
@@ -686,6 +632,11 @@ void GameManager::OnAPressed()
 	right_wing_control -= 0.1f;
 }
 
+void GameManager::OnLeftClick()
+{
+	fireRound(AmmoType::Pistol);
+}
+
 void GameManager::setUpDebugUI()
 {
 	ImGui_ImplOpenGL3_NewFrame();
@@ -730,10 +681,10 @@ void GameManager::ShowLightControlWindow(DirLight& light)
 
 void GameManager::fireRound(AmmoType type)
 {
-	if (!inputManager->isCameraControlled() && ImGui::GetIO().WantCaptureMouse)
-	{
-		return;
-	}
+	//if (!inputManager->isCameraControlled() && ImGui::GetIO().WantCaptureMouse)
+	//{
+	//	return;
+	//}
 
 	AmmoRound* round = nullptr;
 	for (int i = 0; i < ammoCount; ++i)

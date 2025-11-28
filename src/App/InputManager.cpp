@@ -129,7 +129,7 @@ void InputManager::processInput(GLFWwindow* window, float deltaTime)
     rKeyPressed = rKeyCurrentlyPressed;
 
 
-    static bool qPrev = false, ePrev = false, wPrev = false, sPrev = false, dPrev = false, aPrev = false;
+    static bool qPrev = false, ePrev = false, wPrev = false, sPrev = false, dPrev = false, aPrev = false, clickPrev = false;
 
     if (IsKeyPressedOnce(window, GLFW_KEY_Q, qPrev)) mGameManager->OnQPressed();
     if (IsKeyPressedOnce(window, GLFW_KEY_E, ePrev)) mGameManager->OnEPressed();
@@ -137,6 +137,7 @@ void InputManager::processInput(GLFWwindow* window, float deltaTime)
     if (IsKeyPressedOnce(window, GLFW_KEY_S, sPrev)) mGameManager->OnSPressed();
     if (IsKeyPressedOnce(window, GLFW_KEY_D, dPrev)) mGameManager->OnDPressed();
     if (IsKeyPressedOnce(window, GLFW_KEY_A, aPrev)) mGameManager->OnAPressed();
+    if (IsKeyPressedOnce(window, GLFW_MOUSE_BUTTON_1, clickPrev)) mGameManager->OnLeftClick();
 
 }
 

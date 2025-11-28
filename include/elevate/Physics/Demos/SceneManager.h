@@ -32,7 +32,7 @@ public:
 	static void LoadScene(SceneType type);
 	static SceneType GetScene(SceneType type);
 
-private:
 	static GameManager* s_gameManager;
+private:
 	static SceneType s_currentScene;
 };
