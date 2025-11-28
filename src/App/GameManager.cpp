@@ -172,29 +172,40 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	}
 	//	ResetPlane();
 
-
-	Cube* part1 = new Cube(elevate::Vector3(-0.5f, 0, 0), elevate::Vector3(2.0f, 0.8f, 1.0f), &ammoShader, this);
-	part1->LoadMesh();
-	part1->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
+	AircraftVisuals part1{};
+	part1.offset = elevate::Vector3(-0.5f, 0.0f, 0.0f);
+	part1.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(2.0f, 0.8f, 1.0f), &ammoShader, this);
+	part1.mesh->LoadMesh();
+	part1.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
 	aircraftParts.push_back(part1);
-	Cube* part2 = new Cube(elevate::Vector3(1.0f, 0.15f, 0), elevate::Vector3(2.75f, 0.5f, 0.5f), &ammoShader, this);
-	part2->LoadMesh();
-	part2->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
+	
+	AircraftVisuals part2{};
+	part2.offset = elevate::Vector3(1.0f, 0.15f, 0);
+	part2.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(2.75f, 0.5f, 0.5), &ammoShader, this);
+	part2.mesh->LoadMesh();
+	part2.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
 	aircraftParts.push_back(part2);
-	Cube* part3 = new Cube(elevate::Vector3(0, 0.3f, 0), elevate::Vector3(0.8f, 0.1f, 6.0f), &ammoShader, this);
-	part3->LoadMesh();
-	part3->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
+	
+	AircraftVisuals part3{};
+	part3.offset = elevate::Vector3(0, 0.3f, 0);
+	part3.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.8f, 0.1f, 6.0f), &ammoShader, this);
+	part3.mesh->LoadMesh();
+	part3.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
 	aircraftParts.push_back(part3);
-	Cube* part4 = new Cube(elevate::Vector3(2.0f, 0.775f, 0), elevate::Vector3(2.0f, 0.775f, 0), &ammoShader, this);
-	part4->LoadMesh();
-	part4->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
+	
+	AircraftVisuals part4{};
+	part4.offset = elevate::Vector3(2.0f, 0.775f, 0);
+	part4.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.75f, 1.15f, 0.1f), &ammoShader, this);
+	part4.mesh->LoadMesh();
+	part4.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
 	aircraftParts.push_back(part4);
-	Cube* part5 = new Cube(elevate::Vector3(1.9f, 0, 0), elevate::Vector3(0.85f, 0.1f, 2.0f), &ammoShader, this);
-	part5->LoadMesh();
-	part5->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
+	
+	AircraftVisuals part5{};
+	part5.offset = elevate::Vector3(1.9f, 0, 0);
+	part5.mesh = new Cube(elevate::Vector3(0, 0, 0), elevate::Vector3(0.85f, 0.1f, 2.0f), &ammoShader, this);
+	part5.mesh->LoadMesh();
+	part5.mesh->SetColor(glm::vec3(0.8f, 0.8f, 0.2f));
 	aircraftParts.push_back(part5);
-
-
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
@@ -989,6 +1000,7 @@ void GameManager::update(float deltaTime)
 	propulsion = aircraft.getTransform().transformDirection(propulsion);
 	aircraft.addForce(propulsion);
 
+	aircraft.calculateDerivedData();
 	// Add the forces acting on the aircraft.
 	rbRegistry.updateForces(deltaTime);
 
@@ -1000,47 +1012,25 @@ void GameManager::update(float deltaTime)
 	if (pos.y < 0.0f)
 	{
 		pos.y = 0.0f;
-		aircraft.setPosition(pos);
+	//	aircraft.setPosition(pos);
 
 		if (aircraft.getVelocity().y < -10.0f)
 		{
 			ResetPlane();
 		}
 	}
-
-	aircraft.calculateDerivedData();
+	
 	aircraft.getTransform();
-	aircraftParts[0]->SetPosition(aircraft.getPosition());
-	aircraftParts[0]->SetOrientation(glm::quat(
-		(float)aircraft.getOrientation().r,
-		(float)aircraft.getOrientation().i,
-		(float)aircraft.getOrientation().j,
-		(float)aircraft.getOrientation().k));
-
-	aircraftParts[1]->SetPosition(aircraft.getPosition());
-	aircraftParts[1]->SetOrientation(glm::quat(
-		(float)aircraft.getOrientation().r,
-		(float)aircraft.getOrientation().i,
-		(float)aircraft.getOrientation().j,
-		(float)aircraft.getOrientation().k));
-	aircraftParts[2]->SetPosition(aircraft.getPosition());
-	aircraftParts[2]->SetOrientation(glm::quat(
-		(float)aircraft.getOrientation().r,
-		(float)aircraft.getOrientation().i,
-		(float)aircraft.getOrientation().j,
-		(float)aircraft.getOrientation().k));
-	aircraftParts[3]->SetPosition(aircraft.getPosition());
-	aircraftParts[3]->SetOrientation(glm::quat(
-		(float)aircraft.getOrientation().r,
-		(float)aircraft.getOrientation().i,
-		(float)aircraft.getOrientation().j,
-		(float)aircraft.getOrientation().k));
-	aircraftParts[4]->SetPosition(aircraft.getPosition());
-	aircraftParts[4]->SetOrientation(glm::quat(
-		(float)aircraft.getOrientation().r,
-		(float)aircraft.getOrientation().i,
-		(float)aircraft.getOrientation().j,
-		(float)aircraft.getOrientation().k));
+	for (AircraftVisuals& part : aircraftParts)
+	{
+		elevate::Vector3 worldPos = aircraft.getPointInWorldSpace(part.offset);
+		part.mesh->SetPosition(worldPos);
+		part.mesh->SetOrientation(glm::quat(
+			(float)aircraft.getOrientation().r,
+			(float)aircraft.getOrientation().i,
+			(float)aircraft.getOrientation().j,
+			(float)aircraft.getOrientation().k));
+	}
 
 	if (showPlane)
 	{
@@ -1724,9 +1714,9 @@ void GameManager::render()
 
 	if (showPlane)
 	{
-		for (auto part : aircraftParts)
+		for (AircraftVisuals part : aircraftParts)
 		{
-			renderer->draw(part, view, projection);
+			renderer->draw(part.mesh, view, projection);
 		}
 	}
 

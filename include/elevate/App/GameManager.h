@@ -75,6 +75,12 @@ struct CollisionBody
     elevate::CollisionPlane* plane = nullptr;
 };
 
+
+struct AircraftVisuals {
+    elevate::Vector3 offset;
+    Cube* mesh;
+};
+
 class GameManager {
 public:
     GameManager(Window* window, unsigned int width, unsigned int height);
@@ -291,8 +297,8 @@ private:
     Aero tail;
     RigidBody aircraft;
     elevate::Vector3 windspeed;
-	std::vector<Cube*> aircraftParts;
-	bool showPlane = false;
+	std::vector<AircraftVisuals> aircraftParts;
+	bool showPlane = true;
 
     void ResetPlane();
 
