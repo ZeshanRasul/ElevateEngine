@@ -221,6 +221,7 @@ public:
     void ResetPlane();
 
     float car_throttle = 0.0f;
+    float car_steerAngle = 0.0f;
     bool fpsSandboxDemo = false;
 
     SceneType currentScene = SceneType::DemoShowcase;
