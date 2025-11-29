@@ -3,6 +3,7 @@
 
 #include "OpenGL/Renderer.h"
 #include "OpenGL/RenderData.h"
+#include "OpenGL/Cubemap.h"
 #include "Window/Window.h"
 
 #include "App/InputManager.h"
@@ -207,6 +208,7 @@ public:
     Shader ammoShader;
     Shader cubeShader;
     Shader lineShader;
+    Shader cubemapShader;
 
     static const int MaxAmmoRounds = 32;
 
@@ -309,6 +311,9 @@ private:
     Sphere* springSphere3;
     Plane* plane;
 
+    std::vector<std::string> cubemapFaces;
+    Cubemap* cubemap;
+
     elevate::ParticleWorld* pWorld;
     elevate::ParticleCable cable1;
     elevate::ParticleCable cable2;
@@ -316,6 +321,8 @@ private:
 
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection = glm::mat4(1.0f);
+    glm::mat4 cubemapView = glm::mat4(1.0f);
+
     const static unsigned ammoRounds = 16;
 
     FloatingSphere* Sphere0;

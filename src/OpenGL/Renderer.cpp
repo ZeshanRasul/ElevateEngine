@@ -35,10 +35,20 @@ bool Renderer::init(unsigned int width, unsigned int height)
 	return true;
 }
 
-void Renderer::setScene(glm::mat4 viewMat, glm::mat4 proj, DirLight light)
+void Renderer::drawCubemap(Cubemap* cubemap)
+{
+	cubemap->GetShader()->use();
+	cubemap->GetShader()->setMat4("view", cubemapView);
+	cubemap->GetShader()->setMat4("projection", projection);
+
+	cubemap->Draw();
+}
+
+void Renderer::setScene(glm::mat4 viewMat, glm::mat4 proj, glm::mat4 cubemapView, DirLight light)
 {
 	view = viewMat;
 	projection = proj;
+	this->cubemapView = cubemapView;
 	sun = light;
 }
 

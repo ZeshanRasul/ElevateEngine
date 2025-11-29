@@ -142,6 +142,7 @@
     <ClInclude Include="include\elevate\App\GameManager.h" />
     <ClInclude Include="include\elevate\App\InputManager.h" />
     <ClInclude Include="include\elevate\GameObjects\Cube.h" />
+    <ClInclude Include="include\elevate\OpenGL\Cubemap.h" />
     <ClInclude Include="include\elevate\Physics\Aero.h" />
     <ClInclude Include="include\elevate\Physics\Demos\SceneManager.h" />
     <ClInclude Include="include\elevate\Physics\Factory.h" />
@@ -193,6 +194,7 @@
     <ClInclude Include="src\Window\Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\OpenGL\Cubemap.cpp" />
     <ClCompile Include="src\Physics\SceneManager.cpp" />
     <ClCompile Include="include\external\ImGuizmo.cpp" />
     <ClCompile Include="src\Physics\Aero.cpp" />
@@ -239,6 +241,8 @@
     <ClCompile Include="src\Window\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\Shaders\cubemap_fragment.glsl" />
+    <None Include="src\Shaders\cubemap_vertex.glsl" />
     <None Include="src\Shaders\fragment.glsl" />
     <None Include="src\Shaders\line_frag.glsl" />
     <None Include="src\Shaders\line_vert.glsl" />

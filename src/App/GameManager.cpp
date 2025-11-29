@@ -31,13 +31,27 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	renderer = window->getRenderer();
 
 	ammoShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
-
 	cubeShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment_tex.glsl");
 	lineShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/line_vert.glsl", "C:/dev/ElevateEngine/src/Shaders/line_frag.glsl");
+
+	cubemapShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/cubemap_vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/cubemap_fragment.glsl");
 
 	camera = new Camera(glm::vec3(18.0f, 5.0f, 18.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f);
 
 	inputManager->setContext(camera, this, width, height);
+
+	cubemapFaces = {
+	"src/Assets/Textures/Cubemap/right.png",
+	"src/Assets/Textures/Cubemap/left.png",
+	"src/Assets/Textures/Cubemap/top.png",
+	"src/Assets/Textures/Cubemap/bottom.png",
+	"src/Assets/Textures/Cubemap/front.png",
+	"src/Assets/Textures/Cubemap/back.png"
+	};
+
+	cubemap = new Cubemap(&cubemapShader);
+	cubemap->LoadMesh();
+	cubemap->LoadCubemap(cubemapFaces);
 
 	contacts = new elevate::Contact[2056];
 	cData.contactArray = contacts;
@@ -68,12 +82,13 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 void GameManager::setupCamera(unsigned int width, unsigned int height)
 {
 	view = camera->GetViewMatrix();
+	cubemapView = glm::mat4(glm::mat3(camera->GetViewMatrix()));
 	projection = glm::perspective(glm::radians(camera->Zoom), (float)width / (float)height, 0.1f, 5000.0f);
 }
 
 void GameManager::setSceneData()
 {
-	renderer->setScene(view, projection, dirLight);
+	renderer->setScene(view, projection, cubemapView, dirLight);
 }
 
 void GameManager::reset()
@@ -1539,9 +1554,9 @@ void GameManager::update(float deltaTime)
 		Vector3 right = t.getAxisVector(2);
 		right.normalize();
 
-		float steerStrength = 2000.0f;
+		real steerStrength = 2000.0f;
 
-		float halfWidth = car->chassis->halfSize.x;
+		real halfWidth = car->chassis->halfSize.x;
 
 		Vector3 pointLeftLocal = Vector3(-halfWidth, 0.0f, 0.0f);
 		Vector3 pointRightLocal = Vector3(halfWidth, 0.0f, 0.0f);
@@ -2601,6 +2616,8 @@ void GameManager::ResetPlane()
 }
 void GameManager::render()
 {
+	renderer->drawCubemap(cubemap);
+
 	for (auto obj : gameObjects) {
 		renderer->draw(obj, view, projection);
 	}

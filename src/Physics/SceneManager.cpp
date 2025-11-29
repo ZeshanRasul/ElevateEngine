@@ -260,53 +260,55 @@ void Scenes::LoadDemoShowcase(GameManager* gm)
 //
 //	//	gm->reset();
 //
-//	gm->ammoCount = 32;
-//
-//	for (int i = 0; i < gm->ammoCount; ++i)
-//	{
-//		elevate::Vector3 startPos(0.0f, -100.0f, 0.0f); // far below world
-//
-//		elevate::Vector3 scale(1.0f, 1.0f, 1.0f);
-//		Sphere* s = new Sphere(startPos, scale, &gm->ammoShader, gm,
-//			glm::vec3(0.9f, 0.1f, 0.1f));
-//		s->GenerateSphere(0.5f, 16, 16);
-//		s->LoadMesh();
-//		gameObjects.push_back(s);
-//
-//		elevate::RigidBody* body = new elevate::RigidBody();
-//		body->setAwake(false);
-//		body->setPosition(startPos);
-//		body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
-//		body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
-//		body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
-//
-//		real mass = 1.7f;
-//		body->setMass(mass);
-//		body->setDamping(0.97f, 0.97f);
-//
-//		real r = 0.5f;
-//		real coeff = (real)0.4f * mass * r * r;
-//		elevate::Matrix3 inertia;
-//		inertia.setInertiaTensorCoeffs(coeff, coeff, coeff);
-//		body->setInertiaTensor(inertia);
-//
-//		//spawnContext.World->addBody(body);
-//		//spawnContext.World->getForceRegistry().add(body, rbGravity);
-//
-//		elevate::CollisionSphere* cs = new elevate::CollisionSphere();
-//		cs->body = body;
-//		cs->radius = r;
-//		cs->body->calculateDerivedData();
-//		cs->calculateInternals();
-//
-//		gm->ammoPool[i].visual = s;
-//		gm->ammoPool[i].body = body;
-//		gm->ammoPool[i].coll = cs;
-//		gm->ammoPool[i].active = false;
-//		gm->ammoPool[i].lifetime = 0.0f;
-//
-//
-//	}
+	std::vector<GameObject*>& gameObjects = gm->GetGameObjects();
+
+	gm->ammoCount = 32;
+
+	for (int i = 0; i < gm->ammoCount; ++i)
+	{
+		elevate::Vector3 startPos(0.0f, -100.0f, 0.0f); // far below world
+
+		elevate::Vector3 scale(1.0f, 1.0f, 1.0f);
+		Sphere* s = new Sphere(startPos, scale, &gm->ammoShader, gm,
+			glm::vec3(0.9f, 0.1f, 0.1f));
+		s->GenerateSphere(0.5f, 16, 16);
+		s->LoadMesh();
+		gameObjects.push_back(s);
+
+		elevate::RigidBody* body = new elevate::RigidBody();
+		body->setAwake(false);
+		body->setPosition(startPos);
+		body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+		body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+
+		real mass = 1.7f;
+		body->setMass(mass);
+		body->setDamping(0.97f, 0.97f);
+
+		real r = 0.5f;
+		real coeff = (real)0.4f * mass * r * r;
+		elevate::Matrix3 inertia;
+		inertia.setInertiaTensorCoeffs(coeff, coeff, coeff);
+		body->setInertiaTensor(inertia);
+
+		//spawnContext.World->addBody(body);
+		//spawnContext.World->getForceRegistry().add(body, rbGravity);
+
+		elevate::CollisionSphere* cs = new elevate::CollisionSphere();
+		cs->body = body;
+		cs->radius = r;
+		cs->body->calculateDerivedData();
+		cs->calculateInternals();
+
+		gm->ammoPool[i].visual = s;
+		gm->ammoPool[i].body = body;
+		gm->ammoPool[i].coll = cs;
+		gm->ammoPool[i].active = false;
+		gm->ammoPool[i].lifetime = 0.0f;
+
+
+	}
 //
 //	gm->spawnFactory->BuildDominoLine(
 //		elevate::Vector3(75.0f, 3.5f, -150.0f),
