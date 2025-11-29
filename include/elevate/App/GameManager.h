@@ -249,6 +249,7 @@ private:
     void ShowSpawnObjectWindow();
     void ShowEngineWindow();
     void ShowPerformanceWindow();
+    void DrawPhysicsObjectsCombo();
     void CalculatePerformanceMetrics(float deltaTime);
     void RemoveDestroyedGameObjects();
 
@@ -424,6 +425,10 @@ private:
     float physicsTime;
     float physicsTimeSum;
     float physicsTimeAvg;
+
+	std::vector<PhysicsObject*> allSceneObjects;
+    int sceneObjectIndex;
+	PhysicsObject* selectedSceneObject = nullptr;
 
     std::vector<DebugLine> m_DebugLines;
     GLuint m_DebugLineVAO = 0;

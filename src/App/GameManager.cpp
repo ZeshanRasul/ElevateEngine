@@ -101,6 +101,7 @@ void GameManager::reset()
 	floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
 	static_cast<Cube*>(floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_4k_albedo.png");
 	gameObjects.push_back(floor->mesh);
+	allSceneObjects.push_back(floor);
 
 	wall = spawnFactory->CreateWall(
 		elevate::Vector3(1.0f, 60.0f, 200.0f),
@@ -112,7 +113,8 @@ void GameManager::reset()
 	wall->mesh->SetTexTiling(4.0f);
 	static_cast<Cube*>(wall->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	gameObjects.push_back(wall->mesh);
-
+	allSceneObjects.push_back(wall);
+	
 	wall2 = spawnFactory->CreateWall(
 		elevate::Vector3(1.0f, 60.0f, 200.0f),
 		elevate::Vector3(-200.0f, 60.0f, 0.0f),
@@ -123,6 +125,7 @@ void GameManager::reset()
 	wall2->mesh->SetTexTiling(4.0f);
 	static_cast<Cube*>(wall2->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	gameObjects.push_back(wall2->mesh);
+	allSceneObjects.push_back(wall2);
 
 	wall3 = spawnFactory->CreateWall(
 		elevate::Vector3(200.0f, 60.0f, 1.0f),
@@ -133,7 +136,7 @@ void GameManager::reset()
 	wall3->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	wall3->mesh->SetTexTiling(4.0f);
 	static_cast<Cube*>(wall3->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
-	gameObjects.push_back(wall3->mesh);
+	allSceneObjects.push_back(wall3);
 
 	wall4 = spawnFactory->CreateWall(
 		elevate::Vector3(200.0f, 60.0f, 1.0f),
@@ -145,7 +148,8 @@ void GameManager::reset()
 	wall4->mesh->SetTexTiling(4.0f);
 	static_cast<Cube*>(wall4->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	gameObjects.push_back(wall4->mesh);
-
+	allSceneObjects.push_back(wall4);
+	
 	spawnFactory->BuildDominoLine(
 		elevate::Vector3(75.0f, 3.5f, -150.0f),
 		elevate::Vector3(0.0f, 0.0f, 1.0f),
@@ -174,6 +178,7 @@ void GameManager::reset()
 		domino->mesh->setGameManager(this);
 		domino->mesh->SetColor(glm::vec3(0.8f, 0.9f, 0.8f));
 		gameObjects.push_back(domino->mesh);
+		allSceneObjects.push_back(domino);
 	}
 
 
@@ -269,6 +274,8 @@ void GameManager::reset()
 		static_cast<Cube*>(crates[i]->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 
 		gameObjects.push_back(crates[i]->mesh);
+		allSceneObjects.push_back(crate);
+
 	}
 
 	numStackCubes = 5;
@@ -371,7 +378,7 @@ void GameManager::reset()
 	crate->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.1f));
 
 	gameObjects.push_back(crate->mesh);
-
+	allSceneObjects.push_back(crate);
 
 }
 
@@ -725,83 +732,12 @@ void GameManager::setUpDebugUI()
 
 void GameManager::showDebugUI()
 {
-
 	ShowLightControlWindow(dirLight);
 	ShowCameraControlWindow(*camera);
 	ShowSpawnObjectWindow();
 	ShowPerformanceWindow();
 	ShowEngineWindow();
-
-
-
-	glm::mat4 view = camera->GetViewMatrix();
-	glm::mat4 proj = projection;
-
-	glm::mat4 blockWorld = blocks[0].visual->GetWorldMatrix();
-	float* blockWorldPtr = glm::value_ptr(blockWorld);
-	ImGui::Begin("Scene");
-
-
-	ImGuizmo::Manipulate(
-		glm::value_ptr(view),
-		glm::value_ptr(projection),
-		currentOperation,
-		currentMode,
-		blockWorldPtr
-	);
-
-	if (ImGui::RadioButton("Translate", currentOperation == ImGuizmo::TRANSLATE))
-		currentOperation = ImGuizmo::TRANSLATE;
-	ImGui::SameLine();
-	if (ImGui::RadioButton("Rotate", currentOperation == ImGuizmo::ROTATE))
-		currentOperation = ImGuizmo::ROTATE;
-	ImGui::SameLine();
-	if (ImGui::RadioButton("Scale", currentOperation == ImGuizmo::SCALE))
-		currentOperation = ImGuizmo::SCALE;
-
-	ImGui::Separator();
-
-	if (ImGui::RadioButton("Local", currentMode == ImGuizmo::LOCAL))
-		currentMode = ImGuizmo::LOCAL;
-	ImGui::SameLine();
-	if (ImGui::RadioButton("World", currentMode == ImGuizmo::WORLD))
-		currentMode = ImGuizmo::WORLD;
-
-
-	if (ImGuizmo::IsUsing())
-	{
-		glm::vec3 pos, rot, scale;
-		ImGuizmo::DecomposeMatrixToComponents(blockWorldPtr,
-			glm::value_ptr(pos),
-			glm::value_ptr(rot),
-			glm::value_ptr(scale));
-
-		blocks[0].visual->SetPosition(elevate::Vector3(pos.x, pos.y, pos.z));
-		blocks[0].visual->SetScale(elevate::Vector3(scale.x, scale.y, scale.z));
-
-		// rot is Euler degrees from ImGuizmo (XYZ)
-		blocks[0].visual->SetOrientation(glm::quat(glm::radians(rot)));
-
-		blocks[0].halfSize = elevate::Vector3(
-			scale.x * 0.5f,
-			scale.y * 0.5f,
-			scale.z * 0.5f
-		);
-
-		blocks[0].body->setPosition(elevate::Vector3(pos.x, pos.y, pos.z));
-		blocks[0].body->setOrientation(elevate::Quaternion(
-			blocks[0].visual->GetOrientation().w,
-			blocks[0].visual->GetOrientation().x,
-			blocks[0].visual->GetOrientation().y,
-			blocks[0].visual->GetOrientation().z
-		));
-
-		blocks[0].body->calculateDerivedData();
-	}
-
-
-	ImGui::End();
-
+	DrawPhysicsObjectsCombo();
 }
 
 void GameManager::renderDebugUI()
@@ -1264,6 +1200,114 @@ void GameManager::ShowPerformanceWindow()
 	ImGui::Text("Average Physics Time: %.1f ms", physicsTimeAvg);
 	ImGui::Text("Frame Time: %.1f ms", frameTimeMs);
 	ImGui::Text("Elapsed Time: %.1f s", timeElapsed);
+
+	ImGui::End();
+
+}
+
+void GameManager::DrawPhysicsObjectsCombo()
+{
+	ImGui::Begin("Elevate Editor");
+
+	ImGui::Text("Selected Physics Object");
+
+	if (allSceneObjects.empty())
+	{
+		ImGui::TextDisabled("No physics objects in scene.");
+		sceneObjectIndex = -1;
+		selectedSceneObject = nullptr;
+		return;
+	}
+
+	if (sceneObjectIndex < 0 || sceneObjectIndex >= (int)allSceneObjects.size())
+	{
+		sceneObjectIndex = 0;
+		selectedSceneObject = allSceneObjects[0];
+	}
+
+	PhysicsObject* current = allSceneObjects[sceneObjectIndex];
+	const char* previewText = "Physics Object"; // current->GetName().c_str()
+
+	if (ImGui::BeginCombo("##PhysicsObjectCombo", previewText))
+	{
+		for (int i = 0; i < (int)allSceneObjects.size(); ++i)
+		{
+			PhysicsObject* obj = allSceneObjects[i];
+			std::string itemLabel;
+			itemLabel = "PhysicsObject " + std::to_string(i);
+		
+
+			bool isSelected = (sceneObjectIndex == i);
+			if (ImGui::Selectable(itemLabel.c_str(), isSelected))
+			{
+				sceneObjectIndex = i;
+				selectedSceneObject = obj;
+			}
+
+			if (isSelected)
+			{
+				ImGui::SetItemDefaultFocus();
+			}
+		}
+
+		ImGui::EndCombo();
+	}
+
+
+	if (selectedSceneObject)
+	{
+		glm::mat4 transform = selectedSceneObject->mesh->GetWorldMatrix();
+
+		//ImGuizmo::SetDrawlist();
+		//ImGuizmo::SetRect(ImGui::GetWindowPos().x,
+		//	ImGui::GetWindowPos().y,
+		//	ImGui::GetWindowWidth(),
+		//	ImGui::GetWindowHeight());
+
+		glm::mat4 view = camera->GetViewMatrix();
+		glm::mat4 proj = projection;
+		ImGuizmo::Manipulate(glm::value_ptr(view),
+			glm::value_ptr(proj),
+			currentOperation,
+			currentMode,
+			glm::value_ptr(transform));
+
+		if (ImGuizmo::IsUsing())
+		{
+			glm::vec3 pos, rot, scale;
+			ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform),
+				glm::value_ptr(pos),
+				glm::value_ptr(rot),
+				glm::value_ptr(scale));
+
+
+			selectedSceneObject->mesh->SetPosition(elevate::Vector3(pos.x, pos.y, pos.z));
+			selectedSceneObject->mesh->SetScale(elevate::Vector3(scale.x, scale.y, scale.z));
+
+			// rot is Euler degrees from ImGuizmo (XYZ)
+			selectedSceneObject->mesh->SetOrientation(glm::quat(glm::radians(rot)));
+
+			blocks[0].halfSize = elevate::Vector3(
+				scale.x * 0.5f,
+				scale.y * 0.5f,
+				scale.z * 0.5f
+			);
+
+			selectedSceneObject->body->setPosition(elevate::Vector3(pos.x, pos.y, pos.z));
+			selectedSceneObject->body->setOrientation(elevate::Quaternion(
+				selectedSceneObject->mesh->GetOrientation().w,
+				selectedSceneObject->mesh->GetOrientation().x,
+				selectedSceneObject->mesh->GetOrientation().y,
+				selectedSceneObject->mesh->GetOrientation().z
+			));
+
+			selectedSceneObject->body->calculateDerivedData();
+
+			// Sync back to Elevate body
+			selectedSceneObject->body->setPosition({ pos.x, pos.y, pos.z });
+			selectedSceneObject->body->calculateDerivedData();
+		}
+	}
 
 	ImGui::End();
 
