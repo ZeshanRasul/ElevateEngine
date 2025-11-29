@@ -241,6 +241,7 @@ public:
     Texture blockTexture;
     Texture brickTexture;
     Texture crateTexture;
+    Texture stackCrateTexture;
 
     PhysicsObject* crate;
     PhysicsObject* ball;
@@ -438,9 +439,9 @@ private:
     float right_wing_control;
     float rudder_control;
 
-    float friction = 0.9f;
-	float restitution = 0.01f;
-	float tolerance = 0.01f;
+    float friction = 0.6f;
+	float restitution = 0.4f;
+	float tolerance = 0.1f;
 
 	float groundPlaneOffset = 0.0f;
 

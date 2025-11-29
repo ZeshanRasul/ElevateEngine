@@ -14,7 +14,7 @@ static ImGuizmo::MODE currentMode = ImGuizmo::LOCAL;
 DirLight dirLight = {
 		glm::vec3(-0.2f, -1.0f, -0.3f),
 
-		glm::vec3(0.15f, 0.15f, 0.15f),
+		glm::vec3(0.58f, 0.58f, 0.74f),
 		glm::vec3(0.85f),
 		glm::vec3(0.1f, 0.1f, 0.1f)
 };
@@ -228,14 +228,14 @@ void GameManager::reset()
 		}
 	}
 
-	firstHit = false;
+	firstHit = true;
 
 	elevate::Vector3 blockPos(-50, 25, 50);
 	elevate::Vector3 blockScale(15, 15, 15);
 
 	Cube* cube = new Cube(blockPos, elevate::Vector3(15, 15, 15), &cubeShader, this);
 	cube->LoadMesh();
-	blockTexture = cube->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Block/TCom_Concrete_WallAbstract_512_albedo.png");
+	blockTexture = cube->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Block/cracked_concrete_wall_diff_2k.png");
 	cube->SetAngle(0.0f);
 	cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
 	cube->SetColor(glm::vec3(0.2f, 0.1f, 0.5f));
@@ -294,13 +294,14 @@ void GameManager::reset()
 		crates
 	);
 
+	stackCrateTexture = static_cast<Cube*>(crates[0]->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Crate/rusted_shutter_diff_2k.png");
+	
 	for (int i = 0; i < crates.size(); ++i)
 	{
 		crates[i]->mesh->SetShader(&cubeShader);
 		crates[i]->mesh->setGameManager(this);
 		crates[i]->mesh->SetColor(glm::vec3(0.3f, 0.7f, 0.2f));
-		static_cast<Cube*>(crates[i]->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
-
+		static_cast<Cube*>(crates[i]->mesh)->SetTexture(stackCrateTexture);
 		crates[i]->name = "Crate " + std::to_string(i);
 		gameObjects.push_back(crates[i]->mesh);
 		allSceneObjects.push_back(crates[i]);
@@ -380,7 +381,7 @@ void GameManager::reset()
 	);
 
 	brickTexture = static_cast<Cube*>(bricks[0]->mesh)->LoadTextureFromFile(
-		"C:/dev/ElevateEngine/src/Assets/Textures/Brick/TCom_Brick_Glazed2_512_albedo.png");
+		"C:/dev/ElevateEngine/src/Assets/Textures/Brick/painted_brick_diff_2k.png");
 
 	for (size_t i = 0; i < bricks.size(); ++i)
 	{
@@ -401,7 +402,7 @@ void GameManager::reset()
 	);
 
 	crate->mesh->SetShader(&cubeShader);
-	static_cast<Cube*>(crate->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Crate/TCom_MetalThreadplate4_Aged_512_albedo.png");
+	static_cast<Cube*>(crate->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Crate/TCom_Scifi_Pattern_4K_albedo.png");
 	//static_cast<Cube*>(crate->mesh)->SetTexture(crateTexture);
 	crate->mesh->setGameManager(this);
 	crate->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.1f));
@@ -1343,12 +1344,6 @@ void GameManager::DrawPhysicsObjectsCombo()
 
 			// rot is Euler degrees from ImGuizmo (XYZ)
 			selectedSceneObject->mesh->SetOrientation(glm::quat(glm::radians(rot)));
-
-			blocks[0].halfSize = elevate::Vector3(
-				scale.x * 0.5f,
-				scale.y * 0.5f,
-				scale.z * 0.5f
-			);
 
 			selectedSceneObject->body->setPosition(elevate::Vector3(pos.x, pos.y, pos.z));
 			selectedSceneObject->body->setOrientation(elevate::Quaternion(
