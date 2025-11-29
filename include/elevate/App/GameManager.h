@@ -174,6 +174,7 @@ public:
     void reset();
     void ResetState();
     void togglePause() { isPaused = !isPaused; }
+    void ResetCar();
 
     void OnQPressed();
     void OnEPressed();
@@ -430,7 +431,7 @@ private:
     float right_wing_control;
     float rudder_control;
 
-    float friction = 0.6f;
+    float friction = 0.9f;
 	float restitution = 0.2f;
 	float tolerance = 0.01f;
 

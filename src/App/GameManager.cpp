@@ -642,6 +642,12 @@ void GameManager::ResetState()
 		break;
 	};
 }
+void GameManager::ResetCar()
+{
+	car->body->setPosition(elevate::Vector3(0.0f, 1.3f, 0.0f));
+	car->throttle = 0.0f;
+	car->steerAngle = 0.0f;
+}
 void GameManager::OnQPressed()
 {
 	rudder_control += 0.1f;
@@ -662,7 +668,8 @@ void GameManager::OnWPressed()
 
 	if (showCar)
 	{
-		car_throttle += 0.1f * 50;
+		//car_throttle += 0.1f * 50;
+		car->throttle += 0.1f;
 	}
 }
 
@@ -676,7 +683,7 @@ void GameManager::OnSPressed()
 
 	if (showCar)
 	{
-		car_throttle -= 0.1f * 50;
+		car->throttle -= 0.1f;
 	}
 }
 
@@ -699,7 +706,15 @@ void GameManager::OnLeftClick()
 
 void GameManager::OnZPressed()
 {
-	ResetPlane();
+	if (showPlane)
+	{
+		ResetPlane();
+	}
+
+	if (showCar)
+	{
+		ResetCar();
+	}
 }
 
 void GameManager::OnHPressed()
@@ -1163,7 +1178,7 @@ void GameManager::ShowEngineWindow()
 
 	if (showCar)
 	{
-		ImGui::Text("Car Throttle: %.2f", car_throttle);
+		ImGui::Text("Car Throttle: %.2f", car->throttle);
 		ImGui::Text("Car position: X: %.2f Y: %.2f Z: %.2f",
 			car->body->getPosition().x,
 			car->body->getPosition().y,
@@ -1446,14 +1461,30 @@ void GameManager::update(float deltaTime)
 
 	if (showCar)
 	{
+
+
+
 		// Clamp throttle
 	//	car_throttle = glm::clamp(car_throttle, -100.0f, 100.0f);
 		//	car.setPosition(elevate::Vector3(20.0f, 2.0f, -90.0f));
 		car->body->clearAccumulator();
 		car->body->calculateDerivedData();
-		car->body->addForce(elevate::Vector3(car_throttle, 0, 0));
-	//	rbGravity->updateForce(car->body, deltaTime);
-		//	rbRegistry.updateForces(deltaTime);
+		//	car->body->addForce(elevate::Vector3(car_throttle, 0, 0));
+			//	rbRegistry.updateForces(deltaTime);
+
+		Matrix4 transform = car->body->getTransform();
+		Vector3 forward = transform.getAxisVector(0);
+		forward.normalize();
+
+		Vector3 rearAvg = (car->wheels[2].offset + car->wheels[3].offset) * 0.5f;
+
+		real engineForce = 80.0f;
+
+		Vector3 forceWorld = forward * (car->throttle * engineForce);
+
+		car->body->addForceAtBodyPoint(forceWorld, rearAvg);
+		rbGravity->updateForce(car->body, deltaTime);
+
 		car->body->integrate(deltaTime);
 		car->chassis->calculateInternals();
 
@@ -1965,13 +1996,13 @@ void GameManager::generateContacts()
 	for (int i = 0; i < 4; i++)
 	{
 		if (!cData.hasMoreContacts()) return;
-	//	elevate::CollisionDetector::sphereAndHalfSpace(*car->wheels[i].coll, plane, &cData);
+			elevate::CollisionDetector::sphereAndHalfSpace(*car->wheels[i].coll, plane, &cData);
 		if (!cData.hasMoreContacts()) return;
-	//	elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(floor->shape), *car->wheels[i].coll, &cData);
+		//	elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(floor->shape), *car->wheels[i].coll, &cData);
 	}
 
 	if (!cData.hasMoreContacts()) return;
-	//elevate::CollisionDetector::boxAndHalfSpace(*car->chassis, plane, &cData);
+	elevate::CollisionDetector::boxAndHalfSpace(*car->chassis, plane, &cData);
 	if (!cData.hasMoreContacts()) return;
 	//elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(floor->shape), *car->chassis, &cData);
 

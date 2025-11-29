@@ -147,18 +147,8 @@ void Scenes::LoadCarTest(GameManager* gm)
 	Matrix3 inertia;
 	inertia.setDiagonal(ix, iy, iz);
 	gm->car->body->setInertiaTensor(inertia);
-
-
-//	gm->car->body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
-//	gm->car->body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
-//	gm->car->body->setPosition(elevate::Vector3(0.0f, 0.0f, 0.0f));
-
-	//elevate::Vector3 carPropulsion(gm->car_throttle * 50.0f, 0, 0);
-	//car.addForce(carPropulsion);
-	//gm->carEngine->setThrottle(carPropulsion);
 	
 	return;
-
 }
 
 void Scenes::LoadAeroplaneTest(GameManager* gm)
