@@ -644,9 +644,12 @@ void GameManager::ResetState()
 }
 void GameManager::ResetCar()
 {
-	car->body->setPosition(elevate::Vector3(0.0f, 1.3f, 0.0f));
+	car->body->setPosition(elevate::Vector3(0.0f, 1.2f, 0.0f));
 	car->throttle = 0.0f;
 	car->steerAngle = 0.0f;
+	car->body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+	car->body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+	car->body->calculateDerivedData();
 }
 void GameManager::OnQPressed()
 {
@@ -1478,11 +1481,11 @@ void GameManager::update(float deltaTime)
 
 		Vector3 rearAvg = (car->wheels[2].offset + car->wheels[3].offset) * 0.5f;
 
-		real engineForce = 8000.0f;
+		real engineForce = 800.0f;
 
 		Vector3 forceWorld = forward * (car->throttle * engineForce);
 
-		car->body->addForceAtBodyPoint(forceWorld, rearAvg);
+		car->body->addForce(forceWorld);
 	//	rbGravity->updateForce(car->body, deltaTime);
 		car->body->addForce(elevate::Vector3::GRAVITY);
 

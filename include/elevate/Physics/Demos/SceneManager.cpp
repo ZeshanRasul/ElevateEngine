@@ -69,13 +69,13 @@ void Scenes::LoadCarTest(GameManager* gm)
 	//	gameObjects.resize(300);
 
 	gm->floor = gm->spawnFactory->CreateFloor(
-		elevate::Vector3(100.0f, 1.0f, 100.0f),
+		elevate::Vector3(500.0f, 1.0f, 500.0f),
 		&gm->cubeShader,
 		elevate::Vector3(0.0f, -1.0f, 0.0f)
 	);
 	gm->floor->mesh->setGameManager(gm);
 	gm->floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
-	static_cast<Cube*>(gm->floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_512_albedo.png");
+	static_cast<Cube*>(gm->floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_4k_albedo.png");
 	gameObjects.push_back(gm->floor->mesh);
 
 	real chassisMass = 1200.0f;
