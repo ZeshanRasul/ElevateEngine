@@ -449,7 +449,7 @@ private:
     float physicsTimeAvg;
 
 	std::vector<PhysicsObject*> allSceneObjects;
-    int sceneObjectIndex;
+    int sceneObjectIndex = 0;
 	PhysicsObject* selectedSceneObject = nullptr;
 
     std::vector<DebugLine> m_DebugLines;

@@ -225,6 +225,7 @@ namespace elevate
 
 	private:
 		SpawnContext m_Ctx;
+		int itemIndex = 0;
 
 		RigidBody* CreateRigidBody(
 			const Transform& transform,

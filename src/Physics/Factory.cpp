@@ -1,6 +1,7 @@
 #include "Physics/Factory.h"
 #include "GameObjects/Cube.h"
 #include "GameObjects/Sphere.h"
+#include <string>
 
 namespace elevate
 {
@@ -84,7 +85,7 @@ namespace elevate
 		obj->materialId = materialId;
 		obj->body->calculateDerivedData();
 		obj->shape->calculateInternals();
-		obj->name = name;
+	//	obj->name = name + std::to_string(itemIndex++);
 
 		if (name == "Box" || name == "Floor" || name == "Wall")
 		{

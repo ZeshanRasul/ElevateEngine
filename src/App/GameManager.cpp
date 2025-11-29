@@ -99,8 +99,10 @@ void GameManager::reset()
 	floor->mesh->setGameManager(this);
 	floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
 	static_cast<Cube*>(floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_4k_albedo.png");
+	floor->name = "Floor";
 	gameObjects.push_back(floor->mesh);
 	allSceneObjects.push_back(floor);
+	sceneObjectIndex++;
 
 	wall = spawnFactory->CreateWall(
 		elevate::Vector3(1.0f, 60.0f, 200.0f),
@@ -111,8 +113,10 @@ void GameManager::reset()
 	wall->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	wall->mesh->SetTexTiling(4.0f);
 	static_cast<Cube*>(wall->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
+	wall->name = "Wall 1";
 	gameObjects.push_back(wall->mesh);
 	allSceneObjects.push_back(wall);
+	sceneObjectIndex++;
 
 	wall2 = spawnFactory->CreateWall(
 		elevate::Vector3(1.0f, 60.0f, 200.0f),
@@ -123,8 +127,10 @@ void GameManager::reset()
 	wall2->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	wall2->mesh->SetTexTiling(4.0f);
 	static_cast<Cube*>(wall2->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
+	wall2->name = "Wall 2";
 	gameObjects.push_back(wall2->mesh);
 	allSceneObjects.push_back(wall2);
+	sceneObjectIndex++;
 
 	wall3 = spawnFactory->CreateWall(
 		elevate::Vector3(200.0f, 60.0f, 1.0f),
@@ -134,8 +140,12 @@ void GameManager::reset()
 	wall3->mesh->setGameManager(this);
 	wall3->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	wall3->mesh->SetTexTiling(4.0f);
+	wall3->name = "Wall 3";
+
 	static_cast<Cube*>(wall3->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	allSceneObjects.push_back(wall3);
+	sceneObjectIndex++;
+	gameObjects.push_back(wall3->mesh);
 
 	wall4 = spawnFactory->CreateWall(
 		elevate::Vector3(200.0f, 60.0f, 1.0f),
@@ -146,8 +156,11 @@ void GameManager::reset()
 	wall4->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	wall4->mesh->SetTexTiling(4.0f);
 	static_cast<Cube*>(wall4->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
+	wall4->name = "Wall 4";
+
 	gameObjects.push_back(wall4->mesh);
 	allSceneObjects.push_back(wall4);
+	sceneObjectIndex++;
 
 	spawnFactory->BuildDominoLine(
 		elevate::Vector3(75.0f, 3.5f, -150.0f),
@@ -160,11 +173,13 @@ void GameManager::reset()
 
 	for (PhysicsObject* domino : dominoes)
 	{
+		int i = 0;
 		elevate::Matrix3 tensor;
 		tensor.setBlockInertiaTensor(elevate::Vector3(2.0f, 5.0f, 0.8f), 0.5f);
 		domino->body->setInertiaTensor(tensor);
 		domino->body->calculateDerivedData();
 		domino->shape->calculateInternals();
+		domino->name = "Domino " + std::to_string(i++);
 
 		Cube* cube = new Cube(
 			domino->body->getTransform().getAxisVector(3),
@@ -178,9 +193,8 @@ void GameManager::reset()
 		domino->mesh->SetColor(glm::vec3(0.8f, 0.9f, 0.8f));
 		gameObjects.push_back(domino->mesh);
 		allSceneObjects.push_back(domino);
+		sceneObjectIndex++;
 	}
-
-
 
 	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(0.0f, 4.0f, 0.0f)));
 	ragdolls.push_back(spawnFactory->CreateRagdoll(elevate::Vector3(10.0f, 4.0f, 0.0f)));
@@ -272,9 +286,10 @@ void GameManager::reset()
 		crates[i]->mesh->SetColor(glm::vec3(0.3f, 0.7f, 0.2f));
 		static_cast<Cube*>(crates[i]->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 
+		crates[i]->name = "Crate " + std::to_string(i);
 		gameObjects.push_back(crates[i]->mesh);
-		allSceneObjects.push_back(crate);
-
+		allSceneObjects.push_back(crates[i]);
+		sceneObjectIndex++;
 	}
 
 	numStackCubes = 5;
@@ -375,10 +390,11 @@ void GameManager::reset()
 	//static_cast<Cube*>(crate->mesh)->SetTexture(crateTexture);
 	crate->mesh->setGameManager(this);
 	crate->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.1f));
+	crate->name = "Crate Main";
 
 	gameObjects.push_back(crate->mesh);
 	allSceneObjects.push_back(crate);
-
+	sceneObjectIndex++;
 }
 
 void GameManager::ResetState()
@@ -758,15 +774,15 @@ void GameManager::setUpDebugUI()
 
 void GameManager::showDebugUI()
 {
-	if (true)
+	if (showUI)
 	{
 		ShowLightControlWindow(dirLight);
 		ShowSpawnObjectWindow();
 		ShowPerformanceWindow();
-		//	DrawPhysicsObjectsCombo();
+		DrawPhysicsObjectsCombo();
+		ShowCameraControlWindow(*camera);
+		ShowEngineWindow();
 	}
-	ShowCameraControlWindow(*camera);
-	ShowEngineWindow();
 }
 
 void GameManager::renderDebugUI()
@@ -1239,6 +1255,7 @@ void GameManager::DrawPhysicsObjectsCombo()
 		ImGui::TextDisabled("No physics objects in scene.");
 		sceneObjectIndex = -1;
 		selectedSceneObject = nullptr;
+		ImGui::End();
 		return;
 	}
 
@@ -1255,9 +1272,10 @@ void GameManager::DrawPhysicsObjectsCombo()
 	{
 		for (int i = 0; i < (int)allSceneObjects.size(); ++i)
 		{
+			ImGui::PushID(i);
 			PhysicsObject* obj = allSceneObjects[i];
 			std::string itemLabel;
-			itemLabel = selectedSceneObject->name.c_str() + i;
+			itemLabel = obj->name;
 
 
 			bool isSelected = (sceneObjectIndex == i);
@@ -1271,6 +1289,7 @@ void GameManager::DrawPhysicsObjectsCombo()
 			{
 				ImGui::SetItemDefaultFocus();
 			}
+			ImGui::PopID();
 		}
 
 		ImGui::EndCombo();
@@ -1331,7 +1350,6 @@ void GameManager::DrawPhysicsObjectsCombo()
 			selectedSceneObject->body->calculateDerivedData();
 		}
 	}
-
 	ImGui::End();
 
 }
