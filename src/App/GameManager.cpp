@@ -694,14 +694,30 @@ void GameManager::OnSPressed()
 
 void GameManager::OnDPressed()
 {
-	left_wing_control -= 0.1f;
-	right_wing_control += 0.1f;
+	if (showPlane)
+	{
+		left_wing_control -= 0.1f;
+		right_wing_control += 0.1f;
+	}
+
+	else if (showCar)
+	{
+		car->steerAngle += 0.05f;
+	}
+
 }
 
 void GameManager::OnAPressed()
 {
-	left_wing_control += 0.1f;
-	right_wing_control -= 0.1f;
+	if (showPlane)
+	{
+		left_wing_control += 0.1f;
+		right_wing_control -= 0.1f;
+	}
+	else if (showCar)
+	{
+		car->steerAngle -= 0.05f;
+	}
 }
 
 void GameManager::OnLeftClick()
@@ -1492,9 +1508,28 @@ void GameManager::update(float deltaTime)
 
 		Vector3 forceWorld = forward * (car->throttle * engineForce * speedFactor);
 
-		car->body->addForce(forceWorld);
-	//	rbGravity->updateForce(car->body, deltaTime);
+		car->body->addForceAtBodyPoint(forceWorld, rearAvg);
+		//	rbGravity->updateForce(car->body, deltaTime);
 		car->body->addForce(elevate::Vector3::GRAVITY);
+
+		Matrix4 t = car->body->getTransform();
+		forward = t.getAxisVector(2);
+		forward.normalize();
+		Vector3 right = t.getAxisVector(0);
+			right.normalize();
+
+		float steerStrength = 2000.0f;  // tune
+
+		float halfWidth = car->chassis->halfSize.x;
+
+		Vector3 pointLeftLocal = Vector3(-halfWidth, 0.0f, 0.0f);
+		Vector3 pointRightLocal = Vector3(halfWidth, 0.0f, 0.0f);
+
+		Vector3 forceLeft = right * (car->steerAngle * steerStrength);
+		Vector3 forceRight = (right * -1) * (car->steerAngle * steerStrength);
+
+		car->body->addForceAtBodyPoint(forceLeft, pointLeftLocal);
+		car->body->addForceAtBodyPoint(forceRight, pointRightLocal);
 
 
 		car->body->integrate(deltaTime);
@@ -1504,7 +1539,7 @@ void GameManager::update(float deltaTime)
 		resolver.resolveContacts(cData.contactArray, cData.contactCount, deltaTime);
 
 		car->chassis->calculateInternals();
-		Matrix4 t = car->body->getTransform();
+		t = car->body->getTransform();
 
 		elevate::Vector3 worldPos = t.getAxisVector(3);
 		car->chassisMesh->SetPosition(worldPos);
@@ -2009,9 +2044,9 @@ void GameManager::generateContacts()
 	for (int i = 0; i < 4; i++)
 	{
 		if (!cData.hasMoreContacts()) return;
-	///		elevate::CollisionDetector::sphereAndHalfSpace(*car->wheels[i].coll, plane, &cData);
+		///		elevate::CollisionDetector::sphereAndHalfSpace(*car->wheels[i].coll, plane, &cData);
 		if (!cData.hasMoreContacts()) return;
-			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(floor->shape), *car->wheels[i].coll, &cData);
+		elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(floor->shape), *car->wheels[i].coll, &cData);
 	}
 
 	if (!cData.hasMoreContacts()) return;
