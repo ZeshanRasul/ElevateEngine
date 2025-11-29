@@ -1461,6 +1461,16 @@ void GameManager::update(float deltaTime)
 		resolver.resolveContacts(cData.contactArray, cData.contactCount, deltaTime);
 
 		car->body->getTransform();
+
+		elevate::Vector3 worldPos = car->body->getPosition();
+		car->chassisMesh->SetPosition(worldPos);
+		car->chassisMesh->SetOrientation(glm::quat(
+			(float)car->body->getOrientation().r,
+			(float)car->body->getOrientation().i,
+			(float)car->body->getOrientation().j,
+			(float)car->body->getOrientation().k));
+
+
 		for (int i = 0; i < 4; i++)
 		{
 			elevate::Vector3 wheelWorldPos = car->body->getPointInWorldSpace(car->wheels[i].offset);
@@ -1473,13 +1483,6 @@ void GameManager::update(float deltaTime)
 		}
 
 
-		elevate::Vector3 worldPos = car->chassis->body->getPosition();
-		car->chassisMesh->SetPosition(worldPos);
-		car->chassisMesh->SetOrientation(glm::quat(
-			(float)car->body->getOrientation().r,
-			(float)car->body->getOrientation().i,
-			(float)car->body->getOrientation().j,
-			(float)car->body->getOrientation().k));
 
 		if (showCar)
 		{
@@ -1497,12 +1500,12 @@ void GameManager::update(float deltaTime)
 			camUp.normalize();
 
 			// Camera offsets
-			float back = 6.0f;
-			float height = 2.5f;
+			float back = 10.0f;
+			float height = 3.5f;
 
 			// Compute camera position and target
 			Vector3 camPos = carPos + right * -back + worldUp * height;
-			Vector3 target = carPos + forward * 1.5f;
+			Vector3 target = carPos + right * 1.5f;
 
 			// Build view matrix
 			camera->Position = glm::vec3(camPos.x, camPos.y, camPos.z);
