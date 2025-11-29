@@ -88,7 +88,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 		elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
 		elevate::Vector3(0.0f, 0.0f, 0.0f)
 	);
-	gm->carBody->setPosition(elevate::Vector3(0.0f, 3.5f + 0.55f + 0.05f, 0.0f));
+	gm->carBody->setPosition(elevate::Vector3(0.0f, 10.5f + 1.10f + 0.05f, 0.0f));
 	gm->car->body = gm->carBody;
 	gm->car->chassis = new CollisionBox();
 	gm->car->chassis->body = gm->carBody;
@@ -102,7 +102,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->car->body->setMass(totalMass);
 	elevate::Vector3 halfSize = gm->car->chassis->halfSize;
 
-	gm->car->chassisMesh = new Cube(elevate::Vector3(0.0f, halfSize.y + 0.55f, 0.0f), halfSize * 2, &gm->ammoShader, gm);
+	gm->car->chassisMesh = new Cube(elevate::Vector3(0.0f, 10.5f + 1.10f + 0.05f, 0.0f), halfSize * 2, &gm->ammoShader, gm);
 	gm->car->chassisMesh->LoadMesh();
 	gm->car->chassisMesh->SetColor(glm::vec3(0.8f, 0.1f, 0.1f));
 	gameObjects.push_back(gm->car->chassisMesh);
@@ -134,7 +134,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 
 		elevate::Vector3 worldPos = gm->car->body->getPointInWorldSpace(wheelOffsets[i]);
 
-		w.mesh = new Sphere(worldPos, elevate::Vector3(wheelRadius * 2, wheelRadius * 2, wheelWidth), &gm->ammoShader, gm, glm::vec3(0.0f));
+		w.mesh = new Sphere(worldPos, elevate::Vector3(wheelRadius, wheelRadius, wheelRadius), &gm->ammoShader, gm, glm::vec3(0.0f));
 		w.mesh->SetColor(glm::vec3(0.1f, 0.1f, 0.1f));
 		w.mesh->LoadMesh();
 		gameObjects.push_back(w.mesh);
