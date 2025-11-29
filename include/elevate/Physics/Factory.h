@@ -23,6 +23,7 @@ namespace elevate
 		CollisionPrimitive* shape = nullptr;
 		std::string    meshId;
 		std::string    materialId;
+		std::string		name;
 		GameObject* mesh = nullptr;
 	};
 

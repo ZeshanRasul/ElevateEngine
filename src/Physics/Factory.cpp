@@ -84,6 +84,8 @@ namespace elevate
 		obj->materialId = materialId;
 		obj->body->calculateDerivedData();
 		obj->shape->calculateInternals();
+		obj->name = name;
+
 		if (name == "Box" || name == "Floor" || name == "Wall")
 		{
 			Cube* cube = new Cube();

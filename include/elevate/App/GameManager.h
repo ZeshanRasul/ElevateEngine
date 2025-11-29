@@ -115,6 +115,28 @@ struct CarVisuals {
 	GameObject* mesh;
 };
 
+struct Car {
+    elevate::RigidBody* body;
+	elevate::CollisionBox* chassis;
+    GameObject* chassisMesh;
+
+    struct Wheel {
+        elevate::CollisionSphere* coll;
+		elevate::Vector3 offset;
+
+		GameObject* mesh;
+
+        bool isFront;
+        bool isDriven;
+    };
+
+	Wheel wheels[4];
+
+    float throttle;
+    float brake;
+    float steerAngle;
+};
+
 class GameManager {
 public:
     GameManager(Window* window, unsigned int width, unsigned int height);
@@ -160,6 +182,7 @@ public:
     void OnDPressed();
     void OnAPressed();
     void OnZPressed();
+    void OnHPressed();
     void OnLeftClick();
 
     void AddToGameObjects(GameObject* obj) {
@@ -189,15 +212,12 @@ public:
     AmmoRound ammoPool[MaxAmmoRounds];
     int       ammoCount = 0;
 
-    Cube* carBody;
-    Sphere* carWheelFL;
-    Sphere* carWheelFR;
-    Sphere* carWheelRL;
-    Sphere* carWheelRR;
-    RigidBody car;
+    RigidBody* carBody;
     CarPropulsion* carEngine;
     std::vector<CarVisuals> carParts;
     bool showCar = false;
+
+    Car* car;
 
     bool showPlane = false;
     void ResetPlane();
@@ -355,6 +375,7 @@ private:
 
     void generateContacts();
 
+	bool showUI = true;
 
 
     Random random;
@@ -411,7 +432,7 @@ private:
 
     float friction = 0.6f;
 	float restitution = 0.2f;
-	float tolerance = 0.1f;
+	float tolerance = 0.01f;
 
 	float groundPlaneOffset = 0.0f;
 

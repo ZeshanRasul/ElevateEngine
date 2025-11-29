@@ -83,10 +83,7 @@ void GameManager::reset()
 	}
 	else if (currentScene == SceneType::Car)
 	{
-		car_throttle = 0.0f;
-		car.setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		car.setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
-		car.setPosition(elevate::Vector3(0.0f, 2.0f, 0.0f));
+		// TODO: Reset car pos
 		return;
 	}
 
@@ -114,7 +111,7 @@ void GameManager::reset()
 	static_cast<Cube*>(wall->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	gameObjects.push_back(wall->mesh);
 	allSceneObjects.push_back(wall);
-	
+
 	wall2 = spawnFactory->CreateWall(
 		elevate::Vector3(1.0f, 60.0f, 200.0f),
 		elevate::Vector3(-200.0f, 60.0f, 0.0f),
@@ -149,7 +146,7 @@ void GameManager::reset()
 	static_cast<Cube*>(wall4->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	gameObjects.push_back(wall4->mesh);
 	allSceneObjects.push_back(wall4);
-	
+
 	spawnFactory->BuildDominoLine(
 		elevate::Vector3(75.0f, 3.5f, -150.0f),
 		elevate::Vector3(0.0f, 0.0f, 1.0f),
@@ -705,6 +702,11 @@ void GameManager::OnZPressed()
 	ResetPlane();
 }
 
+void GameManager::OnHPressed()
+{
+	showUI = !showUI;
+}
+
 void GameManager::setUpDebugUI()
 {
 	ImGui_ImplOpenGL3_NewFrame();
@@ -712,47 +714,32 @@ void GameManager::setUpDebugUI()
 	ImGui::NewFrame();
 	ImGuizmo::BeginFrame();
 
-
-
-
 	ImGuiID dockspace_id = ImGui::GetID("My Dockspace");
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-
 	ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
-
-	//glm::mat4 view = camera->GetViewMatrix();
-	//glm::mat4 proj = projection;
-
-	//// IMPORTANT: ImGuizmo expects column-major float*
-	//float* viewPtr = glm::value_ptr(view);
-	//float* projPtr = glm::value_ptr(proj);
-
 }
 
 void GameManager::showDebugUI()
 {
-	ShowLightControlWindow(dirLight);
+	if (false)
+	{
+		ShowLightControlWindow(dirLight);
+		ShowSpawnObjectWindow();
+		ShowPerformanceWindow();
+		DrawPhysicsObjectsCombo();
+	}
 	ShowCameraControlWindow(*camera);
-	ShowSpawnObjectWindow();
-	ShowPerformanceWindow();
 	ShowEngineWindow();
-	DrawPhysicsObjectsCombo();
 }
 
 void GameManager::renderDebugUI()
 {
-
-
 	ImGuizmo::SetDrawlist();
 	ImGuizmo::SetRect(ImGui::GetMainViewport()->Pos.x,
 		ImGui::GetMainViewport()->Pos.y,
 		ImGui::GetMainViewport()->Size.x,
 		ImGui::GetMainViewport()->Size.y);
-
-	//float windowWidth = (float)ImGui::GetWindowWidth();
-	//float windowHeight = (float)ImGui::GetWindowHeight();
-	//ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -775,10 +762,10 @@ void GameManager::ShowLightControlWindow(DirLight& light)
 
 void GameManager::fireRound(AmmoType type)
 {
-	//if (!inputManager->isCameraControlled() && ImGui::GetIO().WantCaptureMouse)
-	//{
-	//	return;
-	//}
+	if (!inputManager->isCameraControlled())
+	{
+		return;
+	}
 
 	AmmoRound* round = nullptr;
 	for (int i = 0; i < ammoCount; ++i)
@@ -1178,13 +1165,13 @@ void GameManager::ShowEngineWindow()
 	{
 		ImGui::Text("Car Throttle: %.2f", car_throttle);
 		ImGui::Text("Car position: X: %.2f Y: %.2f Z: %.2f",
-			car.getPosition().x,
-			car.getPosition().y,
-			car.getPosition().z);
+			car->body->getPosition().x,
+			car->body->getPosition().y,
+			car->body->getPosition().z);
 		ImGui::Text("Car velocity: X: %.2f Y: %.2f Z: %.2f",
-			car.getVelocity().x,
-			car.getVelocity().y,
-			car.getVelocity().z);
+			car->body->getVelocity().x,
+			car->body->getVelocity().y,
+			car->body->getVelocity().z);
 	}
 
 	ImGui::End();
@@ -1226,7 +1213,7 @@ void GameManager::DrawPhysicsObjectsCombo()
 	}
 
 	PhysicsObject* current = allSceneObjects[sceneObjectIndex];
-	const char* previewText = "Physics Object"; // current->GetName().c_str()
+	const char* previewText = selectedSceneObject->name.c_str(); // current->GetName().c_str()
 
 	if (ImGui::BeginCombo("##PhysicsObjectCombo", previewText))
 	{
@@ -1234,8 +1221,8 @@ void GameManager::DrawPhysicsObjectsCombo()
 		{
 			PhysicsObject* obj = allSceneObjects[i];
 			std::string itemLabel;
-			itemLabel = "PhysicsObject " + std::to_string(i);
-		
+			itemLabel = selectedSceneObject->name.c_str() + i;
+
 
 			bool isSelected = (sceneObjectIndex == i);
 			if (ImGui::Selectable(itemLabel.c_str(), isSelected))
@@ -1457,28 +1444,71 @@ void GameManager::update(float deltaTime)
 
 	}
 
-	//	car.setPosition(elevate::Vector3(20.0f, 2.0f, -90.0f));
-	car.clearAccumulator();
-	car.addForce(elevate::Vector3(car_throttle, 0, 0));
-	car.calculateDerivedData();
-	rbRegistry.updateForces(deltaTime);
-	car.integrate(deltaTime);
-	car.getTransform();
-	for (CarVisuals part : carParts)
-	{
-		elevate::Vector3 worldPos = car.getPointInWorldSpace(part.offset);
-		part.mesh->SetPosition(worldPos);
-		part.mesh->SetOrientation(glm::quat(
-			(float)car.getOrientation().r,
-			(float)car.getOrientation().i,
-			(float)car.getOrientation().j,
-			(float)car.getOrientation().k));
-	}
 	if (showCar)
 	{
-		camera->Position = glm::vec3(car.getPosition().x + 15.0f, car.getPosition().y + 5.0f, car.getPosition().z);
-		camera->Front = glm::normalize(glm::vec3(car.getPosition().x, car.getPosition().y, car.getPosition().z) - camera->Position);
-		view = camera->GetViewMatrix();
+		// Clamp throttle
+	//	car_throttle = glm::clamp(car_throttle, -100.0f, 100.0f);
+		//	car.setPosition(elevate::Vector3(20.0f, 2.0f, -90.0f));
+		car->body->clearAccumulator();
+		car->body->calculateDerivedData();
+		car->body->addForce(elevate::Vector3(car_throttle, 0, 0));
+	//	rbGravity->updateForce(car->body, deltaTime);
+		//	rbRegistry.updateForces(deltaTime);
+		car->body->integrate(deltaTime);
+		car->chassis->calculateInternals();
+
+		generateContacts();
+		resolver.resolveContacts(cData.contactArray, cData.contactCount, deltaTime);
+
+		car->body->getTransform();
+		for (int i = 0; i < 4; i++)
+		{
+			elevate::Vector3 wheelWorldPos = car->body->getPointInWorldSpace(car->wheels[i].offset);
+			car->wheels[i].mesh->SetPosition(wheelWorldPos);
+			car->wheels[i].mesh->SetOrientation(glm::quat(
+				(float)car->body->getOrientation().r,
+				(float)car->body->getOrientation().i,
+				(float)car->body->getOrientation().j,
+				(float)car->body->getOrientation().k));
+		}
+
+
+		elevate::Vector3 worldPos = car->chassis->body->getPosition();
+		car->chassisMesh->SetPosition(worldPos);
+		car->chassisMesh->SetOrientation(glm::quat(
+			(float)car->body->getOrientation().r,
+			(float)car->body->getOrientation().i,
+			(float)car->body->getOrientation().j,
+			(float)car->body->getOrientation().k));
+
+		if (showCar)
+		{
+			Vector3 carPos = car->body->getPosition();
+			Matrix4 carTransform = car->body->getTransform();
+
+			// Car forward (Z axis)
+			Vector3 forward = carTransform.getAxisVector(2);
+			forward.normalize();
+
+			Vector3 worldUp(0, 1, 0);
+			Vector3 right = worldUp % forward;
+			right.normalize();
+			Vector3 camUp = forward % right;
+			camUp.normalize();
+
+			// Camera offsets
+			float back = 6.0f;
+			float height = 2.5f;
+
+			// Compute camera position and target
+			Vector3 camPos = carPos + right * -back + worldUp * height;
+			Vector3 target = carPos + forward * 1.5f;
+
+			// Build view matrix
+			camera->Position = glm::vec3(camPos.x, camPos.y, camPos.z);
+			camera->Front = glm::normalize(glm::vec3(target.x, target.y, target.z) - camera->Position);
+			view = camera->GetViewMatrix(glm::vec3(target.x, target.y, target.z));
+		}
 	}
 
 	if (fpsSandboxDemo)
@@ -1928,6 +1958,20 @@ void GameManager::generateContacts()
 		if (!cData.hasMoreContacts()) return;
 		elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(floor->shape), *aircraftParts[i].coll, &cData);
 	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		if (!cData.hasMoreContacts()) return;
+	//	elevate::CollisionDetector::sphereAndHalfSpace(*car->wheels[i].coll, plane, &cData);
+		if (!cData.hasMoreContacts()) return;
+	//	elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(floor->shape), *car->wheels[i].coll, &cData);
+	}
+
+	if (!cData.hasMoreContacts()) return;
+	//elevate::CollisionDetector::boxAndHalfSpace(*car->chassis, plane, &cData);
+	if (!cData.hasMoreContacts()) return;
+	//elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(floor->shape), *car->chassis, &cData);
+
 
 	if (fpsSandboxDemo)
 	{

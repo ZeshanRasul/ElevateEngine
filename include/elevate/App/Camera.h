@@ -46,6 +46,7 @@ public:
 	Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
 
 	glm::mat4 GetViewMatrix() const { return lookAt(Position, Position + Front, Up); }
+	glm::mat4 GetViewMatrix(glm::vec3 target) const { return lookAt(Position, target, Up); }
 
 	void ProcessKeyboard(CameraMovement direction, float deltaTime);
 	void ProcessMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch = true);
