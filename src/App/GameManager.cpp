@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "App/GameManager.h"
 #include "Physics/core.h"
 
@@ -1483,7 +1485,12 @@ void GameManager::update(float deltaTime)
 
 		real engineForce = 800.0f;
 
-		Vector3 forceWorld = forward * (car->throttle * engineForce);
+		real maxSpeed = 40.0f; // units/s
+		real speed = car->body->getVelocity().magnitude();
+		real maxSpeedFactor = 1.0f - speed / maxSpeed;
+		real speedFactor = std::max(0.0f, (float)maxSpeedFactor);
+
+		Vector3 forceWorld = forward * (car->throttle * engineForce * speedFactor);
 
 		car->body->addForce(forceWorld);
 	//	rbGravity->updateForce(car->body, deltaTime);
@@ -1538,7 +1545,7 @@ void GameManager::update(float deltaTime)
 
 			// Camera offsets
 			float back = 10.0f;
-			float height = 3.5f;
+			float height = 1.5f;
 
 			// Compute camera position and target
 			Vector3 camPos = carPos + right * -back + worldUp * height;

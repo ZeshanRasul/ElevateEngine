@@ -69,9 +69,9 @@ void Scenes::LoadCarTest(GameManager* gm)
 	//	gameObjects.resize(300);
 
 	gm->floor = gm->spawnFactory->CreateFloor(
-		elevate::Vector3(500.0f, 1.0f, 500.0f),
+		elevate::Vector3(1000.0f, 1.0f, 1000.0f),
 		&gm->cubeShader,
-		elevate::Vector3(0.0f, -1.0f, 0.0f)
+		elevate::Vector3(0.0f, 0.0f, 0.0f)
 	);
 	gm->floor->mesh->setGameManager(gm);
 	gm->floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
@@ -84,7 +84,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 
 	gm->car = new Car();
 	gm->carBody = new elevate::RigidBody();
-	gm->carBody->setPosition(elevate::Vector3(0.0f, 0.5f + 0.55f + 0.05f, 0.0f));
+	gm->carBody->setPosition(elevate::Vector3(0.0f, 1.5f + 0.55f + 0.05f, 0.0f));
 	gm->car->body = gm->carBody;
 	gm->car->chassis = new CollisionBox();
 	gm->car->chassis->body = gm->carBody;
