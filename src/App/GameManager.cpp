@@ -1478,12 +1478,14 @@ void GameManager::update(float deltaTime)
 
 		Vector3 rearAvg = (car->wheels[2].offset + car->wheels[3].offset) * 0.5f;
 
-		real engineForce = 80.0f;
+		real engineForce = 8000.0f;
 
 		Vector3 forceWorld = forward * (car->throttle * engineForce);
 
 		car->body->addForceAtBodyPoint(forceWorld, rearAvg);
-		rbGravity->updateForce(car->body, deltaTime);
+	//	rbGravity->updateForce(car->body, deltaTime);
+		car->body->addForce(elevate::Vector3::GRAVITY);
+
 
 		car->body->integrate(deltaTime);
 		car->chassis->calculateInternals();
@@ -1491,9 +1493,10 @@ void GameManager::update(float deltaTime)
 		generateContacts();
 		resolver.resolveContacts(cData.contactArray, cData.contactCount, deltaTime);
 
-		car->body->getTransform();
+		car->chassis->calculateInternals();
+		Matrix4 t = car->body->getTransform();
 
-		elevate::Vector3 worldPos = car->body->getPosition();
+		elevate::Vector3 worldPos = t.getAxisVector(3);
 		car->chassisMesh->SetPosition(worldPos);
 		car->chassisMesh->SetOrientation(glm::quat(
 			(float)car->body->getOrientation().r,
@@ -1996,16 +1999,15 @@ void GameManager::generateContacts()
 	for (int i = 0; i < 4; i++)
 	{
 		if (!cData.hasMoreContacts()) return;
-			elevate::CollisionDetector::sphereAndHalfSpace(*car->wheels[i].coll, plane, &cData);
+	///		elevate::CollisionDetector::sphereAndHalfSpace(*car->wheels[i].coll, plane, &cData);
 		if (!cData.hasMoreContacts()) return;
-		//	elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(floor->shape), *car->wheels[i].coll, &cData);
+			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(floor->shape), *car->wheels[i].coll, &cData);
 	}
 
 	if (!cData.hasMoreContacts()) return;
-	elevate::CollisionDetector::boxAndHalfSpace(*car->chassis, plane, &cData);
+	//elevate::CollisionDetector::boxAndHalfSpace(*car->chassis, plane, &cData);
 	if (!cData.hasMoreContacts()) return;
-	//elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(floor->shape), *car->chassis, &cData);
-
+	elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(floor->shape), *car->chassis, &cData);
 
 	if (fpsSandboxDemo)
 	{

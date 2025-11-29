@@ -84,7 +84,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 
 	gm->car = new Car();
 	gm->carBody = new elevate::RigidBody();
-	gm->carBody->setPosition(elevate::Vector3(0.0f, 1.3f, 0.0f));
+	gm->carBody->setPosition(elevate::Vector3(0.0f, 0.5f + 0.55f + 0.05f, 0.0f));
 	gm->car->body = gm->carBody;
 	gm->car->chassis = new CollisionBox();
 	gm->car->chassis->body = gm->carBody;
@@ -97,16 +97,16 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->car->body->setMass(totalMass);
 	elevate::Vector3 halfSize = gm->car->chassis->halfSize;
 
-	gm->car->chassisMesh = new Cube(elevate::Vector3(0.0f, 1.3, 0.0f), halfSize * 2, &gm->ammoShader, gm);
+	gm->car->chassisMesh = new Cube(elevate::Vector3(0.0f, 5.8, 0.0f), halfSize * 2, &gm->ammoShader, gm);
 	gm->car->chassisMesh->LoadMesh();
 	gm->car->chassisMesh->SetColor(glm::vec3(0.8f, 0.1f, 0.1f));
 	gameObjects.push_back(gm->car->chassisMesh);
 
-	real wheelRadius = 0.6f;
-	real wheelWidth = 0.3f;
+	real wheelRadius = 0.55f;
+	real wheelWidth = 0.4f;
 
-	real wheelOffsetX = halfSize.x - wheelRadius * 0.1f;
-	real wheelOffsetZ = halfSize.z - wheelRadius * 0.1f;
+	real wheelOffsetX = halfSize.x - wheelRadius * 0.05f;
+	real wheelOffsetZ = halfSize.z - wheelRadius * 0.05f;
 
 	Vector3 wheelOffsets[4] =
 	{
