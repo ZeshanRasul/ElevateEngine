@@ -77,6 +77,9 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	carEngine = new CarPropulsion(elevate::Vector3(0.0f, 0.0f, 0.0f));
 	shapeFactory = new elevate::ShapeFactory();
 	spawnFactory = new elevate::SpawnFactory(spawnContext);
+
+	InitDebugDrawGL();
+
 }
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
@@ -295,7 +298,7 @@ void GameManager::reset()
 	);
 
 	stackCrateTexture = static_cast<Cube*>(crates[0]->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Crate/rusted_shutter_diff_2k.png");
-	
+
 	for (int i = 0; i < crates.size(); ++i)
 	{
 		crates[i]->mesh->SetShader(&cubeShader);
@@ -1588,9 +1591,6 @@ void GameManager::update(float deltaTime)
 
 		car->chassis->calculateInternals();
 		t = car->body->getTransform();
-
-		elevate::Vector3 worldPos = t.getAxisVector(3);
-		car->chassisMesh->SetPosition(worldPos);
 		car->chassisMesh->SetOrientation(glm::quat(
 			(float)car->body->getOrientation().r,
 			(float)car->body->getOrientation().i,
@@ -1607,6 +1607,9 @@ void GameManager::update(float deltaTime)
 				(float)car->body->getOrientation().i,
 				(float)car->body->getOrientation().j,
 				(float)car->body->getOrientation().k));
+
+			car->wheels[i].coll->body->calculateDerivedData();
+			car->wheels[i].coll->calculateInternals();
 		}
 
 
@@ -2611,6 +2614,25 @@ void GameManager::ResetPlane()
 }
 void GameManager::render()
 {
+	DebugDraw::Clear();
+
+	if (!showCar && !showPlane)
+	{
+		DebugDrawCollisionBox(*static_cast<CollisionBox*>(crate->shape), glm::vec3(1.0f, 0.0f, 0.0f)); // red
+	}
+	DebugDrawCollisionBox(*static_cast<CollisionBox*>(floor->shape), glm::vec3(1.0f, 0.0f, 0.0f)); // red
+
+	if (showCar)
+	{
+
+		DebugDrawCollisionBox(*static_cast<CollisionBox*>(car->chassis), glm::vec3(1.0f, 0.0f, 0.0f)); // red
+
+		for (auto& wheel : car->wheels)
+		{
+			DebugDrawCollisionSphere(*wheel.coll, glm::vec3(0.0f, 1.0f, 0.0f)); // green
+		}
+	}
+
 	renderer->drawCubemap(cubemap);
 
 	for (auto obj : gameObjects) {
@@ -2631,6 +2653,9 @@ void GameManager::render()
 			renderer->draw(part.mesh, view, projection);
 		}
 	}
-	drawDebugLines();
+	//drawDebugLines();
 
+	glm::mat4 viewProjMatrix = projection * view;
+	RenderDebugLines(lineShader.getProgramID(), viewProjMatrix);
 }
+

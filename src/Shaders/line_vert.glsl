@@ -1,14 +1,14 @@
 #version 460 core
 
-layout(location = 0) in vec3 aPos;
+layout(location = 0) in vec3 aPos0;
+layout(location = 1) in vec3 aColor0;
 
-out float vGradient;
+uniform mat4 uViewProj;
 
-uniform mat4 view;
-uniform mat4 projection;
+out vec3 vColor;
 
 void main()
 {
-    vGradient = (gl_VertexID == 0) ? 0.0 : 1.0;
-    gl_Position = projection * view * vec4(aPos, 1.0);
+    gl_Position = uViewProj * vec4(aPos0, 1.0);
+    vColor = aColor0;
 }

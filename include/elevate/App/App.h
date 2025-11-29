@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Window/Window.h"
-#include "App/GameManager.h"
 #include "Physics/Demos/SceneManager.h"
 
 class App {

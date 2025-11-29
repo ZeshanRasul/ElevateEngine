@@ -190,11 +190,13 @@
     <ClInclude Include="include\elevate\GameObjects\Line.h" />
     <ClInclude Include="include\elevate\Physics\body.h" />
     <ClInclude Include="include\elevate\Physics\bone.h" />
+    <ClInclude Include="include\elevate\OpenGL\DebugDraw.h" />
     <ClInclude Include="src\Tools\Logger.h" />
     <ClInclude Include="src\Window\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\OpenGL\Cubemap.cpp" />
+    <ClCompile Include="src\OpenGL\DebugDraw.cpp" />
     <ClCompile Include="src\Physics\SceneManager.cpp" />
     <ClCompile Include="include\external\ImGuizmo.cpp" />
     <ClCompile Include="src\Physics\Aero.cpp" />

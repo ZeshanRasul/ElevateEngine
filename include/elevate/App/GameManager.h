@@ -24,6 +24,7 @@
 #include "Physics/random.h"
 #include "Physics/block.h"
 #include "Physics/Aero.h"
+#include "OpenGL/DebugDraw.h"
 
 enum class SceneType
 {
@@ -53,12 +54,6 @@ static const char* SceneTypeToString(SceneType type)
     }
 }
 
-struct DebugLine
-{
-    glm::vec3 p0;
-    glm::vec3 p1;
-    glm::vec3 color;
-};
 
 enum class AmmoType
 {
@@ -265,6 +260,8 @@ public:
 
     std::vector<std::vector<PhysicsObject*>> crateStacks;
 
+    GLuint g_DebugVao;
+    GLuint g_DebugVbo;
 private:
     void ShowCameraControlWindow(Camera& cam);
     void ShowLightControlWindow(DirLight& light);
@@ -464,6 +461,7 @@ private:
     GLuint m_DebugLineVAO = 0;
     GLuint m_DebugLineVBO = 0;
 
+
     void buildContactDebugLines()
     {
         m_DebugLines.clear();
@@ -510,6 +508,51 @@ private:
             crossZ.color = glm::vec3(0.0f, 1.0f, 0.0f);
             m_DebugLines.push_back(crossZ);
         }
+    }
+
+    void InitDebugDrawGL()
+    {
+		glDisable(GL_DEPTH_TEST);
+        glGenVertexArrays(1, &g_DebugVao);
+        glGenBuffers(1, &g_DebugVbo);
+
+        glBindVertexArray(g_DebugVao);
+        glBindBuffer(GL_ARRAY_BUFFER, g_DebugVbo);
+
+        // position
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(DebugLine), (void*)0);
+
+        // color
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(DebugLine), (void*)(sizeof(glm::vec3)));
+
+        glBindVertexArray(0);
+    }
+
+    void RenderDebugLines(GLuint debugShaderProgram, const glm::mat4& viewProj)
+    {
+        const auto& lines = DebugDraw::GetLines();
+        if (lines.empty())
+            return;
+
+        glUseProgram(debugShaderProgram);
+
+        GLint locVP = glGetUniformLocation(debugShaderProgram, "uViewProj");
+        glUniformMatrix4fv(locVP, 1, GL_FALSE, &viewProj[0][0]);
+
+        glBindVertexArray(g_DebugVao);
+        glBindBuffer(GL_ARRAY_BUFFER, g_DebugVbo);
+
+        glBufferData(GL_ARRAY_BUFFER,
+            lines.size() * sizeof(DebugLine),
+            lines.data(),
+            GL_DYNAMIC_DRAW);
+
+        glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(lines.size() * 2));
+
+        glBindVertexArray(0);
+		glEnable(GL_DEPTH_TEST);
     }
 
     void drawDebugLines()
@@ -620,3 +663,7 @@ private:
     }
 
 };
+
+
+
+
