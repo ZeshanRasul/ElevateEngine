@@ -14,6 +14,12 @@ App::App(unsigned int screenWidth, unsigned int screenHeight)
     }
 
     mGameManager = new GameManager(mWindow, screenWidth, screenHeight);
+
+    SceneManager::Init(mGameManager);
+    mGameManager->currentScene = SceneManager::s_currentScene
+        ;
+    SceneManager::LoadScene(mGameManager->currentScene);
+
 }
 
 App::~App()
@@ -24,16 +30,11 @@ App::~App()
 
 void App::run()
 {
-
-		SceneManager::Init(mGameManager);
-		mGameManager->currentScene = SceneManager::s_currentScene
-            ;
-		SceneManager::LoadScene(mGameManager->currentScene);
-
         while (mWindow->isOpen()) {
         currentFrame = (float)glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+        mGameManager->setUpDebugUI();
 
         if(SceneManager::s_currentScene != mGameManager->currentScene)
         {
@@ -42,7 +43,6 @@ void App::run()
             SceneManager::s_currentScene = mGameManager->currentScene;
 		}
 
-        mGameManager->setUpDebugUI();
         mGameManager->showDebugUI();
         mWindow->clear();
 

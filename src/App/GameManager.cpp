@@ -4,6 +4,10 @@
 #include "imgui/imgui.h"
 #include "imgui/backend/imgui_impl_glfw.h"
 #include "imgui/backend/imgui_impl_opengl3.h"
+#include "ImGuizmo.h"
+
+static ImGuizmo::OPERATION currentOperation = ImGuizmo::TRANSLATE;
+static ImGuizmo::MODE currentMode = ImGuizmo::LOCAL;
 
 DirLight dirLight = {
 		glm::vec3(-0.2f, -1.0f, -0.3f),
@@ -699,27 +703,124 @@ void GameManager::setUpDebugUI()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
+
+
+
+
 	ImGuiID dockspace_id = ImGui::GetID("My Dockspace");
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
 
 
 	ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 
+	//glm::mat4 view = camera->GetViewMatrix();
+	//glm::mat4 proj = projection;
+
+	//// IMPORTANT: ImGuizmo expects column-major float*
+	//float* viewPtr = glm::value_ptr(view);
+	//float* projPtr = glm::value_ptr(proj);
+
 }
 
 void GameManager::showDebugUI()
 {
+
 	ShowLightControlWindow(dirLight);
 	ShowCameraControlWindow(*camera);
 	ShowSpawnObjectWindow();
 	ShowPerformanceWindow();
 	ShowEngineWindow();
+
+
+
+	glm::mat4 view = camera->GetViewMatrix();
+	glm::mat4 proj = projection;
+
+	glm::mat4 blockWorld = blocks[0].visual->GetWorldMatrix();
+	float* blockWorldPtr = glm::value_ptr(blockWorld);
+	ImGui::Begin("Scene");
+
+
+	ImGuizmo::Manipulate(
+		glm::value_ptr(view),
+		glm::value_ptr(projection),
+		currentOperation,
+		currentMode,
+		blockWorldPtr
+	);
+
+	if (ImGui::RadioButton("Translate", currentOperation == ImGuizmo::TRANSLATE))
+		currentOperation = ImGuizmo::TRANSLATE;
+	ImGui::SameLine();
+	if (ImGui::RadioButton("Rotate", currentOperation == ImGuizmo::ROTATE))
+		currentOperation = ImGuizmo::ROTATE;
+	ImGui::SameLine();
+	if (ImGui::RadioButton("Scale", currentOperation == ImGuizmo::SCALE))
+		currentOperation = ImGuizmo::SCALE;
+
+	ImGui::Separator();
+
+	if (ImGui::RadioButton("Local", currentMode == ImGuizmo::LOCAL))
+		currentMode = ImGuizmo::LOCAL;
+	ImGui::SameLine();
+	if (ImGui::RadioButton("World", currentMode == ImGuizmo::WORLD))
+		currentMode = ImGuizmo::WORLD;
+
+
+	if (ImGuizmo::IsUsing())
+	{
+		glm::vec3 pos, rot, scale;
+		ImGuizmo::DecomposeMatrixToComponents(blockWorldPtr,
+			glm::value_ptr(pos),
+			glm::value_ptr(rot),
+			glm::value_ptr(scale));
+
+		blocks[0].visual->SetPosition(elevate::Vector3(pos.x, pos.y, pos.z));
+		blocks[0].visual->SetScale(elevate::Vector3(scale.x, scale.y, scale.z));
+
+		// rot is Euler degrees from ImGuizmo (XYZ)
+		blocks[0].visual->SetOrientation(glm::quat(glm::radians(rot)));
+
+		blocks[0].halfSize = elevate::Vector3(
+			scale.x * 0.5f,
+			scale.y * 0.5f,
+			scale.z * 0.5f
+		);
+
+		blocks[0].body->setPosition(elevate::Vector3(pos.x, pos.y, pos.z));
+		blocks[0].body->setOrientation(elevate::Quaternion(
+			blocks[0].visual->GetOrientation().w,
+			blocks[0].visual->GetOrientation().x,
+			blocks[0].visual->GetOrientation().y,
+			blocks[0].visual->GetOrientation().z
+		));
+
+		blocks[0].body->calculateDerivedData();
+	}
+
+
+	ImGui::End();
+
 }
 
 void GameManager::renderDebugUI()
 {
+
+
+	ImGuizmo::SetDrawlist();
+	ImGuizmo::SetRect(ImGui::GetMainViewport()->Pos.x,
+		ImGui::GetMainViewport()->Pos.y,
+		ImGui::GetMainViewport()->Size.x,
+		ImGui::GetMainViewport()->Size.y);
+
+	//float windowWidth = (float)ImGui::GetWindowWidth();
+	//float windowHeight = (float)ImGui::GetWindowHeight();
+	//ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 }
 
 void GameManager::ShowLightControlWindow(DirLight& light)

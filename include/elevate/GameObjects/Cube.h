@@ -32,6 +32,17 @@ public:
 
     void SetTexture(Texture texture) { tex = texture; }
     Texture GetTexture() { return tex; }
+
+    glm::mat4 GetWorldMatrix() const {
+        glm::mat4 modelMat = glm::mat4(1.0f);
+        glm::vec3 posVec = glm::vec3(GetPosition().x, GetPosition().y, GetPosition().z);
+        glm::vec3 scaleVec = glm::vec3(GetScale().x, GetScale().y, GetScale().z);
+        modelMat = glm::translate(modelMat, posVec);
+        modelMat *= glm::mat4_cast(orientation);
+        modelMat = glm::scale(modelMat, scaleVec);
+        return modelMat;
+	}
+
 private:
 
     float vertices[192] = {
