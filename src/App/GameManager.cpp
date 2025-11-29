@@ -758,12 +758,12 @@ void GameManager::setUpDebugUI()
 
 void GameManager::showDebugUI()
 {
-	if (false)
+	if (true)
 	{
 		ShowLightControlWindow(dirLight);
 		ShowSpawnObjectWindow();
 		ShowPerformanceWindow();
-		DrawPhysicsObjectsCombo();
+		//	DrawPhysicsObjectsCombo();
 	}
 	ShowCameraControlWindow(*camera);
 	ShowEngineWindow();
@@ -1499,6 +1499,7 @@ void GameManager::update(float deltaTime)
 		forward.normalize();
 
 		Vector3 rearAvg = (car->wheels[2].offset + car->wheels[3].offset) * 0.5f;
+		Vector3 frontAvg = (car->wheels[0].offset + car->wheels[1].offset) * 0.5f;
 
 		real engineForce = 800.0f;
 
@@ -1510,14 +1511,15 @@ void GameManager::update(float deltaTime)
 		Vector3 forceWorld = forward * (car->throttle * engineForce * speedFactor);
 
 		car->body->addForceAtBodyPoint(forceWorld, rearAvg);
+		car->body->addForceAtBodyPoint(forceWorld * 10.0f, frontAvg);
 		//	rbGravity->updateForce(car->body, deltaTime);
 		car->body->addForce(elevate::Vector3::GRAVITY);
 
 		Matrix4 t = car->body->getTransform();
-		forward = t.getAxisVector(2);
+		forward = t.getAxisVector(0);
 		forward.normalize();
-		Vector3 right = t.getAxisVector(0);
-			right.normalize();
+		Vector3 right = t.getAxisVector(2);
+		right.normalize();
 
 		float steerStrength = 2000.0f;
 
@@ -1531,6 +1533,23 @@ void GameManager::update(float deltaTime)
 
 		car->body->addForceAtBodyPoint(forceLeft, pointLeftLocal);
 		car->body->addForceAtBodyPoint(forceRight, pointRightLocal);
+
+		Vector3 vel = car->body->getVelocity();
+
+		right = transform.getAxisVector(2);
+		forward = transform.getAxisVector(0);
+		right.normalize();
+		forward.normalize();
+
+		real vRight = vel * right;
+		real vForward = vel * forward;
+
+		real totalMass = car->body->getMass();
+
+		real lateralDamping = 5.0f;
+		Vector3 lateralForce = right * (-vRight * totalMass * lateralDamping);
+
+		car->body->addForce(lateralForce);
 
 
 		car->body->integrate(deltaTime);
@@ -1589,10 +1608,12 @@ void GameManager::update(float deltaTime)
 
 			// Build view matrix
 			camera->Position = glm::vec3(camPos.x, camPos.y, camPos.z);
+			//	camera->UpdateCameraVectors();
 			camera->Front = glm::normalize(glm::vec3(target.x, target.y, target.z) - camera->Position);
 			camera->UpdateCameraVectors();
 			view = camera->GetViewMatrix(glm::vec3(target.x, target.y, target.z));
-		//	view = camera->GetViewMatrix();
+			//			camera->UpdateCameraVectors();
+						//	view = camera->GetViewMatrix();
 		}
 	}
 
@@ -2044,18 +2065,21 @@ void GameManager::generateContacts()
 		elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(floor->shape), *aircraftParts[i].coll, &cData);
 	}
 
-	for (int i = 0; i < 4; i++)
+	if (showCar)
 	{
-		if (!cData.hasMoreContacts()) return;
-		///		elevate::CollisionDetector::sphereAndHalfSpace(*car->wheels[i].coll, plane, &cData);
-		if (!cData.hasMoreContacts()) return;
-		elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(floor->shape), *car->wheels[i].coll, &cData);
-	}
+		for (int i = 0; i < 4; i++)
+		{
+			if (!cData.hasMoreContacts()) return;
+			///		elevate::CollisionDetector::sphereAndHalfSpace(*car->wheels[i].coll, plane, &cData);
+			if (!cData.hasMoreContacts()) return;
+			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(floor->shape), *car->wheels[i].coll, &cData);
+		}
 
-	if (!cData.hasMoreContacts()) return;
-	//elevate::CollisionDetector::boxAndHalfSpace(*car->chassis, plane, &cData);
-	if (!cData.hasMoreContacts()) return;
-	elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(floor->shape), *car->chassis, &cData);
+		if (!cData.hasMoreContacts()) return;
+		//elevate::CollisionDetector::boxAndHalfSpace(*car->chassis, plane, &cData);
+		if (!cData.hasMoreContacts()) return;
+		elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(floor->shape), *car->chassis, &cData);
+	}
 
 	if (fpsSandboxDemo)
 	{

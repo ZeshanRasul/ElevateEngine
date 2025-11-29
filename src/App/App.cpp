@@ -2,7 +2,7 @@
 #include "Tools/Logger.h"
 
 GameManager* SceneManager::s_gameManager = nullptr;
-SceneType SceneManager::s_currentScene = SceneType::Car;
+SceneType SceneManager::s_currentScene = SceneType::DemoShowcase;
 
 App::App(unsigned int screenWidth, unsigned int screenHeight)
     : width(screenWidth), height(screenHeight)
@@ -46,9 +46,9 @@ void App::run()
         mGameManager->showDebugUI();
         mWindow->clear();
 
-        mGameManager->update(deltaTime);
         mGameManager->setupCamera(width, height);
         mGameManager->setSceneData();
+        mGameManager->update(deltaTime);
         mGameManager->render();
 
         mGameManager->renderDebugUI();

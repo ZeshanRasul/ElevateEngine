@@ -432,7 +432,7 @@ private:
     float rudder_control;
 
     float friction = 0.9f;
-	float restitution = 0.2f;
+	float restitution = 0.01f;
 	float tolerance = 0.01f;
 
 	float groundPlaneOffset = 0.0f;

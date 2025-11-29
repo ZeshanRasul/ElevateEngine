@@ -45,8 +45,10 @@ public:
 	Camera(glm::vec3 position = glm::vec3(0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH);
 	Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
 
+	void SetFront(glm::vec3 front) { Front = front; UpdateCameraVectors(); }
+
 	glm::mat4 GetViewMatrix() const { return lookAt(Position, Position + Front, Up); }
-	glm::mat4 GetViewMatrix(glm::vec3 target) const { return lookAt(Position, target, glm::vec3(0.0f, 1.0f, 0.0f)); }
+	glm::mat4 GetViewMatrix(glm::vec3 target) const { return lookAt(Position, target, Up); }
 
 	void ProcessKeyboard(CameraMovement direction, float deltaTime);
 	void ProcessMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch = true);
