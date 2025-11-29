@@ -30,7 +30,7 @@ void InputManager::handleMouseMovement(double xPosIn, double yPosIn)
     lastX = xPos;
     lastY = yPos;
 
-    camera->ProcessMouseMovement(xOffset, yOffset);
+    camera->ProcessMouseMovement(xOffset, yOffset, false);
 }
 
 void InputManager::handleMouseScroll(double xOffset, double yOffset)

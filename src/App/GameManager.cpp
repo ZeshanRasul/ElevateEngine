@@ -35,7 +35,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	cubeShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment_tex.glsl");
 	lineShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/line_vert.glsl", "C:/dev/ElevateEngine/src/Shaders/line_frag.glsl");
 
-	camera = new Camera(glm::vec3(18.0f, 5.0f, 18.0f), glm::vec3(0.0f, 1.0f, 0.0f), -138.0f);
+	camera = new Camera(glm::vec3(18.0f, 5.0f, 18.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f);
 
 	inputManager->setContext(camera, this, width, height);
 
@@ -1475,6 +1475,7 @@ void GameManager::update(float deltaTime)
 		{
 			camera->Position = glm::vec3(aircraft.getPosition().x + 15.0f, aircraft.getPosition().y + 5.0f, aircraft.getPosition().z);
 			camera->Front = glm::normalize(glm::vec3(aircraft.getPosition().x, aircraft.getPosition().y, aircraft.getPosition().z) - camera->Position);
+			camera->UpdateCameraVectors();
 			view = camera->GetViewMatrix();
 		}
 
@@ -1518,7 +1519,7 @@ void GameManager::update(float deltaTime)
 		Vector3 right = t.getAxisVector(0);
 			right.normalize();
 
-		float steerStrength = 2000.0f;  // tune
+		float steerStrength = 2000.0f;
 
 		float halfWidth = car->chassis->halfSize.x;
 
@@ -1579,8 +1580,8 @@ void GameManager::update(float deltaTime)
 			camUp.normalize();
 
 			// Camera offsets
-			float back = 10.0f;
-			float height = 1.5f;
+			float back = 40.0f;
+			float height = 4.5f;
 
 			// Compute camera position and target
 			Vector3 camPos = carPos + right * -back + worldUp * height;
@@ -1589,7 +1590,9 @@ void GameManager::update(float deltaTime)
 			// Build view matrix
 			camera->Position = glm::vec3(camPos.x, camPos.y, camPos.z);
 			camera->Front = glm::normalize(glm::vec3(target.x, target.y, target.z) - camera->Position);
+			camera->UpdateCameraVectors();
 			view = camera->GetViewMatrix(glm::vec3(target.x, target.y, target.z));
+		//	view = camera->GetViewMatrix();
 		}
 	}
 

@@ -193,7 +193,7 @@
     <ClInclude Include="src\Window\Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\elevate\Physics\Demos\SceneManager.cpp" />
+    <ClCompile Include="src\Physics\SceneManager.cpp" />
     <ClCompile Include="include\external\ImGuizmo.cpp" />
     <ClCompile Include="src\Physics\Aero.cpp" />
     <ClCompile Include="src\Physics\Factory.cpp" />

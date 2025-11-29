@@ -17,7 +17,7 @@ enum CameraMode {
 	MODE_COUNT
 };
 
-const float YAW = -90.0f;
+const float YAW = 0.0f;
 const float PITCH = 0.0f;
 const float SPEED = 32.5f;
 const float SENSITIVITY = 0.1f;
@@ -46,7 +46,7 @@ public:
 	Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
 
 	glm::mat4 GetViewMatrix() const { return lookAt(Position, Position + Front, Up); }
-	glm::mat4 GetViewMatrix(glm::vec3 target) const { return lookAt(Position, target, Up); }
+	glm::mat4 GetViewMatrix(glm::vec3 target) const { return lookAt(Position, target, glm::vec3(0.0f, 1.0f, 0.0f)); }
 
 	void ProcessKeyboard(CameraMovement direction, float deltaTime);
 	void ProcessMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch = true);

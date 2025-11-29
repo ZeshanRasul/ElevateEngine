@@ -1,4 +1,4 @@
-#include "SceneManager.h"
+#include "Physics/Demos/SceneManager.h"
 #include "Physics/Factory.h"
 
 void SceneManager::Init(GameManager* gm)
@@ -84,7 +84,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 
 	gm->car = new Car();
 	gm->carBody = new elevate::RigidBody();
-	gm->carBody->setPosition(elevate::Vector3(0.0f, 1.5f + 0.55f + 0.05f, 0.0f));
+	gm->carBody->setPosition(elevate::Vector3(0.0f, 2.5f + 0.55f + 0.05f, 0.0f));
 	gm->car->body = gm->carBody;
 	gm->car->chassis = new CollisionBox();
 	gm->car->chassis->body = gm->carBody;
