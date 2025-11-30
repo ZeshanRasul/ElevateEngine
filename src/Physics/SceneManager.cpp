@@ -83,7 +83,10 @@ void Scenes::LoadCarTest(GameManager* gm)
 	real totalMass = chassisMass + 4.0f * wheelMass;
 
 	gm->car = new Car();
+
 	gm->carBody = new elevate::RigidBody();
+	gm->carBody->setAwake(true);
+	gm->carBody->setCanSleep(false);
 	gm->carBody->getTransform().setOrientationAndPos(
 		elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
 		elevate::Vector3(0.0f, 0.0f, 0.0f)
@@ -159,8 +162,8 @@ void Scenes::LoadCarTest(GameManager* gm)
 	Matrix3 inertia;
 	inertia.setDiagonal(ix, iy, iz);
 	gm->car->body->setInertiaTensor(inertia);
-	gm->car->body->setAngularDamping(0.4f);
-	gm->car->body->setLinearDamping(0.02f);
+	gm->car->body->setAngularDamping(0.8f);
+	gm->car->body->setLinearDamping(0.99f);
 
 	gm->car->body->getTransform();
 

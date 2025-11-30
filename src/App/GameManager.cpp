@@ -7,6 +7,7 @@
 #include "imgui/backend/imgui_impl_glfw.h"
 #include "imgui/backend/imgui_impl_opengl3.h"
 #include "ImGuizmo.h"
+#include <iostream>
 
 static ImGuizmo::OPERATION currentOperation = ImGuizmo::TRANSLATE;
 static ImGuizmo::MODE currentMode = ImGuizmo::LOCAL;
@@ -725,7 +726,7 @@ void GameManager::OnSPressed()
 
 	if (showCar)
 	{
-	//	car->throttle -= 0.1f;
+		//	car->throttle -= 0.1f;
 	}
 }
 
@@ -1213,8 +1214,8 @@ void GameManager::ShowEngineWindow()
 
 	if (showCar)
 	{
-	//	ImGui::SliderFloat("Car Throttle", (float*)&car_throttle, 0.0f, 10.0f);
-	//	ImGui::SliderFloat("Car Steering Angle", (float*)&car_steerAngle, 0.0f, 10.0f);
+		//	ImGui::SliderFloat("Car Throttle", (float*)&car_throttle, 0.0f, 10.0f);
+		//	ImGui::SliderFloat("Car Steering Angle", (float*)&car_steerAngle, 0.0f, 10.0f);
 	}
 
 	cData.friction = friction;
@@ -1450,11 +1451,11 @@ void GameManager::update(float deltaTime)
 
 	if (!enableGravity)
 	{
-		rbGravity->setGravity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+//		rbGravity->setGravity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 	}
 	else
 	{
-		rbGravity->setGravity(elevate::Vector3(gravity[0], gravity[1], gravity[2]));
+//		rbGravity->setGravity(elevate::Vector3(gravity[0], gravity[1], gravity[2]));
 	}
 	//rbWorld->startFrame();
 	//rbWorld->runPhysics(1.0f / 60.0f);
@@ -1525,10 +1526,10 @@ void GameManager::update(float deltaTime)
 	{
 
 
-
+		car->body->setAwake(true);
 		car->body->clearAccumulator();
-//		car->chassis->body->clearAccumulator();
-//		car->chassis->body->calculateDerivedData();
+		//		car->chassis->body->clearAccumulator();
+		//		car->chassis->body->calculateDerivedData();
 
 
 		Matrix4 transform = car->body->getTransform();
@@ -1536,8 +1537,8 @@ void GameManager::update(float deltaTime)
 		forward.normalize();
 
 
-		float riseRate = 3.0f;   
-		float fallRate = 5.0f;   
+		float riseRate = 3.0f;
+		float fallRate = 5.0f;
 		float rate = (fabs(targetThrottle) > fabs(car->throttle)) ? riseRate : fallRate;
 
 		car->throttle += (targetThrottle - car->throttle) * rate * deltaTime;
@@ -1574,19 +1575,25 @@ void GameManager::update(float deltaTime)
 		Vector3 lateralVelocity = right * vRight;
 		Vector3 lateralAccel = lateralVelocity * -lateralDamping;
 		Vector3 lateralForce = lateralAccel * car->body->getMass();
-		
-		car->body->addForce(lateralForce);
 
-		car->body->integrate(deltaTime);
+		//	car->body->addForce(lateralForce);
+			//std::cout << "accum: " << car->body->forceAccum.x << " "
+			//	<< car->body->forceAccum.y << " "
+			//	<< car->body->forceAccum.z << "\n";
+		car->body->integrate(1.0f / 60.0f);
 
 		generateContacts();
-		resolver.resolveContacts(cData.contactArray, cData.contactCount, deltaTime);
+		resolver.resolveContacts(cData.contactArray, cData.contactCount, 1.0f / 60.0f);
 
-//		car->chassis->body->calculateDerivedData();
-	//	car->chassis->calculateInternals();
+		std::cout << car->body->getVelocity().magnitude() << std::endl;
+		std::cout << car->throttle << std::endl;
+		std::cout << deltaTime << std::endl;
+		std::cout << "----" << std::endl;
+		//		car->chassis->body->calculateDerivedData();
+			//	car->chassis->calculateInternals();
 		car->body->calculateDerivedData();
 		car->chassis->calculateInternals();
-	
+
 		Matrix4 boxTx = car->chassis->getTransform();;
 
 		Vector3 chassisPos = boxTx.getAxisVector(3);
@@ -1791,10 +1798,13 @@ void GameManager::update(float deltaTime)
 			runtimeFractureBlocks[i].body->integrate(deltaTime);
 			runtimeFractureBlocks[i].calculateInternals();
 		}
+		if (!showCar)
+		{
 
-		generateContacts();
+			generateContacts();
 
-		resolver.resolveContacts(cData.contactArray, cData.contactCount, deltaTime);
+			resolver.resolveContacts(cData.contactArray, cData.contactCount, deltaTime);
+		}
 
 		for (int i = 0; i < ammoCount; ++i)
 		{

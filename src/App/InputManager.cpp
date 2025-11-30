@@ -131,8 +131,8 @@ void InputManager::processInput(GLFWwindow* window, float deltaTime)
         mGameManager->targetThrottle = 1.0f;
     else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
         mGameManager->targetThrottle = -1.0f;
-	//else
-	//	mGameManager->targetThrottle = 0.0f;
+	else
+		mGameManager->targetThrottle = 0.0f;
 
     static bool qPrev = false, ePrev = false, wPrev = false, sPrev = false, dPrev = false, aPrev = false, zPrev = false, hPrev = false, clickPrev = false;
 
