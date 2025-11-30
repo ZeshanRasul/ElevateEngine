@@ -100,12 +100,12 @@ void GameManager::setSceneData()
 
 void GameManager::reset()
 {
-	if (currentScene == SceneType::Aeroplane)
+	if (showPlane)
 	{
 		ResetPlane();
 		return;
 	}
-	else if (currentScene == SceneType::Car)
+	else if (showCar)
 	{
 		// TODO: Reset car pos
 		return;
@@ -1298,7 +1298,7 @@ void GameManager::DrawPhysicsObjectsCombo()
 	}
 
 	PhysicsObject* current = allSceneObjects[sceneObjectIndex];
-	const char* previewText = selectedSceneObject->name.c_str(); // current->GetName().c_str()
+	const char* previewText = current->name.c_str(); // current->GetName().c_str()
 
 	if (ImGui::BeginCombo("##PhysicsObjectCombo", previewText))
 	{

@@ -261,6 +261,8 @@ void Scenes::LoadDominoChain(GameManager* gm)
 
 void Scenes::LoadDemoShowcase(GameManager* gm)
 {
+	gm->showCar = false;
+	gm->showPlane = false;
 	gm->reset();
 //	std::vector<GameObject*>& gameObjects = gm->GetGameObjects();
 //
