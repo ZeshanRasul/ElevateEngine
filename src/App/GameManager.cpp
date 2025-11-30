@@ -1526,63 +1526,39 @@ void GameManager::update(float deltaTime)
 
 
 
-		// Clamp throttle
-		//	car.setPosition(elevate::Vector3(20.0f, 2.0f, -90.0f));
 		car->body->clearAccumulator();
-		car->chassis->body->clearAccumulator();
-		car->body->calculateDerivedData();
-		car->chassis->body->calculateDerivedData();
+//		car->chassis->body->clearAccumulator();
+//		car->chassis->body->calculateDerivedData();
 
-		car->body->setAngularDamping(0.9f);
-		car->chassis->body->setAngularDamping(0.9f);
-		car->body->setLinearDamping(0.1f);
-		car->chassis->body->setLinearDamping(0.1f);
-		//	car->body->addForce(elevate::Vector3(car_throttle, 0, 0));
-			//	rbRegistry.updateForces(deltaTime);
-	//	car->throttle = car_throttle;
-	//	car->steerAngle = car_steerAngle;
+
 		Matrix4 transform = car->body->getTransform();
 		Vector3 forward = transform.getAxisVector(2);
 		forward.normalize();
 
-		car->throttle = glm::clamp(car->throttle, -1.0f, 1.0f);
+
+		float riseRate = 3.0f;   
+		float fallRate = 5.0f;   
+		float rate = (fabs(targetThrottle) > fabs(car->throttle)) ? riseRate : fallRate;
+
+		car->throttle += (targetThrottle - car->throttle) * rate * deltaTime;
+		car->throttle = std::clamp(car->throttle, -1.0f, 1.0f);
 
 		Vector3 rearAvg = (car->wheels[2].offset + car->wheels[3].offset) * 0.5f;
 		Vector3 frontAvg = (car->wheels[0].offset + car->wheels[1].offset) * 0.5f;
 
-		real engineForce = 15000.0f;
+		real engineForce = 8000.0f;
 
 		real maxSpeed = 40.0f; // units/s
 		real speed = car->body->getVelocity().magnitude();
 		real maxSpeedFactor = 1.0f - speed / maxSpeed;
 		real speedFactor = std::max(0.0f, (float)maxSpeedFactor);
+		speedFactor = 1.0f;
 
-		Vector3 forceWorld = forward * (car->throttle * engineForce);
+		Vector3 forceWorld = forward * (car->throttle * engineForce * speedFactor);
 
 		car->body->addForceAtBodyPoint(forceWorld, rearAvg);
-		//car->body->addForce(forceWorld);
-		//	car->body->addForceAtBodyPoint(forceWorld * 10.0f, frontAvg);
-			//	rbGravity->updateForce(car->body, deltaTime);
+
 		car->body->addForce(elevate::Vector3::GRAVITY * car->body->getMass());
-
-		//Matrix4 t = car->body->getTransform();
-		//forward = t.getAxisVector(0);
-		//forward.normalize();
-		//Vector3 right = t.getAxisVector(2);
-		//right.normalize();
-
-		//real steerStrength = 2000.0f;
-
-		//real halfWidth = car->chassis->halfSize.x;
-
-		//Vector3 pointLeftLocal = Vector3(-halfWidth, 0.0f, 0.0f);
-		//Vector3 pointRightLocal = Vector3(halfWidth, 0.0f, 0.0f);
-
-		//Vector3 forceLeft = right * (car->steerAngle * steerStrength);
-		//Vector3 forceRight = (right * -1) * (car->steerAngle * steerStrength);
-
-		//car->body->addForceAtBodyPoint(forceLeft, pointLeftLocal);
-		//car->body->addForceAtBodyPoint(forceRight, pointRightLocal);
 
 		Vector3 vel = car->body->getVelocity();
 
@@ -1594,56 +1570,33 @@ void GameManager::update(float deltaTime)
 		real vRight = vel * right;
 		real vForward = vel * forward;
 
-		//real totalMass = car->body->getMass();
-
 		real lateralDamping = 5.0f;
 		Vector3 lateralVelocity = right * vRight;
 		Vector3 lateralAccel = lateralVelocity * -lateralDamping;
 		Vector3 lateralForce = lateralAccel * car->body->getMass();
+		
 		car->body->addForce(lateralForce);
-		Vector3 lateralVelocityL = right * -vRight;
-		Vector3 lateralAccelL = lateralVelocityL * -lateralDamping;
-		Vector3 lateralForceL = lateralAccelL * car->body->getMass();
-		car->body->addForce(lateralForceL);
-
-		//Vector3 lateralForce = right * (vRight * lateralDamping);
-		//car->body->addForce(lateralForce);
-		//Vector3 lateralAccel = (lateralForce * - 1) * lateralDambingcar->body->getMass();
-
-		//real longitudinalDamping = 2.0f;	
-
-		//Vector3 lateralForce = right * (-vRight * totalMass * lateralDamping);
-
-		//car->body->addForce(lateralForce);
-
 
 		car->body->integrate(deltaTime);
-		car->chassis->calculateInternals();
 
 		generateContacts();
 		resolver.resolveContacts(cData.contactArray, cData.contactCount, deltaTime);
 
-		car->chassis->body->calculateDerivedData();
+//		car->chassis->body->calculateDerivedData();
+	//	car->chassis->calculateInternals();
+		car->body->calculateDerivedData();
 		car->chassis->calculateInternals();
-		// After calculateInternals()
+	
 		Matrix4 boxTx = car->chassis->getTransform();;
 
 		Vector3 chassisPos = boxTx.getAxisVector(3);
 		car->chassisMesh->SetPosition(chassisPos);
 
-		// Orientation: use the body’s orientation or reconstruct from boxTx’s basis
 		car->chassisMesh->SetOrientation(glm::quat(
 			(float)car->body->getOrientation().r,
 			(float)car->body->getOrientation().i,
 			(float)car->body->getOrientation().j,
 			(float)car->body->getOrientation().k));
-
-		//t = car->body->getTransform();
-		//car->chassisMesh->SetOrientation(glm::quat(
-		//	(float)car->body->getOrientation().r,
-		//	(float)car->body->getOrientation().i,
-		//	(float)car->body->getOrientation().j,
-		//	(float)car->body->getOrientation().k));
 
 		for (int i = 0; i < 4; ++i)
 		{
@@ -1660,28 +1613,11 @@ void GameManager::update(float deltaTime)
 				(float)car->body->getOrientation().k));
 		}
 
-		//for (int i = 0; i < 4; i++)
-		//{
-		//	car->wheels[i].coll->body->calculateDerivedData();
-		//	car->wheels[i].coll->calculateInternals();
-		//	elevate::Vector3 wheelWorldPos = car->body->getPointInWorldSpace(car->wheels[i].offset);
-		//	car->wheels[i].mesh->SetPosition(wheelWorldPos);
-		//	car->wheels[i].mesh->SetOrientation(glm::quat(
-		//		(float)car->body->getOrientation().r,
-		//		(float)car->body->getOrientation().i,
-		//		(float)car->body->getOrientation().j,
-		//		(float)car->body->getOrientation().k));
-
-		//}
-
-
-
 		if (showCar)
 		{
 			Vector3 carPos = car->body->getPosition();
 			Matrix4 carTransform = car->body->getTransform();
 
-			// Car forward (Z axis)
 			Vector3 forward = carTransform.getAxisVector(0) * -1;
 			forward.normalize();
 
@@ -1691,22 +1627,16 @@ void GameManager::update(float deltaTime)
 			Vector3 camUp = forward % right;
 			camUp.normalize();
 
-			// Camera offsets
 			float back = 40.0f;
 			float height = 4.5f;
 
-			// Compute camera position and target
 			Vector3 camPos = carPos + right * -back + worldUp * height;
 			Vector3 target = carPos + right * 1.5f;
 
-			// Build view matrix
 			camera->Position = glm::vec3(camPos.x, camPos.y, camPos.z);
-			//	camera->UpdateCameraVectors();
 			camera->Front = glm::normalize(glm::vec3(target.x, target.y, target.z) - camera->Position);
 			camera->UpdateCameraVectors();
 			view = camera->GetViewMatrix(glm::vec3(target.x, target.y, target.z));
-			//			camera->UpdateCameraVectors();
-						//	view = camera->GetViewMatrix();
 		}
 	}
 

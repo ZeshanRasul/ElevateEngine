@@ -88,11 +88,11 @@ void Scenes::LoadCarTest(GameManager* gm)
 		elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
 		elevate::Vector3(0.0f, 0.0f, 0.0f)
 	);
-	gm->carBody->setPosition(elevate::Vector3(0.0f, 3.04f, 0.0f));
+	gm->carBody->setPosition(elevate::Vector3(0.0f, 3.5f, 0.0f));
 	gm->car->body = gm->carBody;
 	gm->car->chassis = new CollisionBox();
 	gm->car->chassis->body = gm->carBody;
-	gm->car->chassis->halfSize = elevate::Vector3(4.0f, 1.5f, 2.30f);
+	gm->car->chassis->halfSize = elevate::Vector3(2.3f, 1.5f, 4.0f);
 	gm->car->chassis->body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 	gm->car->chassis->body->getTransform().getAxisVector(3);
 
@@ -102,7 +102,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->car->body->setMass(totalMass);
 	elevate::Vector3 halfSize = gm->car->chassis->halfSize;
 
-	gm->car->chassisMesh = new Cube(elevate::Vector3(0.0f, 3.04f, 0.0f), halfSize * 2, &gm->ammoShader, gm);
+	gm->car->chassisMesh = new Cube(elevate::Vector3(0.0f, 3.5f, 0.0f), halfSize * 2, &gm->ammoShader, gm);
 	gm->car->chassisMesh->LoadMesh();
 	gm->car->chassisMesh->SetColor(glm::vec3(0.8f, 0.1f, 0.1f));
 	gameObjects.push_back(gm->car->chassisMesh);
@@ -159,6 +159,8 @@ void Scenes::LoadCarTest(GameManager* gm)
 	Matrix3 inertia;
 	inertia.setDiagonal(ix, iy, iz);
 	gm->car->body->setInertiaTensor(inertia);
+	gm->car->body->setAngularDamping(0.4f);
+	gm->car->body->setLinearDamping(0.02f);
 
 	gm->car->body->getTransform();
 

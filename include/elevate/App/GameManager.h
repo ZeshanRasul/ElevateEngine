@@ -221,6 +221,8 @@ public:
     void ResetPlane();
 
     float car_throttle = 0.0f;
+    float targetThrottle = 0.0f;
+
     float car_steerAngle = 0.0f;
     bool fpsSandboxDemo = false;
 
@@ -437,7 +439,7 @@ private:
     float right_wing_control;
     float rudder_control;
 
-    float friction = 0.6f;
+    float friction = 0.3f;
 	float restitution = 0.4f;
 	float tolerance = 0.1f;
 
