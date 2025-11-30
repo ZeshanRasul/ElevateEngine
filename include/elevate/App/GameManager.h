@@ -28,82 +28,82 @@
 
 enum class SceneType
 {
-    None,
-    Empty,
-    Car,
-    Aeroplane,
-    Ragdoll,
-    FractureWall,
-    DominoChain,
-    DemoShowcase,
-    Count
+	None,
+	Empty,
+	Car,
+	Aeroplane,
+	Ragdoll,
+	FractureWall,
+	DominoChain,
+	DemoShowcase,
+	Count
 };
 
 static const char* SceneTypeToString(SceneType type)
 {
-    switch (type)
-    {
-    case SceneType::Empty:        return "Empty";
-    case SceneType::Car:          return "Car";
-    case SceneType::Aeroplane:    return "Aeroplane";
-    case SceneType::Ragdoll:      return "Ragdoll";
-    case SceneType::FractureWall: return "Fracture Wall";
-    case SceneType::DominoChain:  return "Domino Chain";
-    case SceneType::DemoShowcase: return "Demo Showcase";
-    default:                      return "None";
-    }
+	switch (type)
+	{
+	case SceneType::Empty:        return "Empty";
+	case SceneType::Car:          return "Car";
+	case SceneType::Aeroplane:    return "Aeroplane";
+	case SceneType::Ragdoll:      return "Ragdoll";
+	case SceneType::FractureWall: return "Fracture Wall";
+	case SceneType::DominoChain:  return "Domino Chain";
+	case SceneType::DemoShowcase: return "Demo Showcase";
+	default:                      return "None";
+	}
 }
 
 
 enum class AmmoType
 {
-    Pistol,
-    Rifle,
-    Rocket
+	Pistol,
+	Rifle,
+	Rocket
 };
 
 struct AmmoRound
 {
-    Sphere* visual = nullptr;
-    elevate::RigidBody* body = nullptr;
-    elevate::CollisionSphere* coll = nullptr;
-    bool                     active = false;
-    float                    lifetime = 0.0f;
+	Sphere* visual = nullptr;
+	elevate::RigidBody* body = nullptr;
+	elevate::CollisionSphere* coll = nullptr;
+	bool                     active = false;
+	float                    lifetime = 0.0f;
 };
 
 enum class ShapeType
 {
-    Box,
-    Sphere,
-    HalfSpace
+	Box,
+	Sphere,
+	HalfSpace
 };
 
 enum class BodyType
 {
-    Unknown,
-    StackCube,
-    EnvBox,
-    Block,
-    Ammo,
-    Bone,
-    GroundPlane
+	Unknown,
+	StackCube,
+	EnvBox,
+	Block,
+	Ammo,
+	Bone,
+	GroundPlane
 };
 
 struct CollisionBody
 {
-    ShapeType shapeType;
-    BodyType  bodyType;
-    void* owner;
+	ShapeType shapeType;
+	BodyType  bodyType;
+	void* owner;
 
-    elevate::CollisionBox* box = nullptr;
-    elevate::CollisionSphere* sphere = nullptr;
-    elevate::CollisionPlane* plane = nullptr;
+	elevate::CollisionBox* box = nullptr;
+	elevate::CollisionSphere* sphere = nullptr;
+	elevate::CollisionPlane* plane = nullptr;
 };
 
 struct AircraftParts {
-    elevate::Vector3 offset;
-    Cube* mesh;
-    CollisionBox* coll;
+	elevate::Vector3 offset;
+	Cube* mesh;
+	CollisionBox* coll;
 };
 
 struct CarVisuals {
@@ -112,709 +112,709 @@ struct CarVisuals {
 };
 
 struct Car {
-    elevate::RigidBody* body;
+	elevate::RigidBody* body;
 	elevate::CollisionBox* chassis;
-    GameObject* chassisMesh;
+	GameObject* chassisMesh;
 
-    struct Wheel {
-        elevate::Vector3 offset;
-        elevate::Vector3 contactPointWorld;
-        elevate::Vector3 contactNormalWorld;
+	struct Wheel {
+		elevate::Vector3 offset;
+		elevate::Vector3 contactPointWorld;
+		elevate::Vector3 contactNormalWorld;
 
-        bool grounded = false;
+		bool grounded = false;
 
-        real restLength = 0.4f;     // suspension length
-        real minLength = 0.1f;      // bump stop
-        real maxLength = 0.6f;      // max extension
-        real springK = 25000.0f;    // spring stiffness
-        real damperC = 3000.0f;     // damping
+		real restLength = 0.4f;     // suspension length
+		real minLength = 0.1f;      // bump stop
+		real maxLength = 0.6f;      // max extension
+		real springK = 25000.0f;    // spring stiffness
+		real damperC = 3000.0f;     // damping
 
-        real compression = 0.0f;
-        real lastCompression = 0.0f;
+		real compression = 0.0f;
+		real lastCompression = 0.0f;
 
-        real wheelRadius = 0.55f;
-        GameObject* mesh;
-    };
-
+		real wheelRadius = 0.55f;
+		GameObject* mesh;
+	};
+	
 	Wheel wheels[4];
 
-    float throttle;
-    float brake;
-    float steerAngle;
+	float throttle;
+	float brake;
+	float steerAngle;
 
-    Cube* roofMesh = nullptr;
-    Cube* hoodMesh = nullptr;
-    Cube* rearMesh = nullptr;
-    Cube* frontBumperMesh = nullptr;
+	Cube* roofMesh = nullptr;
+	Cube* hoodMesh = nullptr;
+	Cube* rearMesh = nullptr;
+	Cube* frontBumperMesh = nullptr;
 
-    elevate::Vector3 roofOffset;
-    elevate::Vector3 hoodOffset;
-    elevate::Vector3 rearOffset;
-    elevate::Vector3 frontBumperOffset;
+	elevate::Vector3 roofOffset;
+	elevate::Vector3 hoodOffset;
+	elevate::Vector3 rearOffset;
+	elevate::Vector3 frontBumperOffset;
 };
 
 class GameManager {
 public:
-    GameManager(Window* window, unsigned int width, unsigned int height);
+	GameManager(Window* window, unsigned int width, unsigned int height);
 
-    ~GameManager() {
-        delete camera;
-        for (auto it = gameObjects.begin(); it != gameObjects.end(); ) {
-            if (*it) {
-                delete* it;
-            }
-            it = gameObjects.erase(it);
-        }
-        delete inputManager;
-    }
+	~GameManager() {
+		delete camera;
+		for (auto it = gameObjects.begin(); it != gameObjects.end(); ) {
+			if (*it) {
+				delete* it;
+			}
+			it = gameObjects.erase(it);
+		}
+		delete inputManager;
+	}
 
-    void setupCamera(unsigned int width, unsigned int height);
-    void setSceneData();
+	void setupCamera(unsigned int width, unsigned int height);
+	void setSceneData();
 
-    glm::mat4 getView() const { return view; }
-    glm::mat4 getProjection() const { return projection; }
+	glm::mat4 getView() const { return view; }
+	glm::mat4 getProjection() const { return projection; }
 
-    //TODO move this after testing:
-    
-    struct RaycastHit
-    {
-        bool hit = false;
-        real distance = 0.0f;
-        elevate::Vector3 point;
-        elevate::Vector3 normal;
-    };
+	//TODO move this after testing:
 
-    bool RaycastCollisionBox(
-        const elevate::Vector3& rayOrigin,
-        const elevate::Vector3& rayDir,       // normalized
-        real maxDist,
-        CollisionBox* box,
-        RaycastHit& outHit)
-    {
-        // Get box transform (world space)
-        // box->transform is updated via calculateInternals()
-        const elevate::Matrix4& T = box->getTransform();
+	struct RaycastHit
+	{
+		bool hit = false;
+		real distance = 0.0f;
+		elevate::Vector3 point;
+		elevate::Vector3 normal;
+	};
 
-        elevate::Vector3 boxCenter = T.getAxisVector(3);
+	bool RaycastCollisionBox(
+		const elevate::Vector3& rayOrigin,
+		const elevate::Vector3& rayDir,       // normalized
+		real maxDist,
+		CollisionBox* box,
+		RaycastHit& outHit)
+	{
+		// Get box transform (world space)
+		// box->transform is updated via calculateInternals()
+		const elevate::Matrix4& T = box->getTransform();
 
-        // Box axes (world space)
-        elevate::Vector3 X = T.getAxisVector(0);   // box local x
-        elevate::Vector3 Y = T.getAxisVector(1);   // box local y
-        elevate::Vector3 Z = T.getAxisVector(2);   // box local z
+		elevate::Vector3 boxCenter = T.getAxisVector(3);
 
-        // Half extents
-        elevate::Vector3 e = box->halfSize;
+		// Box axes (world space)
+		elevate::Vector3 X = T.getAxisVector(0);   // box local x
+		elevate::Vector3 Y = T.getAxisVector(1);   // box local y
+		elevate::Vector3 Z = T.getAxisVector(2);   // box local z
 
-        // Vector from box center to ray origin
-        elevate::Vector3 p = rayOrigin - boxCenter;
+		// Half extents
+		elevate::Vector3 e = box->halfSize;
 
-        // Precompute dot products
-        real px = p * X;
-        real py = p * Y;
-        real pz = p * Z;
+		// Vector from box center to ray origin
+		elevate::Vector3 p = rayOrigin - boxCenter;
 
-        real dx = rayDir * X;
-        real dy = rayDir * Y;
-        real dz = rayDir * Z;
+		// Precompute dot products
+		real px = p * X;
+		real py = p * Y;
+		real pz = p * Z;
 
-        real tMin = 0.0f;
-        real tMax = maxDist;
+		real dx = rayDir * X;
+		real dy = rayDir * Y;
+		real dz = rayDir * Z;
 
-        real t1, t2;
+		real tMin = 0.0f;
+		real tMax = maxDist;
 
-        // X slab
-        if (fabs(dx) < 1e-6)
-        {
-            // Parallel to X slab ? fail if outside
-            if (px < -e.x || px > e.x)
-                return false;
-        }
-        else
-        {
-            t1 = (-e.x - px) / dx;
-            t2 = (e.x - px) / dx;
-            if (t1 > t2) std::swap(t1, t2);
-            tMin = std::max(tMin, t1);
-            tMax = std::min(tMax, t2);
-            if (tMin > tMax) return false;
-        }
+		real t1, t2;
 
-        // Y slab
-        if (fabs(dy) < 1e-6)
-        {
-            if (py < -e.y || py > e.y)
-                return false;
-        }
-        else
-        {
-            t1 = (-e.y - py) / dy;
-            t2 = (e.y - py) / dy;
-            if (t1 > t2) std::swap(t1, t2);
-            tMin = std::max(tMin, t1);
-            tMax = std::min(tMax, t2);
-            if (tMin > tMax) return false;
-        }
+		// X slab
+		if (fabs(dx) < 1e-6)
+		{
+			// Parallel to X slab ? fail if outside
+			if (px < -e.x || px > e.x)
+				return false;
+		}
+		else
+		{
+			t1 = (-e.x - px) / dx;
+			t2 = (e.x - px) / dx;
+			if (t1 > t2) std::swap(t1, t2);
+			tMin = std::max(tMin, t1);
+			tMax = std::min(tMax, t2);
+			if (tMin > tMax) return false;
+		}
 
-        // Z slab
-        if (fabs(dz) < 1e-6)
-        {
-            if (pz < -e.z || pz > e.z)
-                return false;
-        }
-        else
-        {
-            t1 = (-e.z - pz) / dz;
-            t2 = (e.z - pz) / dz;
-            if (t1 > t2) std::swap(t1, t2);
-            tMin = std::max(tMin, t1);
-            tMax = std::min(tMax, t2);
-            if (tMin > tMax) return false;
-        }
+		// Y slab
+		if (fabs(dy) < 1e-6)
+		{
+			if (py < -e.y || py > e.y)
+				return false;
+		}
+		else
+		{
+			t1 = (-e.y - py) / dy;
+			t2 = (e.y - py) / dy;
+			if (t1 > t2) std::swap(t1, t2);
+			tMin = std::max(tMin, t1);
+			tMax = std::min(tMax, t2);
+			if (tMin > tMax) return false;
+		}
 
-        // Hit detected
-        real tHit = (tMin > 0.0f) ? tMin : tMax;
-        if (tHit < 0.0f || tHit > maxDist)
-            return false;
+		// Z slab
+		if (fabs(dz) < 1e-6)
+		{
+			if (pz < -e.z || pz > e.z)
+				return false;
+		}
+		else
+		{
+			t1 = (-e.z - pz) / dz;
+			t2 = (e.z - pz) / dz;
+			if (t1 > t2) std::swap(t1, t2);
+			tMin = std::max(tMin, t1);
+			tMax = std::min(tMax, t2);
+			if (tMin > tMax) return false;
+		}
 
-        outHit.hit = true;
-        outHit.distance = tHit;
-        outHit.point = rayOrigin + rayDir * tHit;
+		// Hit detected
+		real tHit = (tMin > 0.0f) ? tMin : tMax;
+		if (tHit < 0.0f || tHit > maxDist)
+			return false;
 
-        // Compute hit normal: compare penetration side
-        elevate::Vector3 local = elevate::Vector3(px + tHit * dx, py + tHit * dy, pz + tHit * dz);
+		outHit.hit = true;
+		outHit.distance = tHit;
+		outHit.point = rayOrigin + rayDir * tHit;
 
-        elevate::Vector3 nLocal(0, 0, 0);
-        float bias = 1e-4f;
+		// Compute hit normal: compare penetration side
+		elevate::Vector3 local = elevate::Vector3(px + tHit * dx, py + tHit * dy, pz + tHit * dz);
 
-        if (fabs(local.x - (-e.x)) < bias) nLocal = elevate::Vector3(-1, 0, 0);
-        else if (fabs(local.x - e.x) < bias) nLocal = elevate::Vector3(+1, 0, 0);
-        else if (fabs(local.y - (-e.y)) < bias) nLocal = elevate::Vector3(0, -1, 0);
-        else if (fabs(local.y - e.y) < bias) nLocal = elevate::Vector3(0, +1, 0);
-        else if (fabs(local.z - (-e.z)) < bias) nLocal = elevate::Vector3(0, 0, -1);
-        else if (fabs(local.z - e.z) < bias) nLocal = elevate::Vector3(0, 0, +1);
+		elevate::Vector3 nLocal(0, 0, 0);
+		float bias = 1e-4f;
 
-        // Transform normal to world space
-        outHit.normal =
-            X * nLocal.x +
-            Y * nLocal.y +
-            Z * nLocal.z;
+		if (fabs(local.x - (-e.x)) < bias) nLocal = elevate::Vector3(-1, 0, 0);
+		else if (fabs(local.x - e.x) < bias) nLocal = elevate::Vector3(+1, 0, 0);
+		else if (fabs(local.y - (-e.y)) < bias) nLocal = elevate::Vector3(0, -1, 0);
+		else if (fabs(local.y - e.y) < bias) nLocal = elevate::Vector3(0, +1, 0);
+		else if (fabs(local.z - (-e.z)) < bias) nLocal = elevate::Vector3(0, 0, -1);
+		else if (fabs(local.z - e.z) < bias) nLocal = elevate::Vector3(0, 0, +1);
 
-        outHit.normal.normalize();
-        return true;
-    }
+		// Transform normal to world space
+		outHit.normal =
+			X * nLocal.x +
+			Y * nLocal.y +
+			Z * nLocal.z;
+
+		outHit.normal.normalize();
+		return true;
+	}
 
 
-    void update(float deltaTime);
+	void update(float deltaTime);
 
-    void render();
+	void render();
 
-    void setUpDebugUI();
-    void showDebugUI();
-    void renderDebugUI();
+	void setUpDebugUI();
+	void showDebugUI();
+	void renderDebugUI();
 
-    void setPushDir(float newDir) { pushDirX = newDir; }
-    void fireRound(AmmoType type);
-    void DoAllPairCollisions(std::vector<CollisionBody>& bodies, elevate::CollisionData& cData);
+	void setPushDir(float newDir) { pushDirX = newDir; }
+	void fireRound(AmmoType type);
+	void DoAllPairCollisions(std::vector<CollisionBody>& bodies, elevate::CollisionData& cData);
 
-    void reset();
-    void ResetState();
-    void togglePause() { isPaused = !isPaused; }
-    void ResetCar();
+	void reset();
+	void ResetState();
+	void togglePause() { isPaused = !isPaused; }
+	void ResetCar();
 
-    void OnQPressed();
-    void OnEPressed();
-    void OnWPressed();
-    void OnSPressed();
-    void OnDPressed();
-    void OnAPressed();
-    void OnZPressed();
-    void OnHPressed();
-    void OnLeftClick();
+	void OnQPressed();
+	void OnEPressed();
+	void OnWPressed();
+	void OnSPressed();
+	void OnDPressed();
+	void OnAPressed();
+	void OnZPressed();
+	void OnHPressed();
+	void OnLeftClick();
 
-    void AddToGameObjects(GameObject* obj) {
-        gameObjects.push_back(obj);
-    }
+	void AddToGameObjects(GameObject* obj) {
+		gameObjects.push_back(obj);
+	}
 
-    std::vector<GameObject*>& GetGameObjects() {
-        return gameObjects;
-    }
+	std::vector<GameObject*>& GetGameObjects() {
+		return gameObjects;
+	}
 
-    PhysicsObject* wall;
-    PhysicsObject* wall2;
-    PhysicsObject* wall3;
-    PhysicsObject* wall4;
-    PhysicsObject* floor;
+	PhysicsObject* wall;
+	PhysicsObject* wall2;
+	PhysicsObject* wall3;
+	PhysicsObject* wall4;
+	PhysicsObject* floor;
 
-    SpawnContext spawnContext;
-    ShapeFactory* shapeFactory;
-    SpawnFactory* spawnFactory;
+	SpawnContext spawnContext;
+	ShapeFactory* shapeFactory;
+	SpawnFactory* spawnFactory;
 
-    Shader ammoShader;
-    Shader cubeShader;
-    Shader lineShader;
-    Shader cubemapShader;
+	Shader ammoShader;
+	Shader cubeShader;
+	Shader lineShader;
+	Shader cubemapShader;
 
 	bool showDebugDraw = false;
 
-    static const int MaxAmmoRounds = 32;
+	static const int MaxAmmoRounds = 32;
 
-    AmmoRound ammoPool[MaxAmmoRounds];
-    int       ammoCount = 0;
+	AmmoRound ammoPool[MaxAmmoRounds];
+	int       ammoCount = 0;
 
-    RigidBody* carBody;
-    CarPropulsion* carEngine;
-    std::vector<CarVisuals> carParts;
-    bool showCar = false;
+	RigidBody* carBody;
+	CarPropulsion* carEngine;
+	std::vector<CarVisuals> carParts;
+	bool showCar = false;
 
-    Car* car;
+	Car* car;
 
-    bool showPlane = false;
-    void ResetPlane();
+	bool showPlane = false;
+	void ResetPlane();
 
-    float car_throttle = 0.0f;
-    float targetThrottle = 0.0f;
-    float targetSteer = 0.0f;
-    float targetBrake = 0.0f;
+	float car_throttle = 0.0f;
+	float targetThrottle = 0.0f;
+	float targetSteer = 0.0f;
+	float targetBrake = 0.0f;
 
-    float car_steerAngle = 0.0f;
-    bool fpsSandboxDemo = false;
+	float car_steerAngle = 0.0f;
+	bool fpsSandboxDemo = false;
 
-    SceneType currentScene = SceneType::DemoShowcase;
-    int selectedIndex = 7;
+	SceneType currentScene = SceneType::DemoShowcase;
+	int selectedIndex = 7;
 
 
-    bool hit;
-    bool firstHit = true;
-    bool ball_active;
-    unsigned fracture_contact;
-    Block blocks[9];
-    Cube* cubes[9];
-    Texture blockTexture;
-    Texture brickTexture;
-    Texture crateTexture;
-    Texture stackCrateTexture;
+	bool hit;
+	bool firstHit = true;
+	bool ball_active;
+	unsigned fracture_contact;
+	Block blocks[9];
+	Cube* cubes[9];
+	Texture blockTexture;
+	Texture brickTexture;
+	Texture crateTexture;
+	Texture stackCrateTexture;
 
-    PhysicsObject* crate;
-    PhysicsObject* ball;
-    std::vector<PhysicsObject*> crates;
-    std::vector<PhysicsObject*> bricks;
-    std::vector<PhysicsObject*> dominoes;
+	PhysicsObject* crate;
+	PhysicsObject* ball;
+	std::vector<PhysicsObject*> crates;
+	std::vector<PhysicsObject*> bricks;
+	std::vector<PhysicsObject*> dominoes;
 
-    std::vector<Ragdoll*> ragdolls;
+	std::vector<Ragdoll*> ragdolls;
 
-    static const int MaxEnvBoxes = 8;
-    int               numEnvBoxes = 8;
-    elevate::CollisionBox* envBoxes[MaxEnvBoxes];
-    elevate::RigidBody* envBodies[MaxEnvBoxes];
-    Cube* envCubes[MaxEnvBoxes];
-    static const int MaxStackCubes = 5;
+	static const int MaxEnvBoxes = 8;
+	int               numEnvBoxes = 8;
+	elevate::CollisionBox* envBoxes[MaxEnvBoxes];
+	elevate::RigidBody* envBodies[MaxEnvBoxes];
+	Cube* envCubes[MaxEnvBoxes];
+	static const int MaxStackCubes = 5;
 
-    elevate::CollisionBox* cStackBoxes[MaxStackCubes];
-    elevate::RigidBody* stackBodies[MaxStackCubes];
-    Cube* stackCubes[MaxStackCubes];
-    int                    numStackCubes = 0;
+	elevate::CollisionBox* cStackBoxes[MaxStackCubes];
+	elevate::RigidBody* stackBodies[MaxStackCubes];
+	Cube* stackCubes[MaxStackCubes];
+	int                    numStackCubes = 0;
 
-    std::vector<std::vector<PhysicsObject*>> crateStacks;
+	std::vector<std::vector<PhysicsObject*>> crateStacks;
 
-    GLuint g_DebugVao;
-    GLuint g_DebugVbo;
+	GLuint g_DebugVao;
+	GLuint g_DebugVbo;
 private:
-    void ShowCameraControlWindow(Camera& cam);
-    void ShowLightControlWindow(DirLight& light);
-    void ShowAmmoWindow();
-    void ShowBuoyancyWindow();
-    void ShowSpawnObjectWindow();
-    void ShowEngineWindow();
-    void ShowPerformanceWindow();
-    void DrawPhysicsObjectsCombo();
-    void CalculatePerformanceMetrics(float deltaTime);
-    void RemoveDestroyedGameObjects();
+	void ShowCameraControlWindow(Camera& cam);
+	void ShowLightControlWindow(DirLight& light);
+	void ShowAmmoWindow();
+	void ShowBuoyancyWindow();
+	void ShowSpawnObjectWindow();
+	void ShowEngineWindow();
+	void ShowPerformanceWindow();
+	void DrawPhysicsObjectsCombo();
+	void CalculatePerformanceMetrics(float deltaTime);
+	void RemoveDestroyedGameObjects();
 
-    std::vector<SceneType> sceneTypes = {
-        SceneType::Empty,
-        SceneType::Car,
-        SceneType::Aeroplane,
-        SceneType::Ragdoll,
-        SceneType::FractureWall,
-        SceneType::DominoChain,
-        SceneType::DemoShowcase
-    };
+	std::vector<SceneType> sceneTypes = {
+		SceneType::Empty,
+		SceneType::Car,
+		SceneType::Aeroplane,
+		SceneType::Ragdoll,
+		SceneType::FractureWall,
+		SceneType::DominoChain,
+		SceneType::DemoShowcase
+	};
 
-    Renderer* renderer;
-    Window* window;
-    Camera* camera;
+	Renderer* renderer;
+	Window* window;
+	Camera* camera;
 
-    InputManager* inputManager;
-    std::vector<GameObject*> gameObjects;
+	InputManager* inputManager;
+	std::vector<GameObject*> gameObjects;
 
 
 
-    Cube* cube;
-    Cube* cube2;
-    Cube* cube3;
-    Cube* cube4;
-    Cube* waterCubeTop;
-    Cube* waterCubeBottom;
-    Sphere* pistolSphere;
-    Sphere* artillerySphere;
-    Sphere* fireballSphere;
-    Sphere* laserSphere;
-    Sphere* waterSphere;
-    Sphere* springSphere;
-    Sphere* springSphere2;
-    Sphere* springSphere3;
-    Plane* plane;
+	Cube* cube;
+	Cube* cube2;
+	Cube* cube3;
+	Cube* cube4;
+	Cube* waterCubeTop;
+	Cube* waterCubeBottom;
+	Sphere* pistolSphere;
+	Sphere* artillerySphere;
+	Sphere* fireballSphere;
+	Sphere* laserSphere;
+	Sphere* waterSphere;
+	Sphere* springSphere;
+	Sphere* springSphere2;
+	Sphere* springSphere3;
+	Plane* plane;
 
-    std::vector<std::string> cubemapFaces;
-    Cubemap* cubemap;
+	std::vector<std::string> cubemapFaces;
+	Cubemap* cubemap;
 
-    elevate::ParticleWorld* pWorld;
-    elevate::ParticleCable cable1;
-    elevate::ParticleCable cable2;
-    elevate::ParticleCable cable3;
+	elevate::ParticleWorld* pWorld;
+	elevate::ParticleCable cable1;
+	elevate::ParticleCable cable2;
+	elevate::ParticleCable cable3;
 
-    glm::mat4 view = glm::mat4(1.0f);
-    glm::mat4 projection = glm::mat4(1.0f);
-    glm::mat4 cubemapView = glm::mat4(1.0f);
+	glm::mat4 view = glm::mat4(1.0f);
+	glm::mat4 projection = glm::mat4(1.0f);
+	glm::mat4 cubemapView = glm::mat4(1.0f);
 
-    const static unsigned ammoRounds = 16;
+	const static unsigned ammoRounds = 16;
 
-    FloatingSphere* Sphere0;
-    FloatingSphere* Sphere1;
-    FloatingSphere* Sphere2;
-    std::vector<FloatingSphere*> spheres;
-    elevate::ParticleForceRegistry registry;
-    elevate::ParticleAnchoredSpring* springFG;
-    elevate::ParticleSpring* bungeeFG;
-    elevate::ParticleSpring* bungeeFG1;
-    elevate::ParticleGravity* gravityFG;
-    elevate::ParticleGravity* pushForce;
-    bool isHidden = false;
-    float pushDirX = 0;
+	FloatingSphere* Sphere0;
+	FloatingSphere* Sphere1;
+	FloatingSphere* Sphere2;
+	std::vector<FloatingSphere*> spheres;
+	elevate::ParticleForceRegistry registry;
+	elevate::ParticleAnchoredSpring* springFG;
+	elevate::ParticleSpring* bungeeFG;
+	elevate::ParticleSpring* bungeeFG1;
+	elevate::ParticleGravity* gravityFG;
+	elevate::ParticleGravity* pushForce;
+	bool isHidden = false;
+	float pushDirX = 0;
 
-    Line* lineab;
-    Line* linebc;
-    Line* linecd;
-    glm::vec3 anchorPos = glm::vec3(0.0f);
-    std::vector<Line*> lines;
+	Line* lineab;
+	Line* linebc;
+	Line* linecd;
+	glm::vec3 anchorPos = glm::vec3(0.0f);
+	std::vector<Line*> lines;
 
-    float floatingSphereMass = 2.0f;
-    float waterHeight = 10.0f;
-    float maxDepth = 5.0f;
-    float floatingSphereVolume = 0.1f;
-    float waterDensity = 1000.0f;
-    bool showBuoyanceDemo = false;
+	float floatingSphereMass = 2.0f;
+	float waterHeight = 10.0f;
+	float maxDepth = 5.0f;
+	float floatingSphereVolume = 0.1f;
+	float waterDensity = 1000.0f;
+	bool showBuoyanceDemo = false;
 
-    bool isPaused = false;
-    bool singleStep = false;
-    bool enableGravity = true;
+	bool isPaused = false;
+	bool singleStep = false;
+	bool enableGravity = true;
 
-    bool cubeDemo = false;
-    elevate::RigidBody* testBody = nullptr;
-    elevate::RigidBody* testBody2 = nullptr;
-    World* rbWorld;
-    ForceRegistry rbRegistry;
-    Gravity* rbGravity;
-    float gravity[3] = { 0.0f, -9.81f, 0.0f };
+	bool cubeDemo = false;
+	elevate::RigidBody* testBody = nullptr;
+	elevate::RigidBody* testBody2 = nullptr;
+	World* rbWorld;
+	ForceRegistry rbRegistry;
+	Gravity* rbGravity;
+	float gravity[3] = { 0.0f, -9.81f, 0.0f };
 
-    bool sphereDemo = false;
-    Sphere* sphere = nullptr;
-    Sphere* sphere2 = nullptr;
-    elevate::RigidBody* sphereBody = nullptr;
-    elevate::RigidBody* sphereBody2 = nullptr;
+	bool sphereDemo = false;
+	Sphere* sphere = nullptr;
+	Sphere* sphere2 = nullptr;
+	elevate::RigidBody* sphereBody = nullptr;
+	elevate::RigidBody* sphereBody2 = nullptr;
 
-    elevate::RigidBody* planeBody = nullptr;
+	elevate::RigidBody* planeBody = nullptr;
 
-    elevate::Contact* contacts;
-    elevate::CollisionData cData;
-    elevate::ContactResolver resolver;
-    elevate::CollisionSphere* cSpheres[2];
-    elevate::CollisionSphere* cSphere0;
-    elevate::CollisionSphere* cSphere1;
-    elevate::CollisionBox* cBox0;
-    elevate::CollisionBox* cBox1;
-    elevate::CollisionPlane* cPlane;
+	elevate::Contact* contacts;
+	elevate::CollisionData cData;
+	elevate::ContactResolver resolver;
+	elevate::CollisionSphere* cSpheres[2];
+	elevate::CollisionSphere* cSphere0;
+	elevate::CollisionSphere* cSphere1;
+	elevate::CollisionBox* cBox0;
+	elevate::CollisionBox* cBox1;
+	elevate::CollisionPlane* cPlane;
 
-    void generateContacts();
+	void generateContacts();
 
 	bool showUI = true;
 
 
-    Random random;
+	Random random;
 
-    std::vector<PhysicsObject*> runTimeBoxes;
-    float boxMass = 1.0f;
-    float boxSize[3] = { 1.0f, 1.0f, 1.0f };
-    float boxColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	std::vector<PhysicsObject*> runTimeBoxes;
+	float boxMass = 1.0f;
+	float boxSize[3] = { 1.0f, 1.0f, 1.0f };
+	float boxColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-    std::vector<PhysicsObject*> runTimeSpheres;
-    float sphereRadius = 1.0f;
-    float sphereMass = 1.0f;
-    float sphereColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	std::vector<PhysicsObject*> runTimeSpheres;
+	float sphereRadius = 1.0f;
+	float sphereMass = 1.0f;
+	float sphereColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-    int stackWidth = 3;
-    int stackHeight = 3;
-    int stackDepth = 3;
-    float stackBoxSize[3] = { 1.0f, 1.0f, 1.0f };
-    float stackCrateMass = 2.0f;
-    int stackIndex = 0;
+	int stackWidth = 3;
+	int stackHeight = 3;
+	int stackDepth = 3;
+	float stackBoxSize[3] = { 1.0f, 1.0f, 1.0f };
+	float stackCrateMass = 2.0f;
+	int stackIndex = 0;
 
-    int wallWidth = 5;
-    int wallHeight = 5;
-    int wallIndex = 0;
-    float brickSizeInput[3] = {1.0f, 1.0f, 1.0f};
+	int wallWidth = 5;
+	int wallHeight = 5;
+	int wallIndex = 0;
+	float brickSizeInput[3] = { 1.0f, 1.0f, 1.0f };
 	bool isStaggered = true;
 	float brickMass = 2.0f;
 	std::vector<std::vector<PhysicsObject*>> runtimeWalls;
 
-    float lineDirectionInput[3] = {1.0f, 1.0f, 1.0f};
-    float dominoSizeInput[3] = {1.0f, 1.0f, 1.0f};
+	float lineDirectionInput[3] = { 1.0f, 1.0f, 1.0f };
+	float dominoSizeInput[3] = { 1.0f, 1.0f, 1.0f };
 	int dominoCount = 10;
 	float dominoMass = 2.0f;
 	float dominoSpacing = 2.0f;
 	int dominoLineIndex = 0;
 	std::vector<std::vector<PhysicsObject*>> runtimeDominoLines;
 
-    float blockPos[3] = { -50.0f, 25.0f, 50.0f };
-    float blockScale[3] = { 15.0f, 15.0f, 15.0f };
-    float blockMass = 85.0f;
+	float blockPos[3] = { -50.0f, 25.0f, 50.0f };
+	float blockScale[3] = { 15.0f, 15.0f, 15.0f };
+	float blockMass = 85.0f;
 	std::vector<Block> runtimeFractureBlocks;
 
-    AeroControl left_wing;
-    AeroControl right_wing;
-    AeroControl rudder;
-    Aero tail;
-    RigidBody aircraft;
-    elevate::Vector3 windspeed;
+	AeroControl left_wing;
+	AeroControl right_wing;
+	AeroControl rudder;
+	Aero tail;
+	RigidBody aircraft;
+	elevate::Vector3 windspeed;
 	std::vector<AircraftParts> aircraftParts;
 
-    float left_wing_control;
-    float right_wing_control;
-    float rudder_control;
+	float left_wing_control;
+	float right_wing_control;
+	float rudder_control;
 
-    float friction = 0.3f;
+	float friction = 0.3f;
 	float restitution = 0.4f;
 	float tolerance = 0.1f;
 
 	float groundPlaneOffset = 0.0f;
 
-    float fps;
-    float avgFps;
+	float fps;
+	float avgFps;
 	float frameTimeMs;
-    float frameCount;
+	float frameCount;
 	float timeElapsed;
-    float fpsSum;
-    int numFramesAvg = 100;
-    float physicsTime;
-    float physicsTimeSum;
-    float physicsTimeAvg;
+	float fpsSum;
+	int numFramesAvg = 100;
+	float physicsTime;
+	float physicsTimeSum;
+	float physicsTimeAvg;
 
 	std::vector<PhysicsObject*> allSceneObjects;
-    int sceneObjectIndex = 0;
+	int sceneObjectIndex = 0;
 	PhysicsObject* selectedSceneObject = nullptr;
 
-    std::vector<DebugLine> m_DebugLines;
-    GLuint m_DebugLineVAO = 0;
-    GLuint m_DebugLineVBO = 0;
+	std::vector<DebugLine> m_DebugLines;
+	GLuint m_DebugLineVAO = 0;
+	GLuint m_DebugLineVBO = 0;
 
 
-    void buildContactDebugLines()
-    {
-        m_DebugLines.clear();
+	void buildContactDebugLines()
+	{
+		m_DebugLines.clear();
 
-        for (unsigned i = 0; i < cData.contactCount; ++i)
-        {
-            const elevate::Contact& c = cData.contacts[i];
+		for (unsigned i = 0; i < cData.contactCount; ++i)
+		{
+			const elevate::Contact& c = cData.contacts[i];
 
-            glm::vec3 p(
-                (float)c.contactPoint.x,
-                (float)c.contactPoint.y,
-                (float)c.contactPoint.z);
+			glm::vec3 p(
+				(float)c.contactPoint.x,
+				(float)c.contactPoint.y,
+				(float)c.contactPoint.z);
 
-            glm::vec3 n(
-                (float)c.contactNormal.x,
-                (float)c.contactNormal.y,
-                (float)c.contactNormal.z);
+			glm::vec3 n(
+				(float)c.contactNormal.x,
+				(float)c.contactNormal.y,
+				(float)c.contactNormal.z);
 
-            float nLen = 2.0f;
+			float nLen = 2.0f;
 
-            DebugLine normalLine;
-            normalLine.p0 = p;
-            normalLine.p1 = p + n * nLen;
-            normalLine.color = glm::vec3(1.0f, 0.0f, 0.0f);
-            m_DebugLines.push_back(normalLine);
+			DebugLine normalLine;
+			normalLine.p0 = p;
+			normalLine.p1 = p + n * nLen;
+			normalLine.color = glm::vec3(1.0f, 0.0f, 0.0f);
+			m_DebugLines.push_back(normalLine);
 
-            float s = 0.2f;
+			float s = 0.2f;
 
-            DebugLine crossX;
-            crossX.p0 = p + glm::vec3(-s, 0.0f, 0.0f);
-            crossX.p1 = p + glm::vec3(s, 0.0f, 0.0f);
-            crossX.color = glm::vec3(0.0f, 1.0f, 0.0f);
-            m_DebugLines.push_back(crossX);
+			DebugLine crossX;
+			crossX.p0 = p + glm::vec3(-s, 0.0f, 0.0f);
+			crossX.p1 = p + glm::vec3(s, 0.0f, 0.0f);
+			crossX.color = glm::vec3(0.0f, 1.0f, 0.0f);
+			m_DebugLines.push_back(crossX);
 
-            DebugLine crossY;
-            crossY.p0 = p + glm::vec3(0.0f, -s, 0.0f);
-            crossY.p1 = p + glm::vec3(0.0f, s, 0.0f);
-            crossY.color = glm::vec3(0.0f, 1.0f, 0.0f);
-            m_DebugLines.push_back(crossY);
+			DebugLine crossY;
+			crossY.p0 = p + glm::vec3(0.0f, -s, 0.0f);
+			crossY.p1 = p + glm::vec3(0.0f, s, 0.0f);
+			crossY.color = glm::vec3(0.0f, 1.0f, 0.0f);
+			m_DebugLines.push_back(crossY);
 
-            DebugLine crossZ;
-            crossZ.p0 = p + glm::vec3(0.0f, 0.0f, -s);
-            crossZ.p1 = p + glm::vec3(0.0f, 0.0f, s);
-            crossZ.color = glm::vec3(0.0f, 1.0f, 0.0f);
-            m_DebugLines.push_back(crossZ);
-        }
-    }
+			DebugLine crossZ;
+			crossZ.p0 = p + glm::vec3(0.0f, 0.0f, -s);
+			crossZ.p1 = p + glm::vec3(0.0f, 0.0f, s);
+			crossZ.color = glm::vec3(0.0f, 1.0f, 0.0f);
+			m_DebugLines.push_back(crossZ);
+		}
+	}
 
-    void InitDebugDrawGL()
-    {
-        glGenVertexArrays(1, &g_DebugVao);
-        glGenBuffers(1, &g_DebugVbo);
+	void InitDebugDrawGL()
+	{
+		glGenVertexArrays(1, &g_DebugVao);
+		glGenBuffers(1, &g_DebugVbo);
 
-        glBindVertexArray(g_DebugVao);
-        glBindBuffer(GL_ARRAY_BUFFER, g_DebugVbo);
+		glBindVertexArray(g_DebugVao);
+		glBindBuffer(GL_ARRAY_BUFFER, g_DebugVbo);
 
-        // position
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(DebugLine), (void*)0);
+		// position
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(DebugLine), (void*)0);
 
-        // color
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(DebugLine), (void*)(sizeof(glm::vec3)));
+		// color
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(DebugLine), (void*)(sizeof(glm::vec3)));
 
-        glBindVertexArray(0);
-    }
+		glBindVertexArray(0);
+	}
 
-    void RenderDebugLines(GLuint debugShaderProgram, const glm::mat4& viewProj)
-    {
-        const auto& lines = DebugDraw::GetLines();
-        if (lines.empty())
-            return;
+	void RenderDebugLines(GLuint debugShaderProgram, const glm::mat4& viewProj)
+	{
+		const auto& lines = DebugDraw::GetLines();
+		if (lines.empty())
+			return;
 
-        glUseProgram(debugShaderProgram);
+		glUseProgram(debugShaderProgram);
 
-        GLint locVP = glGetUniformLocation(debugShaderProgram, "uViewProj");
-        glUniformMatrix4fv(locVP, 1, GL_FALSE, &viewProj[0][0]);
+		GLint locVP = glGetUniformLocation(debugShaderProgram, "uViewProj");
+		glUniformMatrix4fv(locVP, 1, GL_FALSE, &viewProj[0][0]);
 
-        glBindVertexArray(g_DebugVao);
-        glBindBuffer(GL_ARRAY_BUFFER, g_DebugVbo);
+		glBindVertexArray(g_DebugVao);
+		glBindBuffer(GL_ARRAY_BUFFER, g_DebugVbo);
 
-        glBufferData(GL_ARRAY_BUFFER,
-            lines.size() * sizeof(DebugLine),
-            lines.data(),
-            GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER,
+			lines.size() * sizeof(DebugLine),
+			lines.data(),
+			GL_DYNAMIC_DRAW);
 
-        glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(lines.size() * 2));
+		glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(lines.size() * 2));
 
-        glBindVertexArray(0);
-    }
+		glBindVertexArray(0);
+	}
 
-    void drawDebugLines()
-    {
-        return;
+	void drawDebugLines()
+	{
+		return;
 
-        if (m_DebugLines.empty())
-            return;
+		if (m_DebugLines.empty())
+			return;
 
-        std::vector<float> vertexData;
-        vertexData.reserve(m_DebugLines.size() * 2 * 6); 
+		std::vector<float> vertexData;
+		vertexData.reserve(m_DebugLines.size() * 2 * 6);
 
-        for (const auto& line : m_DebugLines)
-        {
-            // First endpoint
-            vertexData.push_back(line.p0.x);
-            vertexData.push_back(line.p0.y);
-            vertexData.push_back(line.p0.z);
-            vertexData.push_back(line.color.x);
-            vertexData.push_back(line.color.y);
-            vertexData.push_back(line.color.z);
+		for (const auto& line : m_DebugLines)
+		{
+			// First endpoint
+			vertexData.push_back(line.p0.x);
+			vertexData.push_back(line.p0.y);
+			vertexData.push_back(line.p0.z);
+			vertexData.push_back(line.color.x);
+			vertexData.push_back(line.color.y);
+			vertexData.push_back(line.color.z);
 
-            // Second endpoint
-            vertexData.push_back(line.p1.x);
-            vertexData.push_back(line.p1.y);
-            vertexData.push_back(line.p1.z);
-            vertexData.push_back(line.color.x);
-            vertexData.push_back(line.color.y);
-            vertexData.push_back(line.color.z);
-        }
+			// Second endpoint
+			vertexData.push_back(line.p1.x);
+			vertexData.push_back(line.p1.y);
+			vertexData.push_back(line.p1.z);
+			vertexData.push_back(line.color.x);
+			vertexData.push_back(line.color.y);
+			vertexData.push_back(line.color.z);
+		}
 
-        glBindVertexArray(m_DebugLineVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, m_DebugLineVBO);
+		glBindVertexArray(m_DebugLineVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, m_DebugLineVBO);
 
-        glBufferData(GL_ARRAY_BUFFER,
-            vertexData.size() * sizeof(float),
-            vertexData.data(),
-            GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER,
+			vertexData.size() * sizeof(float),
+			vertexData.data(),
+			GL_DYNAMIC_DRAW);
 
-        lineShader.use();
+		lineShader.use();
 
-        lineShader.setMat4("view", view);
-        lineShader.setMat4("projection", projection);
+		lineShader.setMat4("view", view);
+		lineShader.setMat4("projection", projection);
 
-        glLineWidth(2.0f);
+		glLineWidth(2.0f);
 
-        glDrawArrays(GL_LINES, 0, (GLsizei)m_DebugLines.size() * 2);
+		glDrawArrays(GL_LINES, 0, (GLsizei)m_DebugLines.size() * 2);
 
-        glBindVertexArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
 
-    bool DispatchCollisionPair(
-        const CollisionBody& a,
-        const CollisionBody& b,
-        elevate::CollisionData& cData)
-    {
-        using ST = ShapeType;
+	bool DispatchCollisionPair(
+		const CollisionBody& a,
+		const CollisionBody& b,
+		elevate::CollisionData& cData)
+	{
+		using ST = ShapeType;
 
-        if (!cData.hasMoreContacts()) return false;
+		if (!cData.hasMoreContacts()) return false;
 
-        switch (a.shapeType)
-        {
-        case ST::Box:
-            switch (b.shapeType)
-            {
-            case ST::Box:
-                return elevate::CollisionDetector::boxAndBox(*a.box, *b.box, &cData);
+		switch (a.shapeType)
+		{
+		case ST::Box:
+			switch (b.shapeType)
+			{
+			case ST::Box:
+				return elevate::CollisionDetector::boxAndBox(*a.box, *b.box, &cData);
 
-            case ST::Sphere:
-                return elevate::CollisionDetector::boxAndSphere(*a.box, *b.sphere, &cData);
+			case ST::Sphere:
+				return elevate::CollisionDetector::boxAndSphere(*a.box, *b.sphere, &cData);
 
-            case ST::HalfSpace:
-                return elevate::CollisionDetector::boxAndHalfSpace(*a.box, *b.plane, &cData);
-            }
-            break;
+			case ST::HalfSpace:
+				return elevate::CollisionDetector::boxAndHalfSpace(*a.box, *b.plane, &cData);
+			}
+			break;
 
-        case ST::Sphere:
-            switch (b.shapeType)
-            {
-            case ST::Box:
-                return elevate::CollisionDetector::boxAndSphere(*b.box, *a.sphere, &cData);
+		case ST::Sphere:
+			switch (b.shapeType)
+			{
+			case ST::Box:
+				return elevate::CollisionDetector::boxAndSphere(*b.box, *a.sphere, &cData);
 
-            case ST::Sphere:
-                return elevate::CollisionDetector::sphereAndSphere(*a.sphere, *b.sphere, &cData);
+			case ST::Sphere:
+				return elevate::CollisionDetector::sphereAndSphere(*a.sphere, *b.sphere, &cData);
 
-            case ST::HalfSpace:
-                return elevate::CollisionDetector::sphereAndHalfSpace(*a.sphere, *b.plane, &cData);
-            }
-            break;
+			case ST::HalfSpace:
+				return elevate::CollisionDetector::sphereAndHalfSpace(*a.sphere, *b.plane, &cData);
+			}
+			break;
 
-        case ST::HalfSpace:
-            switch (b.shapeType)
-            {
-            case ST::Box:
-                return elevate::CollisionDetector::boxAndHalfSpace(*b.box, *a.plane, &cData);
+		case ST::HalfSpace:
+			switch (b.shapeType)
+			{
+			case ST::Box:
+				return elevate::CollisionDetector::boxAndHalfSpace(*b.box, *a.plane, &cData);
 
-            case ST::Sphere:
-                return elevate::CollisionDetector::sphereAndHalfSpace(*b.sphere, *a.plane, &cData);
+			case ST::Sphere:
+				return elevate::CollisionDetector::sphereAndHalfSpace(*b.sphere, *a.plane, &cData);
 
-            case ST::HalfSpace:
-                return false;
-            }
-            break;
-        }
+			case ST::HalfSpace:
+				return false;
+			}
+			break;
+		}
 
-        return false;
-    }
+		return false;
+	}
 
 };
 

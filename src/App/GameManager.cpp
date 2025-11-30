@@ -1774,6 +1774,35 @@ void GameManager::update(float deltaTime)
 
 		}
 
+		auto applyAntiRoll = [&](int leftIndex, int rightIndex, real antiRollK)
+			{
+				Car::Wheel& wl = car->wheels[leftIndex];
+				Car::Wheel& wr = car->wheels[rightIndex];
+
+				real travelL = wl.compression; // 0..1
+				real travelR = wr.compression;
+
+				real diff = travelL - travelR;
+				real forceMag = diff * antiRollK;
+
+				if (fabs(forceMag) < 1e-4f) return;
+
+				// Upwards on the more-compressed side, downwards on the other
+				Vector3 upWorld = car->body->getTransform().getAxisVector(1);
+				upWorld.normalize();
+
+				Vector3 posL = car->body->getPointInWorldSpace(wl.offset);
+				Vector3 posR = car->body->getPointInWorldSpace(wr.offset);
+
+				car->body->addForceAtPoint((upWorld * -1) * forceMag, posL);
+				car->body->addForceAtPoint(upWorld * forceMag, posR);
+			};
+
+		real antiRollFront = 8000.0f;
+		real antiRollRear = 8000.0f;
+
+		applyAntiRoll(0, 1, antiRollFront);
+		applyAntiRoll(2, 3, antiRollRear);
 
 
 

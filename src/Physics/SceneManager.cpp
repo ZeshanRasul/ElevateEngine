@@ -220,10 +220,10 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->spawnFactory->BuildDominoLine(
 		elevate::Vector3(0.0f, 0.25f, 150.0f),
 		elevate::Vector3(0.0f, 0.0f, 1.0f),
-		10,
-		elevate::Vector3(20.0f, 0.3f, 14.3f),
+		30,
+		elevate::Vector3(20.0f, 0.3f, 4.3f),
 		2.5f,
-		20.0f,
+		10.0f,
 		gm->dominoes);
 
 	for (PhysicsObject* domino : gm->dominoes)
@@ -239,7 +239,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 
 		Cube* cube = new Cube(
 			domino->body->getTransform().getAxisVector(3),
-			elevate::Vector3(20.0f, 0.3f, 14.3f),
+			elevate::Vector3(20.0f, 0.3f, 4.3f),
 			&gm->ammoShader,
 			gm);
 		cube->LoadMesh();
