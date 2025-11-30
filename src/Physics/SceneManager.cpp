@@ -76,6 +76,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->floor->mesh->setGameManager(gm);
 	gm->floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
 	static_cast<Cube*>(gm->floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_4k_albedo.png");
+	gm->floor->mesh->SetTexTiling(100.0f);
 	gameObjects.push_back(gm->floor->mesh);
 
 	real chassisMass = 1200.0f;
