@@ -87,11 +87,11 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
 {
-	if (!showCar)
+	if (!showCar || !inputManager->isCameraControlled())
 	{
 		view = camera->GetViewMatrix();
+		cubemapView = glm::mat4(glm::mat3(camera->GetViewMatrix()));
 	}
-	cubemapView = glm::mat4(glm::mat3(camera->GetViewMatrix()));
 	projection = glm::perspective(glm::radians(camera->Zoom), (float)width / (float)height, 0.1f, 5000.0f);
 }
 
@@ -106,6 +106,7 @@ void GameManager::reset()
 	{
 		ResetPlane();
 		return;
+
 	}
 	else if (showCar)
 	{
@@ -1606,7 +1607,7 @@ void GameManager::update(float deltaTime)
 		speedFactor = 1.0f;
 
 		//rearAvg.y = 0.0f;
-		
+
 		float steerRate = 10.0f;
 		car->steerAngle += (targetSteer - car->steerAngle) * steerRate * deltaTime;
 		car->steerAngle = std::clamp(car->steerAngle, -1.0f, 1.0f);
@@ -1616,6 +1617,16 @@ void GameManager::update(float deltaTime)
 
 
 		car->body->addForce(elevate::Vector3::GRAVITY * car->body->getMass());
+
+		for (int i = 0; i < dominoes.size(); i++)
+		{
+			dominoes[i]->body->clearAccumulator();
+			dominoes[i]->body->calculateDerivedData();
+			rbGravity->updateForce(dominoes[i]->body, deltaTime);
+			dominoes[i]->body->integrate(deltaTime);
+			dominoes[i]->shape->calculateInternals();
+		}
+
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -1644,6 +1655,15 @@ void GameManager::update(float deltaTime)
 			{
 				w.compression = 0;
 				continue;
+
+			}
+			for (auto& domino : dominoes)
+			{
+				if (!RaycastCollisionBox(attachWorld, suspDir, w.maxLength + w.wheelRadius, static_cast<CollisionBox*>(domino->shape), hit) && (hit.hit = false))
+				{
+					w.compression = 0;
+					break;
+				}
 			}
 
 			// Wheel distance from suspension reference
@@ -1731,8 +1751,8 @@ void GameManager::update(float deltaTime)
 			real slipAngle = atan2(vLat, fabs(vLong) + 0.1f);
 			real latStiffness = 3000.0f;  // for now
 			real Fy = -slipAngle * latStiffness;
-		
-			
+
+
 			real Fz = Fsusp;   // suspension force
 			real mu = 1.1f;    // tarmac
 
@@ -1848,6 +1868,21 @@ void GameManager::update(float deltaTime)
 			camera->Front = glm::normalize(glm::vec3(target.x, target.y, target.z) - camera->Position);
 			camera->Up = glm::vec3(camUp.x, camUp.y, camUp.z);
 			view = glm::lookAt(camera->Position, camera->Position + camera->Front, camera->Up);
+
+			for (int i = 0; i < dominoes.size(); i++)
+			{
+				dominoes[i]->body->calculateDerivedData();
+				dominoes[i]->shape->calculateInternals();
+				elevate::Matrix4 t = dominoes[i]->body->getTransform();
+				elevate::Vector3 p = t.getAxisVector(3);
+				dominoes[i]->mesh->SetPosition(p);
+				dominoes[i]->mesh->SetOrientation(glm::quat(
+					(float)dominoes[i]->body->getOrientation().r,
+					(float)dominoes[i]->body->getOrientation().i,
+					(float)dominoes[i]->body->getOrientation().j,
+					(float)dominoes[i]->body->getOrientation().k));
+			}
+
 		}
 	}
 
@@ -2313,6 +2348,17 @@ void GameManager::generateContacts()
 		//elevate::CollisionDetector::boxAndHalfSpace(*car->chassis, plane, &cData);
 		if (!cData.hasMoreContacts()) return;
 		elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(floor->shape), *car->chassis, &cData);
+
+		for (auto& domino : dominoes)
+		{
+			if (!cData.hasMoreContacts()) return;
+			elevate::CollisionDetector::boxAndHalfSpace(*static_cast<CollisionBox*>(domino->shape), plane, &cData);
+			if (!cData.hasMoreContacts()) return;
+			elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(floor->shape), *static_cast<CollisionBox*>(domino->shape), &cData);
+
+		//	elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(domino->shape), *car->chassis, &cData);
+
+		}
 	}
 
 	if (fpsSandboxDemo)
@@ -2911,6 +2957,11 @@ void GameManager::render()
 		for (CarVisuals part : carParts)
 		{
 			renderer->draw(part.mesh, view, projection);
+		}
+
+		for (auto& domino : dominoes)
+		{
+			renderer->draw(domino->mesh, view, projection);
 		}
 	}
 	//drawDebugLines();

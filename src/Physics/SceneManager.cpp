@@ -217,6 +217,39 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->car->body->calculateDerivedData();
 	gm->car->chassis->calculateInternals();
 
+	gm->spawnFactory->BuildDominoLine(
+		elevate::Vector3(0.0f, 0.25f, 150.0f),
+		elevate::Vector3(0.0f, 0.0f, 1.0f),
+		10,
+		elevate::Vector3(20.0f, 0.3f, 14.3f),
+		2.5f,
+		20.0f,
+		gm->dominoes);
+
+	for (PhysicsObject* domino : gm->dominoes)
+	{
+		int i = 0;
+		elevate::Matrix3 tensor;
+		tensor.setBlockInertiaTensor(elevate::Vector3(10.0f, 0.15f, 7.15f), 2.5f);
+		domino->body->setInertiaTensor(tensor);
+		domino->body->calculateDerivedData();
+		domino->shape->calculateInternals();
+		domino->name = "Domino " + std::to_string(i++);
+		DebugDrawCollisionBox(*static_cast<CollisionBox*>(domino->shape), glm::vec3(1.0f, 0.0f, 0.0f));
+
+		Cube* cube = new Cube(
+			domino->body->getTransform().getAxisVector(3),
+			elevate::Vector3(20.0f, 0.3f, 14.3f),
+			&gm->ammoShader,
+			gm);
+		cube->LoadMesh();
+		domino->mesh = cube;
+
+		domino->mesh->setGameManager(gm);
+		domino->mesh->SetColor(glm::vec3(0.8f, 0.9f, 0.8f));
+		gameObjects.push_back(domino->mesh);
+	}
+
 	return;
 }
 
