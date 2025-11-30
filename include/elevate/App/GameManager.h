@@ -548,7 +548,6 @@ private:
 
     void RenderDebugLines(GLuint debugShaderProgram, const glm::mat4& viewProj)
     {
-		glDisable(GL_DEPTH_TEST);
         const auto& lines = DebugDraw::GetLines();
         if (lines.empty())
             return;
@@ -569,7 +568,6 @@ private:
         glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(lines.size() * 2));
 
         glBindVertexArray(0);
-		glEnable(GL_DEPTH_TEST);
     }
 
     void drawDebugLines()

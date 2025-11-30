@@ -2737,7 +2737,7 @@ void GameManager::render()
 {
 	DebugDraw::Clear();
 
-	if (!showCar && !showPlane)
+	if (showDebugDraw)
 	{
 		DebugDrawCollisionBox(*static_cast<CollisionBox*>(crate->shape), glm::vec3(1.0f, 0.0f, 0.0f));
 
@@ -2832,7 +2832,7 @@ void GameManager::render()
 		}
 	}
 	//drawDebugLines();
-	if (true)
+	if (showDebugDraw)
 	{
 		glm::mat4 viewProjMatrix = projection * view;
 		RenderDebugLines(lineShader.getProgramID(), viewProjMatrix);
