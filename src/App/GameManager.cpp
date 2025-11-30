@@ -74,13 +74,14 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	InitDebugDrawGL();
+
 	spawnContext.World = new World(300, 100);
 	rbGravity = new Gravity(elevate::Vector3(0.0f, -9.81f * 0.5f, 0.0f));
 	carEngine = new CarPropulsion(elevate::Vector3(0.0f, 0.0f, 0.0f));
 	shapeFactory = new elevate::ShapeFactory();
 	spawnFactory = new elevate::SpawnFactory(spawnContext);
 
-	InitDebugDrawGL();
 
 }
 
@@ -137,6 +138,8 @@ void GameManager::reset()
 	wall->mesh->SetTexTiling(4.0f);
 	static_cast<Cube*>(wall->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	wall->name = "Wall 1";
+	DebugDrawCollisionBox(*static_cast<CollisionBox*>(wall->shape), glm::vec3(1.0f, 0.0f, 0.0f));
+
 	gameObjects.push_back(wall->mesh);
 	allSceneObjects.push_back(wall);
 	sceneObjectIndex++;
@@ -151,6 +154,8 @@ void GameManager::reset()
 	wall2->mesh->SetTexTiling(4.0f);
 	static_cast<Cube*>(wall2->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	wall2->name = "Wall 2";
+	DebugDrawCollisionBox(*static_cast<CollisionBox*>(wall2->shape), glm::vec3(1.0f, 0.0f, 0.0f));
+
 	gameObjects.push_back(wall2->mesh);
 	allSceneObjects.push_back(wall2);
 	sceneObjectIndex++;
@@ -164,6 +169,7 @@ void GameManager::reset()
 	wall3->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	wall3->mesh->SetTexTiling(4.0f);
 	wall3->name = "Wall 3";
+	DebugDrawCollisionBox(*static_cast<CollisionBox*>(wall3->shape), glm::vec3(1.0f, 0.0f, 0.0f));
 
 	static_cast<Cube*>(wall3->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	allSceneObjects.push_back(wall3);
@@ -180,6 +186,7 @@ void GameManager::reset()
 	wall4->mesh->SetTexTiling(4.0f);
 	static_cast<Cube*>(wall4->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	wall4->name = "Wall 4";
+	DebugDrawCollisionBox(*static_cast<CollisionBox*>(wall4->shape), glm::vec3(1.0f, 0.0f, 0.0f));
 
 	gameObjects.push_back(wall4->mesh);
 	allSceneObjects.push_back(wall4);
@@ -203,6 +210,7 @@ void GameManager::reset()
 		domino->body->calculateDerivedData();
 		domino->shape->calculateInternals();
 		domino->name = "Domino " + std::to_string(i++);
+		DebugDrawCollisionBox(*static_cast<CollisionBox*>(domino->shape), glm::vec3(1.0f, 0.0f, 0.0f));
 
 		Cube* cube = new Cube(
 			domino->body->getTransform().getAxisVector(3),
@@ -232,6 +240,8 @@ void GameManager::reset()
 			c->LoadMesh();
 			c->SetColor(glm::vec3(0.9f, 0.3f, 0.4f));
 			bone.visual = c;
+			DebugDrawCollisionSphere(bone.getCollisionSphere(), glm::vec3(0.0f, 1.0f, 0.0f));
+
 			gameObjects.push_back(c);
 		}
 	}
@@ -248,6 +258,7 @@ void GameManager::reset()
 	cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
 	cube->SetColor(glm::vec3(0.2f, 0.1f, 0.5f));
 	blocks[0].visual = cube;
+
 	gameObjects.push_back(cube);
 
 	// Set the first block
@@ -270,6 +281,7 @@ void GameManager::reset()
 	blocks[0].body->setAwake(true);
 	blocks[0].body->setCanSleep(true);
 	blocks[0].exists = true;
+	DebugDrawCollisionBox(*static_cast<CollisionBox*>(&blocks[0]), glm::vec3(1.0f, 0.0f, 0.0f));
 	//	spawnContext.World->addBody(blocks[0].body);
 
 		//	hit = false;
@@ -341,6 +353,7 @@ void GameManager::reset()
 		cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
 		cube->SetColor(glm::vec3(0.2f, 0.7f, 0.3f));
 		crateTexture = cube->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Crate/TCom_MetalSheetCladding2_Galvanized_512_albedo.png");
+
 		gameObjects.push_back(cube);
 		stackCubes[i] = cube;
 
@@ -373,6 +386,7 @@ void GameManager::reset()
 		cBox->body->calculateDerivedData();
 		cBox->calculateInternals();
 		cStackBoxes[i] = cBox;
+		DebugDrawCollisionBox(*static_cast<CollisionBox*>(cStackBoxes[i]), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
 
 
@@ -397,6 +411,8 @@ void GameManager::reset()
 		static_cast<Cube*>(bricks[i]->mesh)->SetTexture(brickTexture);
 		bricks[i]->mesh->setGameManager(this);
 		bricks[i]->mesh->SetColor(glm::vec3(0.6f, 0.4f, 0.2f));
+		DebugDrawCollisionBox(*static_cast<CollisionBox*>(bricks[i]->shape), glm::vec3(1.0f, 0.0f, 0.0f));
+
 		gameObjects.push_back(bricks[i]->mesh);
 	}
 
@@ -2723,18 +2739,75 @@ void GameManager::render()
 
 	if (!showCar && !showPlane)
 	{
-		DebugDrawCollisionBox(*static_cast<CollisionBox*>(crate->shape), glm::vec3(1.0f, 0.0f, 0.0f)); // red
+		DebugDrawCollisionBox(*static_cast<CollisionBox*>(crate->shape), glm::vec3(1.0f, 0.0f, 0.0f));
+
+		for (int i = 0; i < 8; i++)
+		{
+			if (blocks[i].exists)
+			{
+				DebugDrawCollisionBox(*static_cast<CollisionBox*>(&blocks[i]), glm::vec3(0.0f, 1.0f, 0.0f));
+			}
+		}
+
+		for (int i = 0; i < runtimeFractureBlocks.size(); i++)
+		{
+			if (runtimeFractureBlocks[i].exists)
+			{
+				DebugDrawCollisionBox(*static_cast<CollisionBox*>(&runtimeFractureBlocks[i]), glm::vec3(0.0f, 0.0f, 1.0f));
+			}
+		}
+
+		for (Ragdoll* ragdoll : ragdolls)
+		{
+			for (Bone* bone = ragdoll->bones; bone < ragdoll->bones + 12; bone++)
+			{
+				DebugDrawCollisionSphere(bone->getCollisionSphere(), glm::vec3(1.0f, 1.0f, 0.0f));
+			};
+		}
+
+		for (PhysicsObject* box : runTimeBoxes)
+		{
+			DebugDrawCollisionBox(*static_cast<CollisionBox*>(box->shape), glm::vec3(1.0f, 0.0f, 1.0f));
+		}
+
+		for (PhysicsObject* sphere : runTimeSpheres)
+		{
+			DebugDrawCollisionSphere(*static_cast<CollisionSphere*>(sphere->shape), glm::vec3(0.0f, 1.0f, 1.0f));
+		}
+
+		for (int i = 0; i < ammoCount; ++i)
+		{
+			AmmoRound& r = ammoPool[i];
+			if (!r.active)
+				continue;
+			DebugDrawCollisionSphere(*r.coll, glm::vec3(1.0f, 1.0f, 1.0f));
+		}
+
+		for (int i = 0; i < numStackCubes; ++i)
+		{
+			DebugDrawCollisionBox(*cStackBoxes[i], glm::vec3(1.0f, 0.5f, 0.0f));
+		}
+
+		for (int i = 0; i < bricks.size(); i++)
+		{
+			DebugDrawCollisionBox(*static_cast<CollisionBox*>(bricks[i]->shape), glm::vec3(0.5f, 0.0f, 0.5f));
+		}
+
+		for (int i = 0; i < crates.size(); i++)
+		{
+			DebugDrawCollisionBox(*static_cast<CollisionBox*>(crates[i]->shape), glm::vec3(0.0f, 0.5f, 0.5f));
+		}
+
 	}
-	DebugDrawCollisionBox(*static_cast<CollisionBox*>(floor->shape), glm::vec3(1.0f, 0.0f, 0.0f)); // red
 
 	if (showCar)
 	{
 
-		DebugDrawCollisionBox(*static_cast<CollisionBox*>(car->chassis), glm::vec3(1.0f, 0.0f, 0.0f)); // red
+		DebugDrawCollisionBox(*static_cast<CollisionBox*>(car->chassis), glm::vec3(1.0f, 0.0f, 0.0f));
 
 		for (auto& wheel : car->wheels)
 		{
-			DebugDrawCollisionSphere(*wheel.coll, glm::vec3(0.0f, 1.0f, 0.0f)); // green
+			DebugDrawCollisionSphere(*wheel.coll, glm::vec3(0.0f, 1.0f, 0.0f));
 		}
 	}
 
@@ -2759,7 +2832,7 @@ void GameManager::render()
 		}
 	}
 	//drawDebugLines();
-	if (showDebugDraw)
+	if (true)
 	{
 		glm::mat4 viewProjMatrix = projection * view;
 		RenderDebugLines(lineShader.getProgramID(), viewProjMatrix);

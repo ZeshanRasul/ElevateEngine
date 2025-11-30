@@ -1,7 +1,9 @@
+#include <string>
+
 #include "Physics/Factory.h"
 #include "GameObjects/Cube.h"
 #include "GameObjects/Sphere.h"
-#include <string>
+#include "OpenGL/DebugDraw.h"
 
 namespace elevate
 {
@@ -95,6 +97,7 @@ namespace elevate
 			obj->mesh->SetPosition(transform.position);
 			obj->mesh->SetScale(Vector3(transform.scale));
 			obj->mesh->SetShader(shader);
+			DebugDrawCollisionBox(*static_cast<CollisionBox*>(obj->shape), glm::vec3(1.0f, 0.0f, 0.0f));
 		}
 
 
@@ -106,6 +109,8 @@ namespace elevate
 			obj->mesh->SetPosition(transform.position);
 			obj->mesh->SetScale(transform.scale);
 			obj->mesh->SetShader(shader);
+			DebugDrawCollisionSphere(*static_cast<CollisionSphere*>(obj->shape), glm::vec3(1.0f, 0.0f, 0.0f));
+
 		}
 
 
@@ -148,6 +153,8 @@ namespace elevate
 
 		CollisionPrimitive* shape = ShapeFactory::CreateBoxShape(*m_Ctx.World, halfExtents);
 
+		
+
 		return CreatePhysicsObject(
 			"Box",
 			t,
@@ -172,6 +179,8 @@ namespace elevate
 		t.scale = { 1.0f, 1.0f, 1.0f };
 
 		CollisionPrimitive* shape = ShapeFactory::CreateSphereShape(*m_Ctx.World, radius);
+		DebugDrawCollisionSphere(*static_cast<CollisionSphere*>(shape), glm::vec3(1.0f, 0.0f, 0.0f));
+
 
 		return CreatePhysicsObject(
 			"Sphere",

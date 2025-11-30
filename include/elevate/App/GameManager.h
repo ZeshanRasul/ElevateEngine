@@ -529,7 +529,6 @@ private:
 
     void InitDebugDrawGL()
     {
-		glDisable(GL_DEPTH_TEST);
         glGenVertexArrays(1, &g_DebugVao);
         glGenBuffers(1, &g_DebugVbo);
 
@@ -549,6 +548,7 @@ private:
 
     void RenderDebugLines(GLuint debugShaderProgram, const glm::mat4& viewProj)
     {
+		glDisable(GL_DEPTH_TEST);
         const auto& lines = DebugDraw::GetLines();
         if (lines.empty())
             return;

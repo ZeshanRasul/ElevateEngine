@@ -34,7 +34,7 @@ static void DebugDrawCollisionBox(const elevate::CollisionBox& box, const glm::v
 {
     using elevate::Vector3;
 
-    const Vector3 hs = box.halfSize * 1.05f;
+    const Vector3 hs = box.halfSize * 1.01f;
 
     const Vector3 axis0 = box.getAxis(0);
     const Vector3 axis1 = box.getAxis(1);
@@ -78,7 +78,7 @@ static void DebugDrawCollisionSphere(const elevate::CollisionSphere& sphere,
     using elevate::Vector3;
 
     const Vector3 centerV = sphere.getAxis(3); // world-space center
-    const float r = static_cast<float>(sphere.radius);
+    const float r = static_cast<float>(sphere.radius) * 1.01f;
     const glm::vec3 center = ToGlm(centerV);
 
     const float twoPi = 6.28318530718f;
