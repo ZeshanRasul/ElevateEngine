@@ -191,6 +191,7 @@
     <ClInclude Include="include\elevate\Physics\body.h" />
     <ClInclude Include="include\elevate\Physics\bone.h" />
     <ClInclude Include="include\elevate\OpenGL\DebugDraw.h" />
+    <ClInclude Include="src\Tools\ImGuiStyles.h" />
     <ClInclude Include="src\Tools\Logger.h" />
     <ClInclude Include="src\Window\Window.h" />
   </ItemGroup>

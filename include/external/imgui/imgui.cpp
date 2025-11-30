@@ -1511,7 +1511,7 @@ ImGuiStyle::ImGuiStyle()
     _NextFrameFontSizeBase      = 0.0f;
 
     // Default theme
-    ImGui::StyleColorsDark(this);
+ //   ImGui::StyleColorsDark(this);
 }
 
 

@@ -1,6 +1,7 @@
 #include "imgui/imgui.h"
 #include "imgui/backend/imgui_impl_glfw.h"
 #include "imgui/backend/imgui_impl_opengl3.h"
+#include "Tools/ImGuiStyles.h"
 
 #include "Window.h"
 #include "App/InputManager.h"
@@ -57,6 +58,8 @@ bool Window::init(unsigned int width, unsigned int height, std::string title)
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
+
+	SetupElevateImGuiStyle();
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(mWindow, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
     ImGui_ImplOpenGL3_Init();

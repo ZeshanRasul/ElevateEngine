@@ -7,6 +7,7 @@
 #include "imgui/backend/imgui_impl_glfw.h"
 #include "imgui/backend/imgui_impl_opengl3.h"
 #include "ImGuizmo.h"
+#include "Tools/ImGuiStyles.h"
 #include <iostream>
 
 static ImGuizmo::OPERATION currentOperation = ImGuizmo::TRANSLATE;
@@ -788,6 +789,7 @@ void GameManager::OnHPressed()
 
 void GameManager::setUpDebugUI()
 {
+	// New frame
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
@@ -797,7 +799,12 @@ void GameManager::setUpDebugUI()
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
 
 	ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+
+
+	//ImGui::Render();
+	//ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
+
 
 void GameManager::showDebugUI()
 {
@@ -810,6 +817,15 @@ void GameManager::showDebugUI()
 		ShowCameraControlWindow(*camera);
 		ShowEngineWindow();
 	}
+	//if (showUI)
+	//{
+	//	ShowLightControlWindow(dirLight);
+	//	ShowSpawnObjectWindow();
+	//	ShowPerformanceWindow();
+	//	DrawPhysicsObjectsCombo();
+	//	ShowCameraControlWindow(*camera);
+	//	ShowEngineWindow();
+	//}
 }
 
 void GameManager::renderDebugUI()
