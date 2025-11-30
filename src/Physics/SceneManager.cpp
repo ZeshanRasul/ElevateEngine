@@ -91,7 +91,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 		elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
 		elevate::Vector3(0.0f, 0.0f, 0.0f)
 	);
-	gm->carBody->setPosition(elevate::Vector3(0.0f, 3.5f, 0.0f));
+	gm->carBody->setPosition(elevate::Vector3(0.0f, 10.5f, 0.0f));
 	gm->car->body = gm->carBody;
 	gm->car->chassis = new CollisionBox();
 	gm->car->chassis->body = gm->carBody;
@@ -105,7 +105,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->car->body->setMass(totalMass);
 	elevate::Vector3 halfSize = gm->car->chassis->halfSize;
 
-	gm->car->chassisMesh = new Cube(elevate::Vector3(0.0f, 3.5f, 0.0f), halfSize * 2, &gm->ammoShader, gm);
+	gm->car->chassisMesh = new Cube(elevate::Vector3(0.0f, 10.5f, 0.0f), halfSize * 2, &gm->ammoShader, gm);
 	gm->car->chassisMesh->LoadMesh();
 	gm->car->chassisMesh->SetColor(glm::vec3(0.8f, 0.1f, 0.1f));
 	gameObjects.push_back(gm->car->chassisMesh);

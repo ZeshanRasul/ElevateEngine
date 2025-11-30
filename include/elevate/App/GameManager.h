@@ -222,6 +222,8 @@ public:
 
     float car_throttle = 0.0f;
     float targetThrottle = 0.0f;
+    float targetSteer = 0.0f;
+    float targetBrake = 0.0f;
 
     float car_steerAngle = 0.0f;
     bool fpsSandboxDemo = false;

@@ -4,6 +4,7 @@
 
 #include "App/InputManager.h"
 #include "App/GameManager.h"
+#include <algorithm>
 
 void InputManager::handleMouseMovement(double xPosIn, double yPosIn)
 {
@@ -133,6 +134,25 @@ void InputManager::processInput(GLFWwindow* window, float deltaTime)
         mGameManager->targetThrottle = -1.0f;
 	else
 		mGameManager->targetThrottle = 0.0f;
+
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        mGameManager->targetSteer = 1.0f;
+    else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+        mGameManager->targetSteer = -1.0f;
+	else
+		mGameManager->targetSteer = 0.0f;
+
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        mGameManager->targetBrake = 1.0f;
+    else
+		mGameManager->targetBrake = 0.0f;
+
+    float brakeRate = 10.0f;
+    mGameManager->car->brake += (mGameManager->targetBrake - mGameManager->car->brake) * brakeRate * deltaTime;
+    mGameManager->car->brake = std::clamp(mGameManager->car->brake, 0.0f, 1.0f);
+
+    float steerRate = 6.0f;
+    mGameManager->car->steerAngle += (mGameManager->targetSteer - mGameManager->car->steerAngle) * steerRate * deltaTime;
 
     static bool qPrev = false, ePrev = false, wPrev = false, sPrev = false, dPrev = false, aPrev = false, zPrev = false, hPrev = false, clickPrev = false;
 

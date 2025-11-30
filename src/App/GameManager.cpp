@@ -1451,11 +1451,11 @@ void GameManager::update(float deltaTime)
 
 	if (!enableGravity)
 	{
-//		rbGravity->setGravity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		//		rbGravity->setGravity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 	}
 	else
 	{
-//		rbGravity->setGravity(elevate::Vector3(gravity[0], gravity[1], gravity[2]));
+		//		rbGravity->setGravity(elevate::Vector3(gravity[0], gravity[1], gravity[2]));
 	}
 	//rbWorld->startFrame();
 	//rbWorld->runPhysics(1.0f / 60.0f);
@@ -1544,18 +1544,21 @@ void GameManager::update(float deltaTime)
 		car->throttle += (targetThrottle - car->throttle) * rate * deltaTime;
 		car->throttle = std::clamp(car->throttle, -1.0f, 1.0f);
 
+
+
 		Vector3 rearAvg = (car->wheels[2].offset + car->wheels[3].offset) * 0.5f;
 		Vector3 frontAvg = (car->wheels[0].offset + car->wheels[1].offset) * 0.5f;
 
 		real engineForce = 8000.0f;
 
-		real maxSpeed = 40.0f; // units/s
+		real maxSpeed = 40.0f;
 		real speed = car->body->getVelocity().magnitude();
 		real maxSpeedFactor = 1.0f - speed / maxSpeed;
 		real speedFactor = std::max(0.0f, (float)maxSpeedFactor);
 		speedFactor = 1.0f;
 
 		Vector3 forceWorld = forward * (car->throttle * engineForce * speedFactor);
+		rearAvg.y = 0.0f;
 
 		car->body->addForceAtBodyPoint(forceWorld, rearAvg);
 
@@ -1571,26 +1574,56 @@ void GameManager::update(float deltaTime)
 		real vRight = vel * right;
 		real vForward = vel * forward;
 
-		real lateralDamping = 5.0f;
+		real lateralDamping = 3.0f;
 		Vector3 lateralVelocity = right * vRight;
 		Vector3 lateralAccel = lateralVelocity * -lateralDamping;
 		Vector3 lateralForce = lateralAccel * car->body->getMass();
 
-		//	car->body->addForce(lateralForce);
-			//std::cout << "accum: " << car->body->forceAccum.x << " "
-			//	<< car->body->forceAccum.y << " "
-			//	<< car->body->forceAccum.z << "\n";
-		car->body->integrate(1.0f / 60.0f);
+		car->body->addForce(lateralForce);
+
+		float maxSteerAngle = 0.5f;
+		float steerAngleRad = car->steerAngle * maxSteerAngle;
+
+		real brakeStrength = 10000.0f;
+		if (car->brake > 0.0f && fabs(vForward) > 0.1f)
+		{
+			Vector3 brakeDir = (vForward > 0.0f) ? (forward * -1.0f) : forward;
+
+			real brakeForceMag = brakeStrength * car->brake;
+
+			real maxUsefulBrake = fabs(vForward) * car->body->getMass() / deltaTime;
+			brakeForceMag = std::min(brakeForceMag, maxUsefulBrake);
+
+			Vector3 brakeForce = brakeDir * brakeForceMag;
+
+			car->body->addForce(brakeForce);
+		}
+
+		if (fabs(steerAngleRad) > 0.001f && fabs(vForward) > 0.5f)
+		{
+			float steerInput = steerAngleRad / maxSteerAngle;
+
+			Vector3 frontLeftLocal = car->wheels[0].offset;
+			Vector3 frontRightLocal = car->wheels[1].offset;
+
+			real steerStrength = 2000.0f;
+			real speedFactorSteer = std::clamp(fabs(vForward) / 10.0f, 0.0, 1.0);
+
+			real steerForceMag = steerStrength * steerInput * speedFactorSteer;
+
+			Vector3 forceLeft = right * steerForceMag;
+			Vector3 forceRight = (right * - 1) * steerForceMag;
+
+			car->body->addForceAtBodyPoint(forceLeft, frontLeftLocal);
+			car->body->addForceAtBodyPoint(forceRight, frontRightLocal);
+		}
+
+
+		car->body->integrate(deltaTime);
 
 		generateContacts();
-		resolver.resolveContacts(cData.contactArray, cData.contactCount, 1.0f / 60.0f);
+		resolver.resolveContacts(cData.contactArray, cData.contactCount, deltaTime);
 
-		std::cout << car->body->getVelocity().magnitude() << std::endl;
-		std::cout << car->throttle << std::endl;
-		std::cout << deltaTime << std::endl;
-		std::cout << "----" << std::endl;
-		//		car->chassis->body->calculateDerivedData();
-			//	car->chassis->calculateInternals();
 		car->body->calculateDerivedData();
 		car->chassis->calculateInternals();
 
