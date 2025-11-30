@@ -1770,16 +1770,6 @@ void GameManager::update(float deltaTime)
 				wheelForward * Fx   // longitudinal
 				+ right * Fy;  // lateral
 
-			if (i >= 2) {   // rear wheels
-				std::cout << "vLong=" << vLong
-					<< " Fx=" << Fx
-					<< " Fy=" << Fy
-					<< " Fz=" << Fz
-					<< " throttle=" << car->throttle
-					<< std::endl;
-			}
-
-
 			car->body->addForceAtPoint(forceWorld, w.contactPointWorld);
 
 		}
