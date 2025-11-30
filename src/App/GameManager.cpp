@@ -686,6 +686,8 @@ void GameManager::ResetCar()
 	car->steerAngle = 0.0f;
 	car->body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 	car->body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+	car->chassisMesh->SetOrientation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+	car->chassisMesh->SetPosition(elevate::Vector3(0.0f, 10.2f, 0.0f));
 	car->body->calculateDerivedData();
 }
 void GameManager::OnQPressed()
@@ -709,7 +711,7 @@ void GameManager::OnWPressed()
 	if (showCar)
 	{
 		//car_throttle += 0.1f * 50;
-		car->throttle += 0.1f;
+//	car->throttle += 0.1f;
 	}
 }
 
@@ -723,7 +725,7 @@ void GameManager::OnSPressed()
 
 	if (showCar)
 	{
-		car->throttle -= 0.1f;
+	//	car->throttle -= 0.1f;
 	}
 }
 
@@ -1525,73 +1527,94 @@ void GameManager::update(float deltaTime)
 
 
 		// Clamp throttle
-	//	car_throttle = glm::clamp(car_throttle, -100.0f, 100.0f);
 		//	car.setPosition(elevate::Vector3(20.0f, 2.0f, -90.0f));
 		car->body->clearAccumulator();
 		car->chassis->body->clearAccumulator();
 		car->body->calculateDerivedData();
 		car->chassis->body->calculateDerivedData();
+
+		car->body->setAngularDamping(0.9f);
+		car->chassis->body->setAngularDamping(0.9f);
+		car->body->setLinearDamping(0.1f);
+		car->chassis->body->setLinearDamping(0.1f);
 		//	car->body->addForce(elevate::Vector3(car_throttle, 0, 0));
 			//	rbRegistry.updateForces(deltaTime);
 	//	car->throttle = car_throttle;
 	//	car->steerAngle = car_steerAngle;
 		Matrix4 transform = car->body->getTransform();
-		Vector3 forward = transform.getAxisVector(0);
+		Vector3 forward = transform.getAxisVector(2);
 		forward.normalize();
+
+		car->throttle = glm::clamp(car->throttle, -1.0f, 1.0f);
 
 		Vector3 rearAvg = (car->wheels[2].offset + car->wheels[3].offset) * 0.5f;
 		Vector3 frontAvg = (car->wheels[0].offset + car->wheels[1].offset) * 0.5f;
 
-		real engineForce = 8000.0f;
+		real engineForce = 15000.0f;
 
 		real maxSpeed = 40.0f; // units/s
 		real speed = car->body->getVelocity().magnitude();
 		real maxSpeedFactor = 1.0f - speed / maxSpeed;
 		real speedFactor = std::max(0.0f, (float)maxSpeedFactor);
 
-		Vector3 forceWorld = forward * (car->throttle * engineForce * speedFactor);
+		Vector3 forceWorld = forward * (car->throttle * engineForce);
 
 		car->body->addForceAtBodyPoint(forceWorld, rearAvg);
-		//	car->body->addForce(forceWorld);
+		//car->body->addForce(forceWorld);
 		//	car->body->addForceAtBodyPoint(forceWorld * 10.0f, frontAvg);
 			//	rbGravity->updateForce(car->body, deltaTime);
 		car->body->addForce(elevate::Vector3::GRAVITY * car->body->getMass());
 
-		Matrix4 t = car->body->getTransform();
-		forward = t.getAxisVector(2);
-		forward.normalize();
-		Vector3 right = t.getAxisVector(2);
-		right.normalize();
+		//Matrix4 t = car->body->getTransform();
+		//forward = t.getAxisVector(0);
+		//forward.normalize();
+		//Vector3 right = t.getAxisVector(2);
+		//right.normalize();
 
-		real steerStrength = 2000.0f;
+		//real steerStrength = 2000.0f;
 
-		real halfWidth = car->chassis->halfSize.x;
+		//real halfWidth = car->chassis->halfSize.x;
 
-		Vector3 pointLeftLocal = Vector3(-halfWidth, 0.0f, 0.0f);
-		Vector3 pointRightLocal = Vector3(halfWidth, 0.0f, 0.0f);
+		//Vector3 pointLeftLocal = Vector3(-halfWidth, 0.0f, 0.0f);
+		//Vector3 pointRightLocal = Vector3(halfWidth, 0.0f, 0.0f);
 
-		Vector3 forceLeft = right * (car->steerAngle * steerStrength);
-		Vector3 forceRight = (right * -1) * (car->steerAngle * steerStrength);
+		//Vector3 forceLeft = right * (car->steerAngle * steerStrength);
+		//Vector3 forceRight = (right * -1) * (car->steerAngle * steerStrength);
 
-		car->body->addForceAtBodyPoint(forceLeft, pointLeftLocal);
-		car->body->addForceAtBodyPoint(forceRight, pointRightLocal);
+		//car->body->addForceAtBodyPoint(forceLeft, pointLeftLocal);
+		//car->body->addForceAtBodyPoint(forceRight, pointRightLocal);
 
 		Vector3 vel = car->body->getVelocity();
 
-		right = transform.getAxisVector(2);
-		forward = transform.getAxisVector(0);
+		Vector3 right = transform.getAxisVector(0);
+		forward = transform.getAxisVector(2);
 		right.normalize();
 		forward.normalize();
 
 		real vRight = vel * right;
 		real vForward = vel * forward;
 
-		real totalMass = car->body->getMass();
+		//real totalMass = car->body->getMass();
 
 		real lateralDamping = 5.0f;
-		Vector3 lateralForce = right * (-vRight * totalMass * lateralDamping);
-
+		Vector3 lateralVelocity = right * vRight;
+		Vector3 lateralAccel = lateralVelocity * -lateralDamping;
+		Vector3 lateralForce = lateralAccel * car->body->getMass();
 		car->body->addForce(lateralForce);
+		Vector3 lateralVelocityL = right * -vRight;
+		Vector3 lateralAccelL = lateralVelocityL * -lateralDamping;
+		Vector3 lateralForceL = lateralAccelL * car->body->getMass();
+		car->body->addForce(lateralForceL);
+
+		//Vector3 lateralForce = right * (vRight * lateralDamping);
+		//car->body->addForce(lateralForce);
+		//Vector3 lateralAccel = (lateralForce * - 1) * lateralDambingcar->body->getMass();
+
+		//real longitudinalDamping = 2.0f;	
+
+		//Vector3 lateralForce = right * (-vRight * totalMass * lateralDamping);
+
+		//car->body->addForce(lateralForce);
 
 
 		car->body->integrate(deltaTime);
@@ -1659,7 +1682,7 @@ void GameManager::update(float deltaTime)
 			Matrix4 carTransform = car->body->getTransform();
 
 			// Car forward (Z axis)
-			Vector3 forward = carTransform.getAxisVector(2);
+			Vector3 forward = carTransform.getAxisVector(0) * -1;
 			forward.normalize();
 
 			Vector3 worldUp(0, 1, 0);
