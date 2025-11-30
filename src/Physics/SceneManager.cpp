@@ -147,6 +147,52 @@ void Scenes::LoadCarTest(GameManager* gm)
 		w.coll->calculateInternals();
 	}
 
+	elevate::Vector3 carComWorld = gm->car->body->getTransform().getAxisVector(3);
+
+	gm->car->roofOffset = elevate::Vector3(0.0f, halfSize.y * 0.7f, -halfSize.z * 0.3f);
+	elevate::Vector3 roofSize(halfSize.x * 1.4f, halfSize.y * 0.7f, halfSize.z * 0.8f);
+
+	{
+		elevate::Vector3 roofWorldPos = gm->car->body->getPointInWorldSpace(gm->car->roofOffset);
+		gm->car->roofMesh = new Cube(roofWorldPos, roofSize * 2.0f, &gm->ammoShader, gm);
+		gm->car->roofMesh->LoadMesh();
+		gm->car->roofMesh->SetColor(glm::vec3(0.8f, 0.8f, 0.85f));
+		gameObjects.push_back(gm->car->roofMesh);
+	}
+
+	gm->car->hoodOffset = elevate::Vector3(0.0f, -halfSize.y * 0.2f, halfSize.z * 0.5f);
+	elevate::Vector3 hoodSize(halfSize.x * 1.6f, halfSize.y * 0.5f, halfSize.z * 0.5f);
+
+	{
+		elevate::Vector3 hoodWorldPos = gm->car->body->getPointInWorldSpace(gm->car->hoodOffset);
+		gm->car->hoodMesh = new Cube(hoodWorldPos, hoodSize * 2.0f, &gm->ammoShader, gm);
+		gm->car->hoodMesh->LoadMesh();
+		gm->car->hoodMesh->SetColor(glm::vec3(0.7f, 0.1f, 0.1f));
+		gameObjects.push_back(gm->car->hoodMesh);
+	}
+
+	gm->car->rearOffset = elevate::Vector3(0.0f, -halfSize.y * 0.2f, -halfSize.z * 0.5f);
+	elevate::Vector3 rearSize(halfSize.x * 1.5f, halfSize.y * 0.6f, halfSize.z * 0.5f);
+
+	{
+		elevate::Vector3 rearWorldPos = gm->car->body->getPointInWorldSpace(gm->car->rearOffset);
+		gm->car->rearMesh = new Cube(rearWorldPos, rearSize * 2.0f, &gm->ammoShader, gm);
+		gm->car->rearMesh->LoadMesh();
+		gm->car->rearMesh->SetColor(glm::vec3(0.75f, 0.15f, 0.15f));
+		gameObjects.push_back(gm->car->rearMesh);
+	}
+
+	gm->car->frontBumperOffset = elevate::Vector3(0.0f, -halfSize.y * 0.8f, halfSize.z * 0.95f);
+	elevate::Vector3 bumperSize(halfSize.x * 1.7f, halfSize.y * 0.3f, halfSize.z * 0.15f);
+
+	{
+		elevate::Vector3 bumperWorldPos = gm->car->body->getPointInWorldSpace(gm->car->frontBumperOffset);
+		gm->car->frontBumperMesh = new Cube(bumperWorldPos, bumperSize * 2.0f, &gm->ammoShader, gm);
+		gm->car->frontBumperMesh->LoadMesh();
+		gm->car->frontBumperMesh->SetColor(glm::vec3(0.2f, 0.2f, 0.25f));
+		gameObjects.push_back(gm->car->frontBumperMesh);
+	}
+
 	real a = halfSize.x;
 	real b = halfSize.y;
 	real c = halfSize.z;

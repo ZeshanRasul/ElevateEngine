@@ -85,7 +85,10 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 void GameManager::setupCamera(unsigned int width, unsigned int height)
 {
-	view = camera->GetViewMatrix();
+	if (!showCar)
+	{
+		view = camera->GetViewMatrix();
+	}
 	cubemapView = glm::mat4(glm::mat3(camera->GetViewMatrix()));
 	projection = glm::perspective(glm::radians(camera->Zoom), (float)width / (float)height, 0.1f, 5000.0f);
 }
@@ -1335,7 +1338,6 @@ void GameManager::DrawPhysicsObjectsCombo()
 		//	ImGui::GetWindowWidth(),
 		//	ImGui::GetWindowHeight());
 
-		glm::mat4 view = camera->GetViewMatrix();
 		glm::mat4 proj = projection;
 		ImGuizmo::Manipulate(glm::value_ptr(view),
 			glm::value_ptr(proj),
@@ -1564,22 +1566,36 @@ void GameManager::update(float deltaTime)
 
 		car->body->addForce(elevate::Vector3::GRAVITY * car->body->getMass());
 
-		Vector3 vel = car->body->getVelocity();
-
 		Vector3 right = transform.getAxisVector(0);
 		forward = transform.getAxisVector(2);
 		right.normalize();
 		forward.normalize();
 
+		Vector3 vel = car->body->getVelocity();
 		real vRight = vel * right;
 		real vForward = vel * forward;
 
-		real lateralDamping = 3.0f;
 		Vector3 lateralVelocity = right * vRight;
-		Vector3 lateralAccel = lateralVelocity * -lateralDamping;
-		Vector3 lateralForce = lateralAccel * car->body->getMass();
 
-		car->body->addForce(lateralForce);
+		real baseGrip = 2.0f;
+
+		static real lastVForward = 0.0f;
+		real vForwardNow = vel * forward;
+		real accelForward = (vForwardNow - lastVForward) / deltaTime;
+		lastVForward = vForwardNow;
+
+		real transfer = std::clamp(-accelForward * 0.1f, (real)-0.5f, (real)0.5f);
+
+		real frontGrip = baseGrip * (1.0f + transfer);
+		real rearGrip = baseGrip * (1.0f - transfer);
+		
+		Vector3 frontAccel = lateralVelocity * -frontGrip;
+		Vector3 frontForce = frontAccel * car->body->getMass() * 0.5f;
+		car->body->addForceAtBodyPoint(frontForce, frontAvg);
+
+		Vector3 rearAccel = lateralVelocity * -rearGrip;
+		Vector3 rearForce = rearAccel * car->body->getMass() * 0.5f;
+		car->body->addForceAtBodyPoint(rearForce, rearAvg);
 
 		float maxSteerAngle = 0.5f;
 		float steerAngleRad = car->steerAngle * maxSteerAngle;
@@ -1638,20 +1654,45 @@ void GameManager::update(float deltaTime)
 			(float)car->body->getOrientation().j,
 			(float)car->body->getOrientation().k));
 
+
+		glm::quat bodyQ(
+			(float)car->body->getOrientation().r,
+			(float)car->body->getOrientation().i,
+			(float)car->body->getOrientation().j,
+			(float)car->body->getOrientation().k);
+
+		glm::quat steerQ = glm::angleAxis(steerAngleRad, glm::vec3(0.0f, 1.0f, 0.0f));
+
 		for (int i = 0; i < 4; ++i)
 		{
-			car->wheels[i].coll->calculateInternals(); // after body derived data
-
-			Matrix4 wtx = car->wheels[i].coll->getTransform();
-			Vector3 wheelPos = wtx.getAxisVector(3);
+			car->wheels[i].coll->calculateInternals();
+			Matrix4 wheelTransform = car->wheels[i].coll->getTransform();
+			Vector3 wheelPos = wheelTransform.getAxisVector(3);
 			car->wheels[i].mesh->SetPosition(wheelPos);
 
-			car->wheels[i].mesh->SetOrientation(glm::quat(
-				(float)car->body->getOrientation().r,
-				(float)car->body->getOrientation().i,
-				(float)car->body->getOrientation().j,
-				(float)car->body->getOrientation().k));
+			if (i < 2)
+			{
+				glm::quat wheelOrientation = bodyQ * steerQ;
+				car->wheels[i].mesh->SetOrientation(wheelOrientation);
+			}
+			else
+			{
+				car->wheels[i].mesh->SetOrientation(bodyQ);
+			}
 		}
+
+		auto updatePart = [&](Cube* mesh, const elevate::Vector3& localOffset)
+			{
+				if (!mesh) return;
+				elevate::Vector3 worldPos = car->body->getPointInWorldSpace(localOffset);
+				mesh->SetPosition(worldPos);
+				mesh->SetOrientation(bodyQ);
+			};
+
+		updatePart(car->roofMesh, car->roofOffset);
+		updatePart(car->hoodMesh, car->hoodOffset);
+		updatePart(car->rearMesh, car->rearOffset);
+		updatePart(car->frontBumperMesh, car->frontBumperOffset);
 
 		if (showCar)
 		{
@@ -1671,20 +1712,17 @@ void GameManager::update(float deltaTime)
 			float height = 4.5f;
 
 			Vector3 camPos = carPos + right * -back + worldUp * height;
-			Vector3 target = carPos + right * 1.5f;
+			Vector3 target = carPos + right * 4.5f;
 
 			camera->Position = glm::vec3(camPos.x, camPos.y, camPos.z);
 			camera->Front = glm::normalize(glm::vec3(target.x, target.y, target.z) - camera->Position);
-			camera->UpdateCameraVectors();
-			view = camera->GetViewMatrix(glm::vec3(target.x, target.y, target.z));
+			camera->Up = glm::vec3(camUp.x, camUp.y, camUp.z);
+			view = glm::lookAt(camera->Position, camera->Position + camera->Front, camera->Up);
 		}
 	}
 
 	if (fpsSandboxDemo)
 	{
-		//rbWorld->startFrame();
-		//
-		//rbWorld->runPhysics(1.0f / 60.0f);
 
 		for (int i = 0; i < ammoCount; ++i)
 		{

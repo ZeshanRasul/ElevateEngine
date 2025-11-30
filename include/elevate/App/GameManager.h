@@ -131,6 +131,16 @@ struct Car {
     float throttle;
     float brake;
     float steerAngle;
+
+    Cube* roofMesh = nullptr;
+    Cube* hoodMesh = nullptr;
+    Cube* rearMesh = nullptr;
+    Cube* frontBumperMesh = nullptr;
+
+    elevate::Vector3 roofOffset;
+    elevate::Vector3 hoodOffset;
+    elevate::Vector3 rearOffset;
+    elevate::Vector3 frontBumperOffset;
 };
 
 class GameManager {
