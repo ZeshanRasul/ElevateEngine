@@ -291,7 +291,7 @@ void GameManager::reset()
 
 
 	spawnFactory->BuildCrateStack(
-		elevate::Vector3(-10.0f, 10.0f, -40.0f),
+		elevate::Vector3(110.0f, 10.0f, -40.0f),
 		3,
 		3,
 		3,
