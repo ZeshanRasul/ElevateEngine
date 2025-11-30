@@ -153,6 +153,13 @@ namespace elevate {
 
 		isAwake = true;
 	}
+	elevate::Vector3 RigidBody::getVelocityAtPoint(const elevate::Vector3& worldPoint) const
+	{
+		elevate::Vector3 r = worldPoint - position;
+
+		elevate::Vector3 v = velocity + rotation % r;
+		return v;
+	}
 	;
 
 	void RigidBody::clearAccumulator()

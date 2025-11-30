@@ -705,14 +705,14 @@ void GameManager::ResetState()
 }
 void GameManager::ResetCar()
 {
-	car->body->setPosition(elevate::Vector3(0.0f, 20.0f, 0.0f));
+	car->body->setPosition(elevate::Vector3(0.0f, 7.5f, 0.0f));
 	car->throttle = 0.0f;
 	car->steerAngle = 0.0f;
 	car->body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 	car->body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
 	car->body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 	car->chassisMesh->SetOrientation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-	car->chassisMesh->SetPosition(elevate::Vector3(0.0f, 20.0f, 0.0f));
+	car->chassisMesh->SetPosition(elevate::Vector3(0.0f, 7.5f, 0.0f));
 	car->body->calculateDerivedData();
 	car->chassis->calculateInternals();
 }
@@ -1605,85 +1605,166 @@ void GameManager::update(float deltaTime)
 		real speedFactor = std::max(0.0f, (float)maxSpeedFactor);
 		speedFactor = 1.0f;
 
-		Vector3 forceWorld = forward * (car->throttle * engineForce * speedFactor);
-		rearAvg.y = 0.0f;
-
-		car->body->addForceAtBodyPoint(forceWorld, rearAvg);
-
-		car->body->addForce(elevate::Vector3::GRAVITY * car->body->getMass());
-
-		Vector3 right = transform.getAxisVector(0);
-		forward = transform.getAxisVector(2);
-		right.normalize();
-		forward.normalize();
-
-		Vector3 vel = car->body->getVelocity();
-		real vRight = vel * right;
-		real vForward = vel * forward;
-
-		Vector3 lateralVelocity = right * vRight;
-
-		real baseGrip = 2.0f;
-
-		static real lastVForward = 0.0f;
-		real vForwardNow = vel * forward;
-		real accelForward = (vForwardNow - lastVForward) / deltaTime;
-		lastVForward = vForwardNow;
-
-		real transfer = std::clamp(-accelForward * 0.1f, (real)-0.5f, (real)0.5f);
-
-		real frontGrip = baseGrip * (1.0f + transfer);
-		real rearGrip = baseGrip * (1.0f - transfer);
-
-		Vector3 frontAccel = lateralVelocity * -frontGrip;
-		Vector3 frontForce = frontAccel * car->body->getMass() * 0.5f;
-		car->body->addForceAtBodyPoint(frontForce, frontAvg);
-
-		Vector3 rearAccel = lateralVelocity * -rearGrip;
-		Vector3 rearForce = rearAccel * car->body->getMass() * 0.5f;
-		car->body->addForceAtBodyPoint(rearForce, rearAvg);
-
-		float steerRate = 6.0f;
+		//rearAvg.y = 0.0f;
+		
+		float steerRate = 10.0f;
 		car->steerAngle += (targetSteer - car->steerAngle) * steerRate * deltaTime;
 		car->steerAngle = std::clamp(car->steerAngle, -1.0f, 1.0f);
-
 
 		float maxSteerAngle = 1.0f;
 		float steerAngleRad = car->steerAngle * maxSteerAngle;
 
-		real brakeStrength = 10000.0f;
-		if (car->brake > 0.0f && fabs(vForward) > 0.1f)
+
+		car->body->addForce(elevate::Vector3::GRAVITY * car->body->getMass());
+
+		for (int i = 0; i < 4; i++)
 		{
-			Vector3 brakeDir = (vForward > 0.0f) ? (forward * -1.0f) : forward;
+			Car::Wheel& w = car->wheels[i];
+			Matrix4 bodyT = car->body->getTransform();
+			Vector3 chassisForward = bodyT.getAxisVector(2);  // Z-forward
+			Vector3 chassisUp = bodyT.getAxisVector(1);  // Y-up
+			chassisForward.normalize();
+			chassisUp.normalize();
+			// Transform wheel attach point to world
+			Vector3 attachWorld = car->body->getPointInWorldSpace(w.offset);
 
-			real brakeForceMag = brakeStrength * car->brake;
+			// Ray goes straight down in car-space Y
+			Vector3 suspDir(0, -1, 0);
+			suspDir = car->body->getTransform().transformDirection(suspDir);
+			suspDir.normalize();
 
-			real maxUsefulBrake = fabs(vForward) * car->body->getMass() / deltaTime;
-			brakeForceMag = std::min(brakeForceMag, maxUsefulBrake);
+			real rayLen = w.maxLength + w.wheelRadius;
 
-			Vector3 brakeForce = brakeDir * brakeForceMag;
+			attachWorld = car->body->getPointInWorldSpace(w.offset);
+			suspDir = car->body->getTransform().transformDirection(Vector3(0, -1, 0));
+			suspDir.normalize();
 
-			car->body->addForce(brakeForce);
+			RaycastHit hit;
+			if (!RaycastCollisionBox(attachWorld, suspDir, w.maxLength + w.wheelRadius, static_cast<CollisionBox*>(floor->shape), hit))
+			{
+				w.compression = 0;
+				continue;
+			}
+
+			// Wheel distance from suspension reference
+			real dist = hit.distance - w.wheelRadius;
+
+			// Suspension compression ratio
+			w.lastCompression = w.compression;
+			w.compression = std::clamp((w.restLength - dist) / w.restLength, (real)0.0f, (real)1.0f);
+
+			// Spring force: Hooke’s Law
+			real Fspring = w.springK * w.compression;
+
+			// Damper force: relative velocity along suspension
+			real compressionVel = (w.compression - w.lastCompression) / deltaTime;
+			real Fdamper = w.damperC * compressionVel;
+
+			real Fsusp = Fspring + Fdamper;
+
+			// Apply along normal (or suspDir if you prefer fake)
+			Vector3 force = hit.normal * Fsusp;
+
+			// Apply at contact point
+			car->body->addForceAtPoint(force, hit.point);
+
+			Vector3 forward = car->body->getTransform().getAxisVector(2);  // Z-forward
+			forward.normalize();
+			Vector3 right = car->body->getTransform().getAxisVector(0);  // X-right
+			right.normalize();
+
+			Vector3 wheelForward = forward;
+
+			// Apply steering to front wheels only (0 = FL, 1 = FR)
+			if (i == 2 || i == 3)
+			{
+				// Build rotation quaternion around Y axis
+				elevate::Quaternion steerQ;
+				steerQ.setEuler(0, car->steerAngle, 0);  // yaw only
+
+				Matrix3 rot;
+				steerQ.fillMatrix(rot);
+
+				wheelForward = rot.transform(forward);
+				wheelForward.normalize();
+			}
+
+			// Cache for tyre forces
+			w.contactPointWorld = hit.point;
+			w.contactNormalWorld = hit.normal;
+
+			Vector3 velAtWheel = car->body->getVelocityAtPoint(w.contactPointWorld);
+
+			forward = car->body->getTransform().getAxisVector(2);
+			right = car->body->getTransform().getAxisVector(0);
+			forward.normalize();
+			right.normalize();
+
+			Vector3 wheelRight = chassisUp % wheelForward;
+			wheelRight.normalize();
+
+
+			real vLong = velAtWheel * wheelForward;
+			real vLat = velAtWheel * wheelRight;
+
+			real longStiffness = 1500.0f;
+			real slipLong = vLong;
+			real Fx = -slipLong * 1.0f;
+
+			real brakeStrength = 1500.0f;
+
+			real engineWheelForce = engineForce / 2.0f;
+			if (i >= 2)  // rear wheels
+				Fx += car->throttle * engineWheelForce;
+
+			if (car->brake > 0)
+				Fx -= car->brake * brakeStrength;
+
+			// Velocity of wheel at contact point already computed
+			velAtWheel = car->body->getVelocityAtPoint(w.contactPointWorld);
+
+			// Project onto wheel axes
+			vLong = velAtWheel * wheelForward;
+			vLat = velAtWheel * wheelRight;
+
+			// Slip angle (avoid divide by zero)
+			real slipAngle = atan2(vLat, fabs(vLong) + 0.1f);
+			real latStiffness = 3000.0f;  // for now
+			real Fy = -slipAngle * latStiffness;
+		
+			
+			real Fz = Fsusp;   // suspension force
+			real mu = 1.1f;    // tarmac
+
+			real maxGrip = mu * Fz;
+			real combined = sqrt(Fx * Fx + Fy * Fy);
+
+			if (combined > maxGrip)
+			{
+				real scale = maxGrip / combined;
+				Fx *= scale;
+				Fy *= scale;
+			}
+
+			Vector3 forceWorld =
+				wheelForward * Fx   // longitudinal
+				+ right * Fy;  // lateral
+
+			if (i >= 2) {   // rear wheels
+				std::cout << "vLong=" << vLong
+					<< " Fx=" << Fx
+					<< " Fy=" << Fy
+					<< " Fz=" << Fz
+					<< " throttle=" << car->throttle
+					<< std::endl;
+			}
+
+
+			car->body->addForceAtPoint(forceWorld, w.contactPointWorld);
+
 		}
 
-		if (fabs(steerAngleRad) > 0.001f && fabs(vForward) > 0.5f)
-		{
-			float steerInput = steerAngleRad / maxSteerAngle;
 
-			Vector3 frontLeftLocal = car->wheels[0].offset;
-			Vector3 frontRightLocal = car->wheels[1].offset;
-
-			real steerStrength = 2000.0f;
-			real speedFactorSteer = std::clamp(fabs(vForward) / 10.0f, 0.0, 1.0);
-
-			real steerForceMag = steerStrength * steerInput * speedFactorSteer;
-
-			Vector3 forceLeft = right * steerForceMag;
-			Vector3 forceRight = (right * -1) * steerForceMag;
-
-			car->body->addForceAtBodyPoint(forceLeft, frontLeftLocal);
-			car->body->addForceAtBodyPoint(forceRight, frontRightLocal);
-		}
 
 
 		car->body->integrate(deltaTime);
@@ -1716,9 +1797,7 @@ void GameManager::update(float deltaTime)
 
 		for (int i = 0; i < 4; ++i)
 		{
-			car->wheels[i].coll->calculateInternals();
-			Matrix4 wheelTransform = car->wheels[i].coll->getTransform();
-			Vector3 wheelPos = wheelTransform.getAxisVector(3);
+			Vector3 wheelPos = car->body->getPointInWorldSpace(car->wheels[i].offset);
 			car->wheels[i].mesh->SetPosition(wheelPos);
 
 			if (i < 2)
@@ -2222,13 +2301,13 @@ void GameManager::generateContacts()
 
 	if (showCar)
 	{
-		for (int i = 0; i < 4; i++)
-		{
-			if (!cData.hasMoreContacts()) return;
-			///		elevate::CollisionDetector::sphereAndHalfSpace(*car->wheels[i].coll, plane, &cData);
-			if (!cData.hasMoreContacts()) return;
-			elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(floor->shape), *car->wheels[i].coll, &cData);
-		}
+		//for (int i = 0; i < 4; i++)
+		//{
+		//	if (!cData.hasMoreContacts()) return;
+		//	///		elevate::CollisionDetector::sphereAndHalfSpace(*car->wheels[i].coll, plane, &cData);
+		//	if (!cData.hasMoreContacts()) return;
+		////	elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(floor->shape), *car->wheels[i].coll, &cData);
+		//}
 
 		if (!cData.hasMoreContacts()) return;
 		//elevate::CollisionDetector::boxAndHalfSpace(*car->chassis, plane, &cData);
@@ -2808,10 +2887,10 @@ void GameManager::render()
 
 		DebugDrawCollisionBox(*static_cast<CollisionBox*>(car->chassis), glm::vec3(1.0f, 0.0f, 0.0f));
 
-		for (auto& wheel : car->wheels)
-		{
-			DebugDrawCollisionSphere(*wheel.coll, glm::vec3(0.0f, 1.0f, 0.0f));
-		}
+		//for (auto& wheel : car->wheels)
+		//{
+		//	DebugDrawCollisionSphere(*wheel.coll, glm::vec3(0.0f, 1.0f, 0.0f));
+		//}
 	}
 
 	renderer->drawCubemap(cubemap);

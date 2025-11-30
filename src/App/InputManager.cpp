@@ -150,6 +150,11 @@ void InputManager::processInput(GLFWwindow* window, float deltaTime)
 		else
 			mGameManager->targetBrake = 0.0f;
 
+		float steerRate = 3.0f;
+		mGameManager->car->steerAngle += (mGameManager->targetSteer - mGameManager->car->steerAngle) * steerRate * deltaTime;
+		mGameManager->car->steerAngle = std::clamp(mGameManager->car->steerAngle, -0.5f, 0.5f);
+
+
 		float brakeRate = 10.0f;
 		mGameManager->car->brake += (mGameManager->targetBrake - mGameManager->car->brake) * brakeRate * deltaTime;
 		mGameManager->car->brake = std::clamp(mGameManager->car->brake, 0.0f, 1.0f);

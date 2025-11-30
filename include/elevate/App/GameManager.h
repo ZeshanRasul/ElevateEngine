@@ -117,13 +117,23 @@ struct Car {
     GameObject* chassisMesh;
 
     struct Wheel {
-        elevate::CollisionSphere* coll;
-		elevate::Vector3 offset;
+        elevate::Vector3 offset;
+        elevate::Vector3 contactPointWorld;
+        elevate::Vector3 contactNormalWorld;
 
-		GameObject* mesh;
+        bool grounded = false;
 
-        bool isFront;
-        bool isDriven;
+        real restLength = 0.4f;     // suspension length
+        real minLength = 0.1f;      // bump stop
+        real maxLength = 0.6f;      // max extension
+        real springK = 25000.0f;    // spring stiffness
+        real damperC = 3000.0f;     // damping
+
+        real compression = 0.0f;
+        real lastCompression = 0.0f;
+
+        real wheelRadius = 0.55f;
+        GameObject* mesh;
     };
 
 	Wheel wheels[4];
@@ -163,6 +173,135 @@ public:
 
     glm::mat4 getView() const { return view; }
     glm::mat4 getProjection() const { return projection; }
+
+    //TODO move this after testing:
+    
+    struct RaycastHit
+    {
+        bool hit = false;
+        real distance = 0.0f;
+        elevate::Vector3 point;
+        elevate::Vector3 normal;
+    };
+
+    bool RaycastCollisionBox(
+        const elevate::Vector3& rayOrigin,
+        const elevate::Vector3& rayDir,       // normalized
+        real maxDist,
+        CollisionBox* box,
+        RaycastHit& outHit)
+    {
+        // Get box transform (world space)
+        // box->transform is updated via calculateInternals()
+        const elevate::Matrix4& T = box->getTransform();
+
+        elevate::Vector3 boxCenter = T.getAxisVector(3);
+
+        // Box axes (world space)
+        elevate::Vector3 X = T.getAxisVector(0);   // box local x
+        elevate::Vector3 Y = T.getAxisVector(1);   // box local y
+        elevate::Vector3 Z = T.getAxisVector(2);   // box local z
+
+        // Half extents
+        elevate::Vector3 e = box->halfSize;
+
+        // Vector from box center to ray origin
+        elevate::Vector3 p = rayOrigin - boxCenter;
+
+        // Precompute dot products
+        real px = p * X;
+        real py = p * Y;
+        real pz = p * Z;
+
+        real dx = rayDir * X;
+        real dy = rayDir * Y;
+        real dz = rayDir * Z;
+
+        real tMin = 0.0f;
+        real tMax = maxDist;
+
+        real t1, t2;
+
+        // X slab
+        if (fabs(dx) < 1e-6)
+        {
+            // Parallel to X slab ? fail if outside
+            if (px < -e.x || px > e.x)
+                return false;
+        }
+        else
+        {
+            t1 = (-e.x - px) / dx;
+            t2 = (e.x - px) / dx;
+            if (t1 > t2) std::swap(t1, t2);
+            tMin = std::max(tMin, t1);
+            tMax = std::min(tMax, t2);
+            if (tMin > tMax) return false;
+        }
+
+        // Y slab
+        if (fabs(dy) < 1e-6)
+        {
+            if (py < -e.y || py > e.y)
+                return false;
+        }
+        else
+        {
+            t1 = (-e.y - py) / dy;
+            t2 = (e.y - py) / dy;
+            if (t1 > t2) std::swap(t1, t2);
+            tMin = std::max(tMin, t1);
+            tMax = std::min(tMax, t2);
+            if (tMin > tMax) return false;
+        }
+
+        // Z slab
+        if (fabs(dz) < 1e-6)
+        {
+            if (pz < -e.z || pz > e.z)
+                return false;
+        }
+        else
+        {
+            t1 = (-e.z - pz) / dz;
+            t2 = (e.z - pz) / dz;
+            if (t1 > t2) std::swap(t1, t2);
+            tMin = std::max(tMin, t1);
+            tMax = std::min(tMax, t2);
+            if (tMin > tMax) return false;
+        }
+
+        // Hit detected
+        real tHit = (tMin > 0.0f) ? tMin : tMax;
+        if (tHit < 0.0f || tHit > maxDist)
+            return false;
+
+        outHit.hit = true;
+        outHit.distance = tHit;
+        outHit.point = rayOrigin + rayDir * tHit;
+
+        // Compute hit normal: compare penetration side
+        elevate::Vector3 local = elevate::Vector3(px + tHit * dx, py + tHit * dy, pz + tHit * dz);
+
+        elevate::Vector3 nLocal(0, 0, 0);
+        float bias = 1e-4f;
+
+        if (fabs(local.x - (-e.x)) < bias) nLocal = elevate::Vector3(-1, 0, 0);
+        else if (fabs(local.x - e.x) < bias) nLocal = elevate::Vector3(+1, 0, 0);
+        else if (fabs(local.y - (-e.y)) < bias) nLocal = elevate::Vector3(0, -1, 0);
+        else if (fabs(local.y - e.y) < bias) nLocal = elevate::Vector3(0, +1, 0);
+        else if (fabs(local.z - (-e.z)) < bias) nLocal = elevate::Vector3(0, 0, -1);
+        else if (fabs(local.z - e.z) < bias) nLocal = elevate::Vector3(0, 0, +1);
+
+        // Transform normal to world space
+        outHit.normal =
+            X * nLocal.x +
+            Y * nLocal.y +
+            Z * nLocal.z;
+
+        outHit.normal.normalize();
+        return true;
+    }
 
 
     void update(float deltaTime);

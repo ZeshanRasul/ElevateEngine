@@ -129,6 +129,9 @@ namespace elevate {
 		}
 	};
 
+	class Matrix3;
+
+
 	class Quaternion
 	{
 	public:
@@ -222,6 +225,29 @@ namespace elevate {
 			j *= d;
 			k *= d;
 		}
+
+		void setEuler(real pitch, real yaw, real roll)
+		{
+			real cy = real_cos(yaw * 0.5f);
+			real sy = real_sin(yaw * 0.5f);
+
+			real cp = real_cos(pitch * 0.5f);
+			real sp = real_sin(pitch * 0.5f);
+
+			real cr = real_cos(roll * 0.5f);
+			real sr = real_sin(roll * 0.5f);
+
+			r = cr * cp * cy + sr * sp * sy;
+			i = sr * cp * cy - cr * sp * sy;
+			j = cr * sp * cy + sr * cp * sy;
+			k = cr * cp * sy - sr * sp * cy;
+
+			normalise();
+		}
+
+
+		void fillMatrix(Matrix3& m);
+
 
 		/**
 		 * Multiplies the quaternion by the given quaternion.
@@ -886,4 +912,6 @@ namespace elevate {
 		 */
 		static Matrix3 linearInterpolate(const Matrix3& a, const Matrix3& b, real prop);
 	};
+
+
 }

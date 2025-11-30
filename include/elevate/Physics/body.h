@@ -131,6 +131,9 @@ namespace elevate {
 
 		void setCanSleep(const bool canSleep) { this->canSleep = canSleep; }
 
+		elevate::Vector3 getVelocityAtPoint(const elevate::Vector3& worldPoint) const;
+
+
 	protected:
 		real linearDamping;
 		real angularDamping;

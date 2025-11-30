@@ -92,7 +92,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 		elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
 		elevate::Vector3(0.0f, 0.0f, 0.0f)
 	);
-	gm->carBody->setPosition(elevate::Vector3(0.0f, 20.0f, 0.0f));
+	gm->carBody->setPosition(elevate::Vector3(0.0f, 10.5f, 0.0f));
 	gm->car->body = gm->carBody;
 	gm->car->chassis = new CollisionBox();
 	gm->car->chassis->body = gm->carBody;
@@ -106,7 +106,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->car->body->setMass(totalMass);
 	elevate::Vector3 halfSize = gm->car->chassis->halfSize;
 
-	gm->car->chassisMesh = new Cube(elevate::Vector3(0.0f, 20.0f, 0.0f), halfSize * 2, &gm->ammoShader, gm);
+	gm->car->chassisMesh = new Cube(elevate::Vector3(0.0f, 10.5f, 0.0f), halfSize * 2, &gm->ammoShader, gm);
 	gm->car->chassisMesh->LoadMesh();
 	gm->car->chassisMesh->SetColor(glm::vec3(0.8f, 0.1f, 0.1f));
 	gameObjects.push_back(gm->car->chassisMesh);
@@ -128,12 +128,12 @@ void Scenes::LoadCarTest(GameManager* gm)
 	for (int i = 0; i < 4; ++i)
 	{
 		Car::Wheel& w = gm->car->wheels[i];
-		w.coll = new elevate::CollisionSphere();
-		w.coll->radius = wheelRadius;
-		w.coll->offset.setOrientationAndPos(
-			elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
-			wheelOffsets[i]
-		);
+	//w.coll = new elevate::CollisionSphere();
+	//w.coll->radius = wheelRadius;
+	//w.coll->offset.setOrientationAndPos(
+	//	elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
+	//	wheelOffsets[i]
+	//);
 		w.offset = wheelOffsets[i];
 
 		elevate::Vector3 worldPos = gm->car->body->getPointInWorldSpace(wheelOffsets[i]);
@@ -142,10 +142,10 @@ void Scenes::LoadCarTest(GameManager* gm)
 		w.mesh->SetColor(glm::vec3(0.1f, 0.1f, 0.1f));
 		w.mesh->LoadMesh();
 		gameObjects.push_back(w.mesh);
-		w.coll->body = gm->car->body;
-		//w.coll->body->setMass(wheelMass);
-		w.coll->body->calculateDerivedData();
-		w.coll->calculateInternals();
+		//w.coll->body = gm->car->body;
+		////w.coll->body->setMass(wheelMass);
+		//w.coll->body->calculateDerivedData();
+		//w.coll->calculateInternals();
 	}
 
 	elevate::Vector3 carComWorld = gm->car->body->getTransform().getAxisVector(3);

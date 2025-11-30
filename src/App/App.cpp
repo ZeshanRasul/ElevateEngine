@@ -2,7 +2,8 @@
 #include "Tools/Logger.h"
 
 GameManager* SceneManager::s_gameManager = nullptr;
-SceneType SceneManager::s_currentScene = SceneType::DemoShowcase;
+SceneType SceneManager::s_currentScene = SceneType::Car
+;
 
 App::App(unsigned int screenWidth, unsigned int screenHeight)
     : width(screenWidth), height(screenHeight)
