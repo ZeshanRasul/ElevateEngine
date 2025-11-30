@@ -123,6 +123,7 @@ void GameManager::reset()
 	floor->mesh->setGameManager(this);
 	floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
 	static_cast<Cube*>(floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_4k_albedo.png");
+	floor->mesh->SetTexTiling(20.0f);
 	floor->name = "Floor";
 	gameObjects.push_back(floor->mesh);
 	allSceneObjects.push_back(floor);
@@ -137,6 +138,8 @@ void GameManager::reset()
 	wall->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	wall->mesh->SetTexTiling(4.0f);
 	static_cast<Cube*>(wall->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
+	wall->mesh->SetTexTiling(8.0f);
+
 	wall->name = "Wall 1";
 	DebugDrawCollisionBox(*static_cast<CollisionBox*>(wall->shape), glm::vec3(1.0f, 0.0f, 0.0f));
 
@@ -151,7 +154,7 @@ void GameManager::reset()
 	);
 	wall2->mesh->setGameManager(this);
 	wall2->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
-	wall2->mesh->SetTexTiling(4.0f);
+	wall2->mesh->SetTexTiling(8.0f);
 	static_cast<Cube*>(wall2->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	wall2->name = "Wall 2";
 	DebugDrawCollisionBox(*static_cast<CollisionBox*>(wall2->shape), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -167,7 +170,7 @@ void GameManager::reset()
 	);
 	wall3->mesh->setGameManager(this);
 	wall3->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
-	wall3->mesh->SetTexTiling(4.0f);
+	wall3->mesh->SetTexTiling(8.0f);
 	wall3->name = "Wall 3";
 	DebugDrawCollisionBox(*static_cast<CollisionBox*>(wall3->shape), glm::vec3(1.0f, 0.0f, 0.0f));
 
@@ -183,7 +186,7 @@ void GameManager::reset()
 	);
 	wall4->mesh->setGameManager(this);
 	wall4->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
-	wall4->mesh->SetTexTiling(4.0f);
+	wall4->mesh->SetTexTiling(8.0f);
 	static_cast<Cube*>(wall4->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	wall4->name = "Wall 4";
 	DebugDrawCollisionBox(*static_cast<CollisionBox*>(wall4->shape), glm::vec3(1.0f, 0.0f, 0.0f));
