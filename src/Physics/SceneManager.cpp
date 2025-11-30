@@ -91,11 +91,11 @@ void Scenes::LoadCarTest(GameManager* gm)
 		elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
 		elevate::Vector3(0.0f, 0.0f, 0.0f)
 	);
-	gm->carBody->setPosition(elevate::Vector3(0.0f, 10.5f, 0.0f));
+	gm->carBody->setPosition(elevate::Vector3(0.0f, 20.0f, 0.0f));
 	gm->car->body = gm->carBody;
 	gm->car->chassis = new CollisionBox();
 	gm->car->chassis->body = gm->carBody;
-	gm->car->chassis->halfSize = elevate::Vector3(2.3f, 1.5f, 4.0f);
+	gm->car->chassis->halfSize = elevate::Vector3(3.3f, 4.5f, 4.0f);
 	gm->car->chassis->body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 	gm->car->chassis->body->getTransform().getAxisVector(3);
 
@@ -105,13 +105,13 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->car->body->setMass(totalMass);
 	elevate::Vector3 halfSize = gm->car->chassis->halfSize;
 
-	gm->car->chassisMesh = new Cube(elevate::Vector3(0.0f, 10.5f, 0.0f), halfSize * 2, &gm->ammoShader, gm);
+	gm->car->chassisMesh = new Cube(elevate::Vector3(0.0f, 20.0f, 0.0f), halfSize * 2, &gm->ammoShader, gm);
 	gm->car->chassisMesh->LoadMesh();
 	gm->car->chassisMesh->SetColor(glm::vec3(0.8f, 0.1f, 0.1f));
 	gameObjects.push_back(gm->car->chassisMesh);
 
-	real wheelRadius = 0.55f;
-	real wheelWidth = 0.4f;
+	real wheelRadius = 1.55f;
+	real wheelWidth = 0.7f;
 
 	real wheelOffsetX = halfSize.x + wheelRadius * 0.05f;
 	real wheelOffsetZ = halfSize.z + wheelRadius * 0.05f;

@@ -685,14 +685,16 @@ void GameManager::ResetState()
 }
 void GameManager::ResetCar()
 {
-	car->body->setPosition(elevate::Vector3(0.0f, 1.2f, 0.0f));
+	car->body->setPosition(elevate::Vector3(0.0f, 20.0f, 0.0f));
 	car->throttle = 0.0f;
 	car->steerAngle = 0.0f;
 	car->body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 	car->body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+	car->body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 	car->chassisMesh->SetOrientation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-	car->chassisMesh->SetPosition(elevate::Vector3(0.0f, 10.2f, 0.0f));
+	car->chassisMesh->SetPosition(elevate::Vector3(0.0f, 20.0f, 0.0f));
 	car->body->calculateDerivedData();
+	car->chassis->calculateInternals();
 }
 void GameManager::OnQPressed()
 {
@@ -1247,7 +1249,7 @@ void GameManager::ShowEngineWindow()
 	if (showCar)
 	{
 		ImGui::Text("Car Throttle: %.2f", car->throttle);
-		ImGui::Text("Car Throttle: %.2f", car->steerAngle);
+		ImGui::Text("Car Steer Angle: %.2f", car->steerAngle);
 		ImGui::Text("Car position: X: %.2f Y: %.2f Z: %.2f",
 			car->body->getPosition().x,
 			car->body->getPosition().y,
@@ -1597,7 +1599,12 @@ void GameManager::update(float deltaTime)
 		Vector3 rearForce = rearAccel * car->body->getMass() * 0.5f;
 		car->body->addForceAtBodyPoint(rearForce, rearAvg);
 
-		float maxSteerAngle = 0.5f;
+		float steerRate = 6.0f;
+		car->steerAngle += (targetSteer - car->steerAngle) * steerRate * deltaTime;
+		car->steerAngle = std::clamp(car->steerAngle, -1.0f, 1.0f);
+
+
+		float maxSteerAngle = 1.0f;
 		float steerAngleRad = car->steerAngle * maxSteerAngle;
 
 		real brakeStrength = 10000.0f;
