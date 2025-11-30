@@ -1215,6 +1215,7 @@ void GameManager::ShowEngineWindow()
 	}
 
 	ImGui::Checkbox("Enable Gravity", &enableGravity);
+	ImGui::Checkbox("Show Debug Draw", &showDebugDraw);
 
 	ImGui::End();
 
@@ -1614,7 +1615,7 @@ void GameManager::update(float deltaTime)
 
 		real frontGrip = baseGrip * (1.0f + transfer);
 		real rearGrip = baseGrip * (1.0f - transfer);
-		
+
 		Vector3 frontAccel = lateralVelocity * -frontGrip;
 		Vector3 frontForce = frontAccel * car->body->getMass() * 0.5f;
 		car->body->addForceAtBodyPoint(frontForce, frontAvg);
@@ -1659,7 +1660,7 @@ void GameManager::update(float deltaTime)
 			real steerForceMag = steerStrength * steerInput * speedFactorSteer;
 
 			Vector3 forceLeft = right * steerForceMag;
-			Vector3 forceRight = (right * - 1) * steerForceMag;
+			Vector3 forceRight = (right * -1) * steerForceMag;
 
 			car->body->addForceAtBodyPoint(forceLeft, frontLeftLocal);
 			car->body->addForceAtBodyPoint(forceRight, frontRightLocal);
@@ -2758,8 +2759,10 @@ void GameManager::render()
 		}
 	}
 	//drawDebugLines();
-
-	glm::mat4 viewProjMatrix = projection * view;
-	RenderDebugLines(lineShader.getProgramID(), viewProjMatrix);
+	if (showDebugDraw)
+	{
+		glm::mat4 viewProjMatrix = projection * view;
+		RenderDebugLines(lineShader.getProgramID(), viewProjMatrix);
+	}
 }
 

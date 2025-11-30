@@ -215,6 +215,8 @@ public:
     Shader lineShader;
     Shader cubemapShader;
 
+	bool showDebugDraw = false;
+
     static const int MaxAmmoRounds = 32;
 
     AmmoRound ammoPool[MaxAmmoRounds];
