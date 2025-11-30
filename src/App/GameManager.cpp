@@ -811,21 +811,12 @@ void GameManager::showDebugUI()
 	if (showUI)
 	{
 		ShowLightControlWindow(dirLight);
+		ShowCameraControlWindow(*camera);
 		ShowSpawnObjectWindow();
 		ShowPerformanceWindow();
-		DrawPhysicsObjectsCombo();
-		ShowCameraControlWindow(*camera);
 		ShowEngineWindow();
+		DrawPhysicsObjectsCombo();
 	}
-	//if (showUI)
-	//{
-	//	ShowLightControlWindow(dirLight);
-	//	ShowSpawnObjectWindow();
-	//	ShowPerformanceWindow();
-	//	DrawPhysicsObjectsCombo();
-	//	ShowCameraControlWindow(*camera);
-	//	ShowEngineWindow();
-	//}
 }
 
 void GameManager::renderDebugUI()
@@ -1309,6 +1300,21 @@ void GameManager::DrawPhysicsObjectsCombo()
 		return;
 	}
 
+	if (ImGui::IsKeyPressed(ImGuiKey_T))
+		currentOperation = ImGuizmo::TRANSLATE;
+	if (ImGui::IsKeyPressed(ImGuiKey_E))
+		currentOperation = ImGuizmo::ROTATE;
+	if (ImGui::IsKeyPressed(ImGuiKey_S))
+		currentOperation = ImGuizmo::SCALE;
+	if (ImGui::RadioButton("Translate", currentOperation == ImGuizmo::TRANSLATE))
+		currentOperation = ImGuizmo::TRANSLATE;
+	ImGui::SameLine();
+	if (ImGui::RadioButton("Rotate", currentOperation == ImGuizmo::ROTATE))
+		currentOperation = ImGuizmo::ROTATE;
+	ImGui::SameLine();
+	if (ImGui::RadioButton("Scale", currentOperation == ImGuizmo::SCALE))
+		currentOperation = ImGuizmo::SCALE;
+
 	if (sceneObjectIndex < 0 || sceneObjectIndex >= (int)allSceneObjects.size())
 	{
 		sceneObjectIndex = 0;
@@ -1343,7 +1349,9 @@ void GameManager::DrawPhysicsObjectsCombo()
 		}
 
 		ImGui::EndCombo();
+
 	}
+
 
 
 	if (selectedSceneObject)
