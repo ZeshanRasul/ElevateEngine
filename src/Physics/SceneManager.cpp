@@ -96,7 +96,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->car->body = gm->carBody;
 	gm->car->chassis = new CollisionBox();
 	gm->car->chassis->body = gm->carBody;
-	gm->car->chassis->halfSize = elevate::Vector3(3.3f, 4.5f, 4.0f);
+	gm->car->chassis->halfSize = elevate::Vector3(3.3f, 2.5f, 4.0f);
 	gm->car->chassis->body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 	gm->car->chassis->body->getTransform().getAxisVector(3);
 
@@ -218,7 +218,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->car->chassis->calculateInternals();
 
 	gm->spawnFactory->BuildDominoLine(
-		elevate::Vector3(0.0f, 0.25f, 150.0f),
+		elevate::Vector3(0.0f, 0.25f, 250.0f),
 		elevate::Vector3(0.0f, 0.0f, 1.0f),
 		30,
 		elevate::Vector3(20.0f, 0.3f, 4.3f),

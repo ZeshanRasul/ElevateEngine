@@ -684,7 +684,6 @@ void GameManager::ResetState()
 	{
 	case SceneType::DemoShowcase:
 	{
-		//reset();
 		fpsSandboxDemo = true;
 		break;
 	}
@@ -764,10 +763,10 @@ void GameManager::OnDPressed()
 		right_wing_control += 0.1f;
 	}
 
-	else if (showCar)
-	{
-		car->steerAngle += 0.05f;
-	}
+	//else if (showCar)
+	//{
+	//	car->steerAngle += 0.05f;
+	//}
 
 }
 
@@ -778,10 +777,10 @@ void GameManager::OnAPressed()
 		left_wing_control += 0.1f;
 		right_wing_control -= 0.1f;
 	}
-	else if (showCar)
-	{
-		car->steerAngle -= 0.05f;
-	}
+	//else if (showCar)
+	//{
+	//	car->steerAngle -= 0.05f;
+	//}
 }
 
 void GameManager::OnLeftClick()
@@ -1606,13 +1605,7 @@ void GameManager::update(float deltaTime)
 		real speedFactor = std::max(0.0f, (float)maxSpeedFactor);
 		speedFactor = 1.0f;
 
-		//rearAvg.y = 0.0f;
-
-		float steerRate = 10.0f;
-		car->steerAngle += (targetSteer - car->steerAngle) * steerRate * deltaTime;
-		car->steerAngle = std::clamp(car->steerAngle, -1.0f, 1.0f);
-
-		float maxSteerAngle = 1.0f;
+		float maxSteerAngle = 28.0f;
 		float steerAngleRad = car->steerAngle * maxSteerAngle;
 
 
@@ -1632,14 +1625,13 @@ void GameManager::update(float deltaTime)
 		{
 			Car::Wheel& w = car->wheels[i];
 			Matrix4 bodyT = car->body->getTransform();
-			Vector3 chassisForward = bodyT.getAxisVector(2);  // Z-forward
+			Vector3 chassisForward = bodyT.getAxisVector(2);  
 			Vector3 chassisUp = bodyT.getAxisVector(1);  // Y-up
 			chassisForward.normalize();
 			chassisUp.normalize();
-			// Transform wheel attach point to world
+			
 			Vector3 attachWorld = car->body->getPointInWorldSpace(w.offset);
 
-			// Ray goes straight down in car-space Y
 			Vector3 suspDir(0, -1, 0);
 			suspDir = car->body->getTransform().transformDirection(suspDir);
 			suspDir.normalize();
@@ -1666,41 +1658,33 @@ void GameManager::update(float deltaTime)
 				}
 			}
 
-			// Wheel distance from suspension reference
 			real dist = hit.distance - w.wheelRadius;
 
-			// Suspension compression ratio
 			w.lastCompression = w.compression;
 			w.compression = std::clamp((w.restLength - dist) / w.restLength, (real)0.0f, (real)1.0f);
 
-			// Spring force: Hooke’s Law
 			real Fspring = w.springK * w.compression;
 
-			// Damper force: relative velocity along suspension
 			real compressionVel = (w.compression - w.lastCompression) / deltaTime;
 			real Fdamper = w.damperC * compressionVel;
 
 			real Fsusp = Fspring + Fdamper;
 
-			// Apply along normal (or suspDir if you prefer fake)
 			Vector3 force = hit.normal * Fsusp;
 
-			// Apply at contact point
 			car->body->addForceAtPoint(force, hit.point);
 
-			Vector3 forward = car->body->getTransform().getAxisVector(2);  // Z-forward
+			Vector3 forward = car->body->getTransform().getAxisVector(2);
 			forward.normalize();
-			Vector3 right = car->body->getTransform().getAxisVector(0);  // X-right
+			Vector3 right = car->body->getTransform().getAxisVector(0);
 			right.normalize();
 
 			Vector3 wheelForward = forward;
 
-			// Apply steering to front wheels only (0 = FL, 1 = FR)
 			if (i == 2 || i == 3)
 			{
-				// Build rotation quaternion around Y axis
 				elevate::Quaternion steerQ;
-				steerQ.setEuler(0, car->steerAngle, 0);  // yaw only
+				steerQ.setEuler(0, car->steerAngle, 0);
 
 				Matrix3 rot;
 				steerQ.fillMatrix(rot);
@@ -1734,13 +1718,12 @@ void GameManager::update(float deltaTime)
 			real brakeStrength = 1500.0f;
 
 			real engineWheelForce = engineForce / 2.0f;
-			if (i >= 2)  // rear wheels
+			if (i >= 2)
 				Fx += car->throttle * engineWheelForce;
 
 			if (car->brake > 0)
 				Fx -= car->brake * brakeStrength;
 
-			// Velocity of wheel at contact point already computed
 			velAtWheel = car->body->getVelocityAtPoint(w.contactPointWorld);
 
 			// Project onto wheel axes
@@ -1753,8 +1736,8 @@ void GameManager::update(float deltaTime)
 			real Fy = -slipAngle * latStiffness;
 
 
-			real Fz = Fsusp;   // suspension force
-			real mu = 1.1f;    // tarmac
+			real Fz = Fsusp;
+			real mu = 1.1f;
 
 			real maxGrip = mu * Fz;
 			real combined = sqrt(Fx * Fx + Fy * Fy);
@@ -1767,8 +1750,8 @@ void GameManager::update(float deltaTime)
 			}
 
 			Vector3 forceWorld =
-				wheelForward * Fx   // longitudinal
-				+ right * Fy;  // lateral
+				wheelForward * Fx
+				+ right * Fy;
 
 			car->body->addForceAtPoint(forceWorld, w.contactPointWorld);
 
@@ -1779,7 +1762,7 @@ void GameManager::update(float deltaTime)
 				Car::Wheel& wl = car->wheels[leftIndex];
 				Car::Wheel& wr = car->wheels[rightIndex];
 
-				real travelL = wl.compression; // 0..1
+				real travelL = wl.compression;
 				real travelR = wr.compression;
 
 				real diff = travelL - travelR;
