@@ -75,8 +75,9 @@ void Scenes::LoadCarTest(GameManager* gm)
 	);
 	gm->floor->mesh->setGameManager(gm);
 	gm->floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
-	static_cast<Cube*>(gm->floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_4k_albedo.png");
+	static_cast<Cube*>(gm->floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Pavement_RoadNew_SolidLineYellow_1K_albedo.png");
 	gm->floor->mesh->SetTexTiling(100.0f);
+	gm->floor->mesh->SetOrientation(glm::quat(0.707f, 0.0f, 0.707f, 0.0f));
 	gameObjects.push_back(gm->floor->mesh);
 
 	real chassisMass = 1200.0f;
@@ -218,9 +219,9 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->car->chassis->calculateInternals();
 
 	gm->spawnFactory->BuildDominoLine(
-		elevate::Vector3(0.0f, 0.25f, 250.0f),
+		elevate::Vector3(0.0f, 0.15f, 250.0f),
 		elevate::Vector3(0.0f, 0.0f, 1.0f),
-		30,
+		13,
 		elevate::Vector3(20.0f, 0.3f, 4.3f),
 		2.5f,
 		10.0f,
