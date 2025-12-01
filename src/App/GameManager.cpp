@@ -1440,12 +1440,13 @@ void GameManager::CalculatePerformanceMetrics(float deltaTime)
 		physicsTimeAvg = physicsTimeSum / numFramesAvg;
 		fpsSum = 0.0f;
 		frameCount = 0;
+		physicsTimeSum = 0.0f;
 	}
 
 	frameTimeMs = deltaTime * 1000.0f;
 
 	timeElapsed += deltaTime;
-	physicsTime = 0.0f;
+//	physicsTime = 0.0f;
 }
 
 void GameManager::RemoveDestroyedGameObjects()
