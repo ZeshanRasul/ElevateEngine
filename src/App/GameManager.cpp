@@ -1307,121 +1307,133 @@ void GameManager::ShowPerformanceWindow()
 
 void GameManager::DrawPhysicsObjectsCombo()
 {
-	ImGui::Begin("Elevate Editor");
+	//ImGui::Begin("Elevate Editor");
 
-	ImGui::Text("Selected Physics Object");
+	//ImGui::Text("Selected Physics Object");
 
-	if (allSceneObjects.empty())
-	{
-		ImGui::TextDisabled("No physics objects in scene.");
-		sceneObjectIndex = -1;
-		selectedSceneObject = nullptr;
-		ImGui::End();
-		return;
-	}
+	//if (allSceneObjects.empty())
+	//{
+	//	ImGui::TextDisabled("No physics objects in scene.");
+	//	sceneObjectIndex = -1;
+	//	selectedSceneObject = nullptr;
+	//	ImGui::End();
+	//	return;
+	//}
 
-	if (ImGui::IsKeyPressed(ImGuiKey_T))
-		currentOperation = ImGuizmo::TRANSLATE;
-	if (ImGui::IsKeyPressed(ImGuiKey_E))
-		currentOperation = ImGuizmo::ROTATE;
-	if (ImGui::IsKeyPressed(ImGuiKey_S))
-		currentOperation = ImGuizmo::SCALE;
-	if (ImGui::RadioButton("Translate", currentOperation == ImGuizmo::TRANSLATE))
-		currentOperation = ImGuizmo::TRANSLATE;
-	ImGui::SameLine();
-	if (ImGui::RadioButton("Rotate", currentOperation == ImGuizmo::ROTATE))
-		currentOperation = ImGuizmo::ROTATE;
-	ImGui::SameLine();
-	if (ImGui::RadioButton("Scale", currentOperation == ImGuizmo::SCALE))
-		currentOperation = ImGuizmo::SCALE;
+	//if (ImGui::IsKeyPressed(ImGuiKey_T))
+	//	currentOperation = ImGuizmo::TRANSLATE;
+	//if (ImGui::IsKeyPressed(ImGuiKey_E))
+	//	currentOperation = ImGuizmo::ROTATE;
+	//if (ImGui::IsKeyPressed(ImGuiKey_S))
+	//	currentOperation = ImGuizmo::SCALE;
+	//if (ImGui::RadioButton("Translate", currentOperation == ImGuizmo::TRANSLATE))
+	//{
+	//	currentOperation = ImGuizmo::TRANSLATE;
+	//	ImGuizmo::Enable(true);
+	//}
+	//ImGui::SameLine();
+	//if (ImGui::RadioButton("Rotate", currentOperation == ImGuizmo::ROTATE))
+	//{
+	//	currentOperation = ImGuizmo::ROTATE;
+	//	ImGuizmo::Enable(true);
+	//}
+	//ImGui::SameLine();
+	//if (ImGui::RadioButton("Scale", currentOperation == ImGuizmo::SCALE))
+	//{
+	//	currentOperation = ImGuizmo::SCALE;
+	//	ImGuizmo::Enable(true);
+	//}
+	//ImGui::SameLine();
+	//if (ImGui::RadioButton("None", currentOperation == -1))
+	//	ImGuizmo::Enable(false);
 
-	if (sceneObjectIndex < 0 || sceneObjectIndex >= (int)allSceneObjects.size())
-	{
-		sceneObjectIndex = 0;
-		selectedSceneObject = allSceneObjects[0];
-	}
+	//if (sceneObjectIndex < 0 || sceneObjectIndex >= (int)allSceneObjects.size())
+	//{
+	//	sceneObjectIndex = 0;
+	//	selectedSceneObject = allSceneObjects[0];
+	//}
 
-	PhysicsObject* current = allSceneObjects[sceneObjectIndex];
-	const char* previewText = current->name.c_str(); // current->GetName().c_str()
+	//PhysicsObject* current = allSceneObjects[sceneObjectIndex];
+	//const char* previewText = current->name.c_str(); // current->GetName().c_str()
 
-	if (ImGui::BeginCombo("##PhysicsObjectCombo", previewText))
-	{
-		for (int i = 0; i < (int)allSceneObjects.size(); ++i)
-		{
-			ImGui::PushID(i);
-			PhysicsObject* obj = allSceneObjects[i];
-			std::string itemLabel;
-			itemLabel = obj->name;
-
-
-			bool isSelected = (sceneObjectIndex == i);
-			if (ImGui::Selectable(itemLabel.c_str(), isSelected))
-			{
-				sceneObjectIndex = i;
-				selectedSceneObject = obj;
-			}
-
-			if (isSelected)
-			{
-				ImGui::SetItemDefaultFocus();
-			}
-			ImGui::PopID();
-		}
-
-		ImGui::EndCombo();
-
-	}
+	//if (ImGui::BeginCombo("##PhysicsObjectCombo", previewText))
+	//{
+	//	for (int i = 0; i < (int)allSceneObjects.size(); ++i)
+	//	{
+	//		ImGui::PushID(i);
+	//		PhysicsObject* obj = allSceneObjects[i];
+	//		std::string itemLabel;
+	//		itemLabel = obj->name;
 
 
+	//		bool isSelected = (sceneObjectIndex == i);
+	//		if (ImGui::Selectable(itemLabel.c_str(), isSelected))
+	//		{
+	//			sceneObjectIndex = i;
+	//			selectedSceneObject = obj;
+	//		}
 
-	if (selectedSceneObject)
-	{
-		glm::mat4 transform = selectedSceneObject->mesh->GetWorldMatrix();
+	//		if (isSelected)
+	//		{
+	//			ImGui::SetItemDefaultFocus();
+	//		}
+	//		ImGui::PopID();
+	//	}
 
-		//ImGuizmo::SetDrawlist();
-		//ImGuizmo::SetRect(ImGui::GetWindowPos().x,
-		//	ImGui::GetWindowPos().y,
-		//	ImGui::GetWindowWidth(),
-		//	ImGui::GetWindowHeight());
+	//	ImGui::EndCombo();
 
-		glm::mat4 proj = projection;
-		ImGuizmo::Manipulate(glm::value_ptr(view),
-			glm::value_ptr(proj),
-			currentOperation,
-			currentMode,
-			glm::value_ptr(transform));
-
-		if (ImGuizmo::IsUsing())
-		{
-			glm::vec3 pos, rot, scale;
-			ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform),
-				glm::value_ptr(pos),
-				glm::value_ptr(rot),
-				glm::value_ptr(scale));
+	//}
 
 
-			selectedSceneObject->mesh->SetPosition(elevate::Vector3(pos.x, pos.y, pos.z));
-			selectedSceneObject->mesh->SetScale(elevate::Vector3(scale.x, scale.y, scale.z));
 
-			// rot is Euler degrees from ImGuizmo (XYZ)
-			selectedSceneObject->mesh->SetOrientation(glm::quat(glm::radians(rot)));
+	//if (selectedSceneObject)
+	//{
+	//	glm::mat4 transform = selectedSceneObject->mesh->GetWorldMatrix();
 
-			selectedSceneObject->body->setPosition(elevate::Vector3(pos.x, pos.y, pos.z));
-			selectedSceneObject->body->setOrientation(elevate::Quaternion(
-				selectedSceneObject->mesh->GetOrientation().w,
-				selectedSceneObject->mesh->GetOrientation().x,
-				selectedSceneObject->mesh->GetOrientation().y,
-				selectedSceneObject->mesh->GetOrientation().z
-			));
+	//	//ImGuizmo::SetDrawlist();
+	//	//ImGuizmo::SetRect(ImGui::GetWindowPos().x,
+	//	//	ImGui::GetWindowPos().y,
+	//	//	ImGui::GetWindowWidth(),
+	//	//	ImGui::GetWindowHeight());
 
-			selectedSceneObject->body->calculateDerivedData();
+	//	glm::mat4 proj = projection;
+	//	ImGuizmo::Manipulate(glm::value_ptr(view),
+	//		glm::value_ptr(proj),
+	//		currentOperation,
+	//		currentMode,
+	//		glm::value_ptr(transform));
 
-			// Sync back to Elevate body
-			selectedSceneObject->body->setPosition({ pos.x, pos.y, pos.z });
-			selectedSceneObject->body->calculateDerivedData();
-		}
-	}
-	ImGui::End();
+	//	if (ImGuizmo::IsUsing())
+	//	{
+	//		glm::vec3 pos, rot, scale;
+	//		ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform),
+	//			glm::value_ptr(pos),
+	//			glm::value_ptr(rot),
+	//			glm::value_ptr(scale));
+
+
+	//		selectedSceneObject->mesh->SetPosition(elevate::Vector3(pos.x, pos.y, pos.z));
+	//		selectedSceneObject->mesh->SetScale(elevate::Vector3(scale.x, scale.y, scale.z));
+
+	//		// rot is Euler degrees from ImGuizmo (XYZ)
+	//		selectedSceneObject->mesh->SetOrientation(glm::quat(glm::radians(rot)));
+
+	//		selectedSceneObject->body->setPosition(elevate::Vector3(pos.x, pos.y, pos.z));
+	//		selectedSceneObject->body->setOrientation(elevate::Quaternion(
+	//			selectedSceneObject->mesh->GetOrientation().w,
+	//			selectedSceneObject->mesh->GetOrientation().x,
+	//			selectedSceneObject->mesh->GetOrientation().y,
+	//			selectedSceneObject->mesh->GetOrientation().z
+	//		));
+
+	//		selectedSceneObject->body->calculateDerivedData();
+
+	//		// Sync back to Elevate body
+	//		selectedSceneObject->body->setPosition({ pos.x, pos.y, pos.z });
+	//		selectedSceneObject->body->calculateDerivedData();
+	//	}
+	//}
+	//ImGui::End();
 
 }
 
@@ -2359,7 +2371,7 @@ void GameManager::generateContacts()
 			if (!cData.hasMoreContacts()) return;
 			elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(floor->shape), *static_cast<CollisionBox*>(domino->shape), &cData);
 
-		//	elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(domino->shape), *car->chassis, &cData);
+//			elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(domino->shape), *car->chassis, &cData);
 
 		}
 	}
