@@ -32,11 +32,11 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	renderer = window->getRenderer();
 
-	ammoShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment.glsl");
-	cubeShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/fragment_tex.glsl");
-	lineShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/line_vert.glsl", "C:/dev/ElevateEngine/src/Shaders/line_frag.glsl");
+	ammoShader.loadShaders("src/Shaders/vertex.glsl", "src/Shaders/fragment.glsl");
+	cubeShader.loadShaders("src/Shaders/vertex.glsl", "src/Shaders/fragment_tex.glsl");
+	lineShader.loadShaders("src/Shaders/line_vert.glsl", "src/Shaders/line_frag.glsl");
 
-	cubemapShader.loadShaders("C:/dev/ElevateEngine/src/Shaders/cubemap_vertex.glsl", "C:/dev/ElevateEngine/src/Shaders/cubemap_fragment.glsl");
+	cubemapShader.loadShaders("src/Shaders/cubemap_vertex.glsl", "src/Shaders/cubemap_fragment.glsl");
 
 	camera = new Camera(glm::vec3(18.0f, 5.0f, 18.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f);
 
