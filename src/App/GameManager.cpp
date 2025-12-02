@@ -705,14 +705,14 @@ void GameManager::ResetState()
 }
 void GameManager::ResetCar()
 {
-	car->body->setPosition(elevate::Vector3(0.0f, 7.5f, 0.0f));
+	car->body->setPosition(elevate::Vector3(0.0f, 4.9f, 0.0f));
 	car->throttle = 0.0f;
 	car->steerAngle = 0.0f;
 	car->body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 	car->body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
 	car->body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 	car->chassisMesh->SetOrientation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-	car->chassisMesh->SetPosition(elevate::Vector3(0.0f, 7.5f, 0.0f));
+	car->chassisMesh->SetPosition(elevate::Vector3(0.0f, 4.9f, 0.0f));
 	car->body->calculateDerivedData();
 	car->chassis->calculateInternals();
 }
@@ -1738,7 +1738,7 @@ void GameManager::update(float deltaTime)
 
 
 			real Fz = Fsusp;
-			real mu = 1.1f;
+			real mu = 0.75f;
 
 			real maxGrip = mu * Fz;
 			real combined = sqrt(Fx * Fx + Fy * Fy);

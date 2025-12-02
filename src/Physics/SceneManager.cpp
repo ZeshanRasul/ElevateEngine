@@ -93,7 +93,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 		elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
 		elevate::Vector3(0.0f, 7.5f, 0.0f)
 	);
-	gm->carBody->setPosition(elevate::Vector3(0.0f, 7.5f, 0.0f));
+	gm->carBody->setPosition(elevate::Vector3(0.0f, 4.9f, 0.0f));
 	gm->car->body = gm->carBody;
 	gm->car->chassis = new CollisionBox();
 	gm->car->chassis->body = gm->carBody;
@@ -107,7 +107,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->car->body->setMass(totalMass);
 	elevate::Vector3 halfSize = gm->car->chassis->halfSize;
 
-	gm->car->chassisMesh = new Cube(elevate::Vector3(0.0f, 7.5f, 0.0f), halfSize * 2, &gm->ammoShader, gm);
+	gm->car->chassisMesh = new Cube(elevate::Vector3(0.0f, 4.9f, 0.0f), halfSize * 2, &gm->ammoShader, gm);
 	gm->car->chassisMesh->LoadMesh();
 	gm->car->chassisMesh->SetColor(glm::vec3(0.8f, 0.1f, 0.1f));
 	gameObjects.push_back(gm->car->chassisMesh);
@@ -219,9 +219,9 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->car->chassis->calculateInternals();
 
 	gm->spawnFactory->BuildDominoLine(
-		elevate::Vector3(0.0f, 0.15f, 250.0f),
+		elevate::Vector3(0.0f, 2.25f, 250.0f),
 		elevate::Vector3(0.0f, 0.0f, 1.0f),
-		13,
+		8,
 		elevate::Vector3(20.0f, 0.3f, 4.3f),
 		2.5f,
 		10.0f,
