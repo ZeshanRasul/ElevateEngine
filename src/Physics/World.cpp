@@ -14,8 +14,9 @@ RigidBody* elevate::World::CreateRigidBody(const Transform& transform, real mass
 	RigidBody* body = new RigidBody();
 
 	body->setPosition(transform.position);
-	body->setOrientation(transform.rotation);
+	body->setOrientation(elevate::Quaternion(0, 0, 0, 1));
 	body->setMass(mass);
+
 //	addBody(body);
 	return body;
 }
@@ -24,6 +25,7 @@ CollisionPrimitive* elevate::World::CreateBoxShape(const Vector3& halfExtents)
 {
 	elevate::CollisionBox* cbox = new elevate::CollisionBox();
 //	cbox->body = body;
+
 
 	cbox->halfSize = elevate::Vector3(
 		halfExtents.x,

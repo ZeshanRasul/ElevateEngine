@@ -75,7 +75,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 	);
 	gm->floor->mesh->setGameManager(gm);
 	gm->floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
-	static_cast<Cube*>(gm->floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Pavement_RoadNew_SolidLineYellow_1K_albedo.png");
+	static_cast<Cube*>(gm->floor->mesh)->LoadTextureFromFile("src/Assets/Textures/Ground/TCom_Pavement_RoadNew_SolidLineYellow_1K_albedo.png");
 	gm->floor->mesh->SetTexTiling(100.0f);
 	gm->floor->mesh->SetOrientation(glm::quat(0.707f, 0.0f, 0.707f, 0.0f));
 	gameObjects.push_back(gm->floor->mesh);
@@ -273,7 +273,7 @@ void Scenes::LoadAeroplaneTest(GameManager* gm)
 	);
 	gm->floor->mesh->setGameManager(gm);
 	gm->floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
-	static_cast<Cube*>(gm->floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_512_albedo.png");
+	static_cast<Cube*>(gm->floor->mesh)->LoadTextureFromFile("src/Assets/Textures/Ground/TCom_Scifi_Floor2_512_albedo.png");
 	gameObjects.push_back(gm->floor->mesh);
 
 	gm->ResetPlane();
@@ -306,8 +306,7 @@ void Scenes::LoadDemoShowcase(GameManager* gm)
 //
 //	gm->fpsSandboxDemo = true;
 //	gameObjects.clear();
-//	gameObjects.reserve(300);
-//	//	gameObjects.resize(300);
+
 //
 //	gm->floor = gm->spawnFactory->CreateFloor(
 //		elevate::Vector3(200.0f, 1.0f, 200.0f),

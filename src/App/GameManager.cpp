@@ -123,7 +123,7 @@ void GameManager::reset()
 	);
 	floor->mesh->setGameManager(this);
 	floor->mesh->SetColor(glm::vec3(0.3f, 0.8f, 0.3f));
-	static_cast<Cube*>(floor->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Ground/TCom_Scifi_Floor2_4k_albedo.png");
+	static_cast<Cube*>(floor->mesh)->LoadTextureFromFile("src/Assets/Textures/Ground/TCom_Scifi_Floor2_4k_albedo.png");
 	floor->mesh->SetTexTiling(20.0f);
 	floor->name = "Floor";
 	gameObjects.push_back(floor->mesh);
@@ -138,7 +138,7 @@ void GameManager::reset()
 	wall->mesh->setGameManager(this);
 	wall->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	wall->mesh->SetTexTiling(4.0f);
-	static_cast<Cube*>(wall->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
+	static_cast<Cube*>(wall->mesh)->LoadTextureFromFile("src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	wall->mesh->SetTexTiling(8.0f);
 
 	wall->name = "Wall 1";
@@ -156,7 +156,7 @@ void GameManager::reset()
 	wall2->mesh->setGameManager(this);
 	wall2->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	wall2->mesh->SetTexTiling(8.0f);
-	static_cast<Cube*>(wall2->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
+	static_cast<Cube*>(wall2->mesh)->LoadTextureFromFile("src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	wall2->name = "Wall 2";
 	DebugDrawCollisionBox(*static_cast<CollisionBox*>(wall2->shape), glm::vec3(1.0f, 0.0f, 0.0f));
 
@@ -175,7 +175,7 @@ void GameManager::reset()
 	wall3->name = "Wall 3";
 	DebugDrawCollisionBox(*static_cast<CollisionBox*>(wall3->shape), glm::vec3(1.0f, 0.0f, 0.0f));
 
-	static_cast<Cube*>(wall3->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
+	static_cast<Cube*>(wall3->mesh)->LoadTextureFromFile("src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	allSceneObjects.push_back(wall3);
 	sceneObjectIndex++;
 	gameObjects.push_back(wall3->mesh);
@@ -188,7 +188,7 @@ void GameManager::reset()
 	wall4->mesh->setGameManager(this);
 	wall4->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.3f));
 	wall4->mesh->SetTexTiling(8.0f);
-	static_cast<Cube*>(wall4->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
+	static_cast<Cube*>(wall4->mesh)->LoadTextureFromFile("src/Assets/Textures/Wall/TCom_SciFiPanels09_512_albedo.png");
 	wall4->name = "Wall 4";
 	DebugDrawCollisionBox(*static_cast<CollisionBox*>(wall4->shape), glm::vec3(1.0f, 0.0f, 0.0f));
 
@@ -197,7 +197,7 @@ void GameManager::reset()
 	sceneObjectIndex++;
 
 	spawnFactory->BuildDominoLine(
-		elevate::Vector3(75.0f, 3.5f, -150.0f),
+		elevate::Vector3(75.0f, 0.5f, -150.0f),
 		elevate::Vector3(0.0f, 0.0f, 1.0f),
 		15,
 		elevate::Vector3(2.0f, 5.0f, 0.8f),
@@ -257,7 +257,7 @@ void GameManager::reset()
 
 	Cube* cube = new Cube(blockPos, elevate::Vector3(15, 15, 15), &cubeShader, this);
 	cube->LoadMesh();
-	blockTexture = cube->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Block/cracked_concrete_wall_diff_2k.png");
+	blockTexture = cube->LoadTextureFromFile("src/Assets/Textures/Block/cracked_concrete_wall_diff_2k.png");
 	cube->SetAngle(0.0f);
 	cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
 	cube->SetColor(glm::vec3(0.2f, 0.1f, 0.5f));
@@ -308,7 +308,7 @@ void GameManager::reset()
 
 
 	spawnFactory->BuildCrateStack(
-		elevate::Vector3(110.0f, 10.0f, -40.0f),
+		elevate::Vector3(110.0f, 0.0f, -40.0f),
 		3,
 		3,
 		3,
@@ -318,10 +318,32 @@ void GameManager::reset()
 		crates
 	);
 
-	stackCrateTexture = static_cast<Cube*>(crates[0]->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Crate/rusted_shutter_diff_2k.png");
+	stackCrateTexture = static_cast<Cube*>(crates[0]->mesh)->LoadTextureFromFile("src/Assets/Textures/Crate/rusted_shutter_diff_2k.png");
 
 	for (int i = 0; i < crates.size(); ++i)
 	{
+		crates[i]->body->setAwake(true);
+
+		elevate::Matrix3 boxInertia;
+		boxInertia.setBlockInertiaTensor(crates[i]->mesh->GetScale()* 0.5f, mass);
+		crates[i]->body->setInertiaTensor(boxInertia);
+		crates[i]->body->setPosition(crates[i]->body->getPosition());
+		crates[i]->body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+		crates[i]->body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		crates[i]->body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		crates[i]->body->setMass(1.0f);
+		//rbWorld->addBody(body);
+		//rbGravity->updateForce(body, 0); // or via registry below
+
+//		rbWorld->getForceRegistry().add(body, rbGravity);
+
+		// Collision box
+		elevate::CollisionBox* cBox = new elevate::CollisionBox();
+		cBox->body = crates[i]->body;
+		cBox->halfSize = crates[i]->mesh->GetScale() * 0.5f;
+		cBox->body->calculateDerivedData();
+		cBox->calculateInternals();
+
 		crates[i]->mesh->SetShader(&cubeShader);
 		crates[i]->mesh->setGameManager(this);
 		crates[i]->mesh->SetColor(glm::vec3(0.3f, 0.7f, 0.2f));
@@ -356,7 +378,7 @@ void GameManager::reset()
 		cube->SetAngle(0.0f);
 		cube->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
 		cube->SetColor(glm::vec3(0.2f, 0.7f, 0.3f));
-		crateTexture = cube->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Crate/TCom_MetalSheetCladding2_Galvanized_512_albedo.png");
+		crateTexture = cube->LoadTextureFromFile("src/Assets/Textures/Crate/TCom_MetalSheetCladding2_Galvanized_512_albedo.png");
 
 		gameObjects.push_back(cube);
 		stackCubes[i] = cube;
@@ -396,7 +418,7 @@ void GameManager::reset()
 
 
 	spawnFactory->BuildBrickWall(
-		elevate::Vector3(0.0f, 5.75f, -80.0f),
+		elevate::Vector3(0.0f, 1.27f, -80.0f),
 		15,
 		5,
 		elevate::Vector3(6.5f, 2.5f, 1.5f),
@@ -407,10 +429,25 @@ void GameManager::reset()
 	);
 
 	brickTexture = static_cast<Cube*>(bricks[0]->mesh)->LoadTextureFromFile(
-		"C:/dev/ElevateEngine/src/Assets/Textures/Brick/painted_brick_diff_2k.png");
+		"src/Assets/Textures/Brick/painted_brick_diff_2k.png");
 
 	for (size_t i = 0; i < bricks.size(); ++i)
 	{
+
+		// Physics body
+		elevate::RigidBody* body = new elevate::RigidBody();
+		bricks[i]->body->setAwake(true);
+		bricks[i]->body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+		bricks[i]->body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		bricks[i]->body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+
+		real mass = 0.4f;
+		bricks[i]->body->setMass(mass);
+
+		elevate::Matrix3 boxInertia;
+		boxInertia.setBlockInertiaTensor(cubeHalfSize, mass);
+		bricks[i]->body->setInertiaTensor(boxInertia);
+
 		bricks[i]->mesh->SetShader(&cubeShader);
 		static_cast<Cube*>(bricks[i]->mesh)->SetTexture(brickTexture);
 		bricks[i]->mesh->setGameManager(this);
@@ -430,7 +467,7 @@ void GameManager::reset()
 	);
 
 	crate->mesh->SetShader(&cubeShader);
-	static_cast<Cube*>(crate->mesh)->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Crate/TCom_Scifi_Pattern_4K_albedo.png");
+	static_cast<Cube*>(crate->mesh)->LoadTextureFromFile("src/Assets/Textures/Crate/TCom_Scifi_Pattern_4K_albedo.png");
 	//static_cast<Cube*>(crate->mesh)->SetTexture(crateTexture);
 	crate->mesh->setGameManager(this);
 	crate->mesh->SetColor(glm::vec3(0.8f, 0.3f, 0.1f));
