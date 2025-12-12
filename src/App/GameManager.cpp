@@ -367,7 +367,7 @@ void GameManager::reset()
 
 		delete cStackBoxes[i];
 
-		float centerY = 3.3f + i * 4.3f;
+		float centerY = cubeHalfSize.y + i * (cubeHalfSize.y * 2.0f + 0.3f);
 
 		elevate::Vector3 pos(-20.0f, centerY, -20.0f);
 		elevate::Vector3 scale(renderScale.x, renderScale.y, renderScale.z);
@@ -418,9 +418,9 @@ void GameManager::reset()
 
 
 	spawnFactory->BuildBrickWall(
-		elevate::Vector3(0.0f, 1.27f, -80.0f),
+		elevate::Vector3(0.0f, 1.250001f, -80.0f),
 		15,
-		5,
+		3,
 		elevate::Vector3(6.5f, 2.5f, 1.5f),
 		0.5f,
 		false,
@@ -436,7 +436,7 @@ void GameManager::reset()
 
 		// Physics body
 		elevate::RigidBody* body = new elevate::RigidBody();
-		bricks[i]->body->setAwake(true);
+		bricks[i]->body->setAwake(false);
 		bricks[i]->body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 		bricks[i]->body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 		bricks[i]->body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
@@ -445,7 +445,7 @@ void GameManager::reset()
 		bricks[i]->body->setMass(mass);
 
 		elevate::Matrix3 boxInertia;
-		boxInertia.setBlockInertiaTensor(cubeHalfSize, mass);
+		boxInertia.setBlockInertiaTensor(elevate::Vector3(6.5f, 2.5f, 1.5f) * 0.5f, mass);
 		bricks[i]->body->setInertiaTensor(boxInertia);
 
 		bricks[i]->mesh->SetShader(&cubeShader);
@@ -460,7 +460,7 @@ void GameManager::reset()
 
 
 	crate = spawnFactory->SpawnCrate(
-		elevate::Vector3(40.0f, 1.5f, 20.0f),
+		elevate::Vector3(140.0f, 1.5f, 20.0f),
 		&cubeShader,
 		elevate::Vector3(8.0f, 4.0f, 2.0f),
 		1.0f
@@ -1094,6 +1094,16 @@ void GameManager::ShowSpawnObjectWindow()
 
 		for (int i = 0; i < crateStacks[stackIndex - 1].size(); i++)
 		{
+
+			elevate::Matrix3 boxInertia;
+			boxInertia.setBlockInertiaTensor(crateStacks[stackIndex - 1][i]->mesh->GetScale() * 0.5f, stackCrateMass);
+			crateStacks[stackIndex - 1][i]->body->setInertiaTensor(boxInertia);
+			crateStacks[stackIndex - 1][i]->body->setPosition(crateStacks[stackIndex - 1][i]->body->getPosition());
+			crateStacks[stackIndex - 1][i]->body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+			crateStacks[stackIndex - 1][i]->body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+			crateStacks[stackIndex - 1][i]->body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
+			crateStacks[stackIndex - 1][i]->body->setMass(1.0f);
+
 			crateStacks[stackIndex - 1][i]->mesh->SetShader(&cubeShader);
 			crateStacks[stackIndex - 1][i]->mesh->setGameManager(this);
 			crateStacks[stackIndex - 1][i]->mesh->SetColor(glm::vec3(0.3f, 0.7f, 0.2f));
