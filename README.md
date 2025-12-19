@@ -58,14 +58,34 @@ Given the ambitious nature of Elevate Engine, the project implements a number of
 - Ragdoll Physics: Articulated rigid body systems with joint constraints for realistic character simulations
 - Dynamic Fracture: Early stage yet fully functional dynamic fracture system using contact point to generate realistic breakage of objects
 - Particle Systems: Mass-aggregate particle systems with spring constraints for pendulum and projectile simulations
-- Runtime Tooling: In-engine user interface for real-time parameter tweaking and scene manipulation (both spawning new objects and manipulating existing objects) using ImGui
+- Runtime Tooling: Interactive live user interface for real-time parameter tweaking and scene manipulation (both spawning new objects and manipulating existing objects) using ImGui
 - Vehicle Physics (Work in progress): Car and aeroplane simulation systems with car suspension, vehicle steering and aerodynamics including lift and thrust
 
 ## Engine Architecture
 
-## Validation and Physical Correctness
+Central to the design of Elevate Engine is a modular and extensible architecture that allows for easy addition of new features, forces and object types. Key architectural components include:
+
+- Separation of 3D rigid body and mass-aggregate particle system engines to reduce clutter
+- Physics world class handling possession of physics objects, force generators and integration of physics objects
+- Scene manager allowing for loading and switching between various demonstration scenes and scenarios
+- Factory class used for creation of new physics objects as well as simulation specific objects such as brick walls, crate stacks and destroyable blocks
+- Custom math library used for math functions and objects such as vectors, matrices and quaternions
+- Game object OOP architecture allowing for easy introduction of new game object types
+- Separated rendering code to allow easy implementation of new rendering APIs as well as clear separation of concerns between game logic and rendering logic
 
 ## Performance and Profiling
+
+As Elevate Engine is a compute intensive project and requires fast and efficient processing to successfully simulate the physics within it, a number of performance considerations needed to be taken into account.
+For example, given the player can shoot projectiles within a scene which can cause more computations particularly within collision detection areas of the engine, limitations needed to be placed to ensure there were only ever a certain number of projectiles in the scene at any one time. This mirrors considerations made in games throughout the years, both present leading titles and titles of the past.
+
+Other performance considerations include:
+
+- Ensurin collisions only register for objects that have a realistic chance of colliding
+- Work underway to extend collision detection efficiency using bounding volume hierarchy broad phase and narrow phase stages to the collision detection pipeline
+- Sleep and awake states for physics objects when their velocity is below a given sleep epsilon variable which is exposed to the runtime UI
+- Profiling of key engine systems to identify bottlenecks and areas for optimization (to be extended to use Tracy)
+- Treat physics as a priority system within the engine by reducing complexity of rendering and other computationally expensive systems
+- Live update of performance metrics within the runtime UI for easy monitoring such as frame time and physics update time allowing the user to experiment with different scenarios and easily measure the impact scenarios have on performance
 
 ## Tools, Debugging and Visualization
 
