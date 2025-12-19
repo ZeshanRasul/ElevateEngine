@@ -89,6 +89,17 @@ Other performance considerations include:
 
 ## Tools, Debugging and Visualization
 
+At Elevate's core is an interactive, runtime graphical user interface, which allows the user to modify physics parameters, spawn and manipulate objects in the scene as well as load a number of different scenarios based on their requirements. 
+
+This UI is essential to achieving the project goals, allowing for fast and efficient iteration and testing of various physics objects, both as they were being implemented and also at each individual project milestone. This GUI was created using ImGui and includes features such as:
+
+- Real-time parameter tweaking for physics properties such as gravity, friction and restitution
+- Object spawning and manipulation within the scene
+- Loading of different demonstration scenarios
+- Performance metrics display such as frame time and physics update time
+- Visual debugging of collision shapes and contact points
+
+
 ## Technical Challenges and Solutions
 
 ## Example Scenarios and Demos
@@ -97,6 +108,31 @@ Other performance considerations include:
 
 ## Build and Run Instructions
 
+Although the Elevate Engine project is currently in the form of a Visual Studio solution, future work will include migrating to CMake for cross-platform compatibility.
+
+To build and run Elevate Engine:
+
+1. Clone the repository from GitHub: `git clone https://www.github.com/zeshanrasul/elevate-engine.git`
+2. Open the Visual Studio solution file `ElevateEngine.sln`
+3. Build the solution in either Debug or Release mode (Release mode recommended for best performance))
+1. Run the executable located in the `bin` directory
+
 ## Future Work
 
 ## Acknowledgements, References, and Resources
+
+It would be remiss of me not to acknowledge the following resources which were invaluable in the development of Elevate Engine. For anyone looking for physics engine development resources, these books, blogs and videos have been extremely useful throughout the project:
+
+### Books
+
+- "Game Physics Engine Development" by Ian Millington
+- "Real-Time Collision Detection" by Christer Ericson
+- "Physics for Game Developers" by David M. Bourg
+- "Game Physics" by David H. Eberly
+- "The Feynman Lectures on Physics" by Richard P. Feynman
+- "Principles of Physics" by Halliday and Resnick
+
+### Online Resources
+
+- Pikuma 2D Game Physics series by Gustavo Pezze
+- Vehicle Physics blog posts by Various Authors
