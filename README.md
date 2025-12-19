@@ -102,6 +102,20 @@ This UI is essential to achieving the project goals, allowing for fast and effic
 
 ## Technical Challenges and Solutions
 
+It goes without saying that building a real-time physics engine from scratch is a challenging task and any developer brave enough to embark on this journey should expect technical challenges and blockers. The development of Elevate was no exception to this and a number of challenges were faced and overcome throughout development.
+
+### Foundational Understanding of Physics Principles
+An inital challenge was gaining a deep understanding of the underlying physics principles and mathematical concepts that are the foundations for any physics engine project. Although I had studied and been interested in physics through my life, it was only after taking courses in linear algebra, calculus and newtonian mechnaics in my free time over the summer of 2025 that I was able to be truly confident in my understanding of theory such that I could implement a strong project in a real-time setting. Not only did these courses build my confidence in my theoretical knowledge, they instilled within me a burning passion and desire to create something tangible out of the knowledge I had refreshed and acquired.
+
+### Collision Response and Detection
+Collision response and penetration resolution was another significant challenged faced during development. After researching a range of approaches, I settled on an impulse-based collision resolution system which was the perfect trade-off in performance and accuracy required for a real-time engine. Early iterations saw objects interpenetrating and jittering while resting on surfaces. This tied in closely to another challenge which was finding and settling upon appropriate physical behaviour parameters such as restitution and friction quantities. Although it was initially a challenge, having an interactive GUI exposing these values at runtime was invaluable to deciding on these values given I was able to modify them during runtime and understand the impact and benefits of each change immediately.
+
+### Vehicle Physics
+Although in early stage development, vehicle physics has not just been a journey of great learning in a specific area of physics simulations, it has also taught me the value of trade-offs between implementing the most realistic simulation versus implementing a working similaution that is fun to play and experience as a gamer. Initial iterations of the car were (and to some extent still are) difficult to control and keep steady. It would be no surprise that towards the beginning of the car physics development after placing colliders on the wheels, the car often entered the land of NaN when spawning! This was quickly overcome by clamping values and ensuring that the car spawn position was always above the ground plane to prevent immediate interpenetration.
+
+### Performance Optimization
+Finally, performance in terms of maintaining a steady frame rate and maintain stutter free physical behaviours was a consideration throughout. Although the single phase collision detection works at a stable framerate at present and does not dip below 60FPS in regular scenarios, a more complex and scaled scenario will require the implmentation of a broad and narrow phase collision detection system. This is something that is a work-in-progress at present and is high on my prioity list for future work. 
+
 ## Example Scenarios and Demos
 
 ## Integration and Use Cases
