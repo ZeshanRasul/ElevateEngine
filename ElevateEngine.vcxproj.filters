@@ -335,5 +335,6 @@
     <None Include="src\Shaders\fragment_tex.glsl" />
     <None Include="src\Shaders\cubemap_vertex.glsl" />
     <None Include="src\Shaders\cubemap_fragment.glsl" />
+    <None Include="README.md" />
   </ItemGroup>
 </Project>

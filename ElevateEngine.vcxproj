@@ -244,6 +244,10 @@
     <ClCompile Include="src\Window\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="README.md">
+      <SubType>
+      </SubType>
+    </None>
     <None Include="src\Shaders\cubemap_fragment.glsl" />
     <None Include="src\Shaders\cubemap_vertex.glsl" />
     <None Include="src\Shaders\fragment.glsl" />

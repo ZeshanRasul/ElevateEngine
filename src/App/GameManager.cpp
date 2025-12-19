@@ -38,7 +38,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	cubemapShader.loadShaders("src/Shaders/cubemap_vertex.glsl", "src/Shaders/cubemap_fragment.glsl");
 
-	camera = new Camera(glm::vec3(18.0f, 5.0f, 18.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f);
+	camera = new Camera(glm::vec3(18.0f, 5.0f, 18.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
 
 	inputManager->setContext(camera, this, width, height);
 
@@ -418,10 +418,10 @@ void GameManager::reset()
 
 
 	spawnFactory->BuildBrickWall(
-		elevate::Vector3(0.0f, 1.250001f, -80.0f),
+		elevate::Vector3(0.0f, 1.251f, -80.0f),
 		15,
-		3,
-		elevate::Vector3(6.5f, 2.5f, 1.5f),
+		5,
+		elevate::Vector3(6.5f, 2.6f, 1.5f),
 		0.5f,
 		false,
 		bricks,
@@ -436,7 +436,8 @@ void GameManager::reset()
 
 		// Physics body
 		elevate::RigidBody* body = new elevate::RigidBody();
-		bricks[i]->body->setAwake(false);
+		bricks[i]->body->setCanSleep(true);
+		bricks[i]->body->setAwake(true);
 		bricks[i]->body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 		bricks[i]->body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 		bricks[i]->body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
