@@ -120,6 +120,13 @@ Finally, performance in terms of maintaining a steady frame rate and maintain st
 
 ## Integration and Use Cases
 
+Given the initial development phases of Elevate Engine are complete and the engine contains most, if not all, of the core systems a physics engine requires, there are a number of use cases where Elevate could be leveraged and applied:
+
+- Game development physics engines: I intend to use Elevate in many of my future game projects as the core physics engine. The modularity and extensibility of Elevate allows any game developer to easily integrate and tweak Elevate to their particular use case
+- Simulation and training applications: Elevate's accurate physics simulations make it suitable for use in simulation and training applications where realistic physics behaviour is essential
+- Educational tool: Elevate can serve as an educational tool for students and enthusiasts looking to learn about physics engine development and real-time simulations
+- Research and development: Artificial intelligence and neural network researchers have a fantastic opportunity to use Elevate as a core underlying physics system to train intelligent systems to improve accuracy and accelerate performance of real-time physics engines (I have a side passion for AI/ML myself and am keen to carry out research on this area in the medium term)
+
 ## Build and Run Instructions
 
 Although the Elevate Engine project is currently in the form of a Visual Studio solution, future work will include migrating to CMake for cross-platform compatibility.
@@ -132,6 +139,17 @@ To build and run Elevate Engine:
 1. Run the executable located in the `bin` directory
 
 ## Future Work
+
+There are a number of exciting directions in which I plan to take Elevate Engine in the near and long-term future. Below are some of the highest priority enhancements I've identified during development and upon reflection:
+
+- Separating the physics engine in to its own library for easy integration into other projects
+- Implementing a broad phase and narrow phase collision detection system using bounding volume hierarchies for improved performance in more complex and demanding scenes
+- Continuous collision detection to prevent occasional tunneling of projectiles
+- Extending and enhancing the vehicle physics system to include more realistic suspension, aerodynamics and handling, ideally creating a more exciting vehicle demo with an interactable environment
+- Soft body and deformable object simulation systems
+- Improved dynamic fracture system with more realistic breakage patterns and support for a wider range of materials similar to NVIDIA's Blast and Apex systems
+- Multithreading and parallelization of physics calculations for improved performance on multi-core systems
+- At a lower priority, using my previous experience in OpenGL to use more advanced rendering techniques such as PBR and shadow mapping to improve scene realism while prioritising physics engine performance
 
 ## Acknowledgements, References, and Resources
 
@@ -148,5 +166,5 @@ It would be remiss of me not to acknowledge the following resources which were i
 
 ### Online Resources
 
-- Pikuma 2D Game Physics series by Gustavo Pezze
+- Pikuma 2D Game Physics series by Gustavo Pezzi
 - Vehicle Physics blog posts by Various Authors
