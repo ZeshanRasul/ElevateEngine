@@ -367,7 +367,7 @@ void GameManager::reset()
 
 		delete cStackBoxes[i];
 
-		float centerY = cubeHalfSize.y + i * (cubeHalfSize.y * 2.0f + 0.3f);
+		real centerY = cubeHalfSize.y + i * (cubeHalfSize.y * 2.0f + 0.3f);
 
 		elevate::Vector3 pos(-20.0f, centerY, -20.0f);
 		elevate::Vector3 scale(renderScale.x, renderScale.y, renderScale.z);
@@ -1552,22 +1552,18 @@ void GameManager::ShowCameraControlWindow(Camera& cam)
 void GameManager::update(float deltaTime)
 {
 
-	//deltaTime = glm::clamp(deltaTime, 0.0f, 1/ 60.0f);
-//	RemoveDestroyedGameObjects();
 	inputManager->processInput(window->getWindow(), deltaTime);
 
 	if (isPaused) return;
 
 	if (!enableGravity)
 	{
-		//		rbGravity->setGravity(elevate::Vector3(0.0f, 0.0f, 0.0f));
+		rbGravity->setGravity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 	}
 	else
 	{
-		//		rbGravity->setGravity(elevate::Vector3(gravity[0], gravity[1], gravity[2]));
+		rbGravity->setGravity(elevate::Vector3(gravity[0], gravity[1], gravity[2]));
 	}
-	//rbWorld->startFrame();
-	//rbWorld->runPhysics(1.0f / 60.0f);
 
 	physicsTime = (float)glfwGetTime();
 
@@ -1575,7 +1571,6 @@ void GameManager::update(float deltaTime)
 	{
 		aircraft.clearAccumulator();
 
-		// Add the propeller force
 		elevate::Vector3 propulsion(-10.0f, 0, 0);
 		propulsion = aircraft.getTransform().transformDirection(propulsion);
 		aircraft.addForce(propulsion);
@@ -1584,15 +1579,9 @@ void GameManager::update(float deltaTime)
 		right_wing.setControl(glm::clamp(right_wing_control, -1.0f, 1.0f));
 		rudder.setControl(glm::clamp(rudder_control, -1.0f, 1.0f));
 
-		//	aircraft.addForce(elevate::Vector3(gravity[0], gravity[1], gravity[2]));
-		//	aircraft.calculateDerivedData();
-	// 
 		aircraft.calculateDerivedData();
 
-		// Add the forces acting on the aircraft.
 		rbRegistry.updateForces(deltaTime);
-		//	rbGravity->updateForce(&aircraft, deltaTime);
-			// Update the aircraft's physics.
 		aircraft.integrate(deltaTime);
 
 		for (AircraftParts& part : aircraftParts)
@@ -1637,9 +1626,6 @@ void GameManager::update(float deltaTime)
 
 		car->body->setAwake(true);
 		car->body->clearAccumulator();
-		//		car->chassis->body->clearAccumulator();
-		//		car->chassis->body->calculateDerivedData();
-
 
 		Matrix4 transform = car->body->getTransform();
 		Vector3 forward = transform.getAxisVector(2);
@@ -2319,7 +2305,6 @@ void GameManager::update(float deltaTime)
 			{
 				Cube* c = new Cube(elevate::Vector3(3.0f, 5.0f, 3.0f), elevate::Vector3(1.0f, 1.0f, 1.0f), &cubeShader, this);
 				c->LoadMesh();
-				//c->LoadTextureFromFile("C:/dev/ElevateEngine/src/Assets/Textures/Block/TCom_Concrete_WallAbstract_512_albedo.png");
 				c->SetTexture(blockTexture);
 				c->SetAngle(0.0f);
 				c->SetRotAxis(Vector3(0.0f, 0.0f, 0.0f));
@@ -2399,16 +2384,7 @@ void GameManager::generateContacts()
 
 	if (showCar)
 	{
-		//for (int i = 0; i < 4; i++)
-		//{
-		//	if (!cData.hasMoreContacts()) return;
-		//	///		elevate::CollisionDetector::sphereAndHalfSpace(*car->wheels[i].coll, plane, &cData);
-		//	if (!cData.hasMoreContacts()) return;
-		////	elevate::CollisionDetector::boxAndSphere(*static_cast<CollisionBox*>(floor->shape), *car->wheels[i].coll, &cData);
-		//}
-
 		if (!cData.hasMoreContacts()) return;
-		//elevate::CollisionDetector::boxAndHalfSpace(*car->chassis, plane, &cData);
 		if (!cData.hasMoreContacts()) return;
 		elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(floor->shape), *car->chassis, &cData);
 
@@ -2418,9 +2394,6 @@ void GameManager::generateContacts()
 			elevate::CollisionDetector::boxAndHalfSpace(*static_cast<CollisionBox*>(domino->shape), plane, &cData);
 			if (!cData.hasMoreContacts()) return;
 			elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(floor->shape), *static_cast<CollisionBox*>(domino->shape), &cData);
-
-//			elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(domino->shape), *car->chassis, &cData);
-
 		}
 	}
 
@@ -2995,11 +2968,6 @@ void GameManager::render()
 	{
 
 		DebugDrawCollisionBox(*static_cast<CollisionBox*>(car->chassis), glm::vec3(1.0f, 0.0f, 0.0f));
-
-		//for (auto& wheel : car->wheels)
-		//{
-		//	DebugDrawCollisionSphere(*wheel.coll, glm::vec3(0.0f, 1.0f, 0.0f));
-		//}
 	}
 
 	renderer->drawCubemap(cubemap);
@@ -3027,7 +2995,7 @@ void GameManager::render()
 			renderer->draw(domino->mesh, view, projection);
 		}
 	}
-	//drawDebugLines();
+
 	if (showDebugDraw)
 	{
 		glm::mat4 viewProjMatrix = projection * view;

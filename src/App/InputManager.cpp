@@ -97,25 +97,6 @@ void InputManager::processInput(GLFWwindow* window, float deltaTime)
 
 	leftClickPressed = leftClickCurrentlyPressed;
 
-	//  if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-		  //mGameManager->setCurrentShotType(ShotType::PISTOL);
-	//  if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-	//      mGameManager->setCurrentShotType(ShotType::ARTILLERY);
-	//  if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-	//      mGameManager->setCurrentShotType(ShotType::FIREBALL);
-	//  if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
-	//      mGameManager->setCurrentShotType(ShotType::LASER);
-
-
-	  //bool leftArrowCurrentlyPressed = glfwGetMouseButton(window, GLFW_KEY_LEFT) == GLFW_PRESS;
-
-	  //if (leftArrowCurrentlyPressed && !leftArrowPressed)
-	  //{
-	  //    mGameManager->fireRound();
-	  //}
-
-	  //leftClickPressed = leftClickCurrentlyPressed;
-
 	mGameManager->targetSteer = 0.0f;
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)

@@ -137,77 +137,25 @@ namespace elevate {
 	public:
 		union {
 			struct {
-				/**
-				 * Holds the real component of the quaternion.
-				 */
 				real r;
 
-				/**
-				 * Holds the first complex component of the
-				 * quaternion.
-				 */
 				real i;
 
-				/**
-				 * Holds the second complex component of the
-				 * quaternion.
-				 */
 				real j;
 
-				/**
-				 * Holds the third complex component of the
-				 * quaternion.
-				 */
 				real k;
 			};
 
-			/**
-			 * Holds the quaternion data in array form.
-			 */
 			real data[4];
 		};
 
-		// ... other Quaternion code as before ...
-
-		/**
-		 * The default constructor creates a quaternion representing
-		 * a zero rotation.
-		 */
 		Quaternion() : r(1), i(0), j(0), k(0) {}
 
-		/**
-		 * The explicit constructor creates a quaternion with the given
-		 * components.
-		 *
-		 * @param r The real component of the rigid body's orientation
-		 * quaternion.
-		 *
-		 * @param i The first complex component of the rigid body's
-		 * orientation quaternion.
-		 *
-		 * @param j The second complex component of the rigid body's
-		 * orientation quaternion.
-		 *
-		 * @param k The third complex component of the rigid body's
-		 * orientation quaternion.
-		 *
-		 * @note The given orientation does not need to be normalised,
-		 * and can be zero. This function will not alter the given
-		 * values, or normalise the quaternion. To normalise the
-		 * quaternion (and make a zero quaternion a legal rotation),
-		 * use the normalise function.
-		 *
-		 * @see normalise
-		 */
 		Quaternion(const real r, const real i, const real j, const real k)
 			: r(r), i(i), j(j), k(k)
 		{
 		}
 
-		/**
-		 * Normalises the quaternion to unit length, making it a valid
-		 * orientation quaternion.
-		 */
 		void normalise()
 		{
 			real d = r * r + i * i + j * j + k * k;
@@ -248,12 +196,6 @@ namespace elevate {
 
 		void fillMatrix(Matrix3& m);
 
-
-		/**
-		 * Multiplies the quaternion by the given quaternion.
-		 *
-		 * @param multiplier The quaternion by which to multiply.
-		 */
 		void operator *=(const Quaternion& multiplier)
 		{
 			Quaternion q = *this;
@@ -267,15 +209,6 @@ namespace elevate {
 				q.i * multiplier.j - q.j * multiplier.i;
 		}
 
-		/**
-		 * Adds the given vector to this, scaled by the given amount.
-		 * This is used to update the orientation quaternion by a rotation
-		 * and time.
-		 *
-		 * @param vector The vector to add.
-		 *
-		 * @param scale The amount of the vector to add.
-		 */
 		void addScaledVector(const Vector3& vector, real scale)
 		{
 			Quaternion q(0,
@@ -299,17 +232,8 @@ namespace elevate {
 	class Matrix4
 	{
 	public:
-		/**
-		 * Holds the transform matrix data in array form.
-		 */
 		real data[12];
 
-		// ... Other Matrix4 code as before ...
-
-
-		/**
-		 * Creates an identity matrix.
-		 */
 		Matrix4()
 		{
 			data[1] = data[2] = data[3] = data[4] = data[6] =
@@ -317,9 +241,6 @@ namespace elevate {
 			data[0] = data[5] = data[10] = 1;
 		}
 
-		/**
-		 * Sets the matrix to be a diagonal matrix with the given coefficients.
-		 */
 		void setDiagonal(real a, real b, real c)
 		{
 			data[0] = a;
@@ -327,10 +248,6 @@ namespace elevate {
 			data[10] = c;
 		}
 
-		/**
-		 * Returns a matrix which is this matrix multiplied by the given
-		 * other matrix.
-		 */
 		Matrix4 operator*(const Matrix4& o) const
 		{
 			Matrix4 result;
@@ -353,11 +270,6 @@ namespace elevate {
 			return result;
 		}
 
-		/**
-		 * Transform the given vector by this matrix.
-		 *
-		 * @param vector The vector to transform.
-		 */
 		Vector3 operator*(const Vector3& vector) const
 		{
 			return Vector3(
@@ -375,29 +287,15 @@ namespace elevate {
 			);
 		}
 
-		/**
-		 * Transform the given vector by this matrix.
-		 *
-		 * @param vector The vector to transform.
-		 */
 		Vector3 transform(const Vector3& vector) const
 		{
 			return (*this) * vector;
 		}
 
-		/**
-		 * Returns the determinant of the matrix.
-		 */
 		real getDeterminant() const;
 
-		/**
-		 * Sets the matrix to be the inverse of the given matrix.
-		 *
-		 * @param m The matrix to invert and use to set this.
-		 */
 		void setInverse(const Matrix4& m);
 
-		/** Returns a new matrix containing the inverse of this matrix. */
 		Matrix4 inverse() const
 		{
 			Matrix4 result;
@@ -405,22 +303,11 @@ namespace elevate {
 			return result;
 		}
 
-		/**
-		 * Inverts the matrix.
-		 */
 		void invert()
 		{
 			setInverse(*this);
 		}
 
-		/**
-		 * Transform the given direction vector by this matrix.
-		 *
-		 * @note When a direction is converted between frames of
-		 * reference, there is no translation required.
-		 *
-		 * @param vector The vector to transform.
-		 */
 		Vector3 transformDirection(const Vector3& vector) const
 		{
 			return Vector3(
@@ -438,22 +325,6 @@ namespace elevate {
 			);
 		}
 
-		/**
-		 * Transform the given direction vector by the
-		 * transformational inverse of this matrix.
-		 *
-		 * @note This function relies on the fact that the inverse of
-		 * a pure rotation matrix is its transpose. It separates the
-		 * translational and rotation components, transposes the
-		 * rotation, and multiplies out. If the matrix is not a
-		 * scale and shear free transform matrix, then this function
-		 * will not give correct results.
-		 *
-		 * @note When a direction is converted between frames of
-		 * reference, there is no translation required.
-		 *
-		 * @param vector The vector to transform.
-		 */
 		Vector3 transformInverseDirection(const Vector3& vector) const
 		{
 			return Vector3(
@@ -471,19 +342,6 @@ namespace elevate {
 			);
 		}
 
-		/**
-		 * Transform the given vector by the transformational inverse
-		 * of this matrix.
-		 *
-		 * @note This function relies on the fact that the inverse of
-		 * a pure rotation matrix is its transpose. It separates the
-		 * translational and rotation components, transposes the
-		 * rotation, and multiplies out. If the matrix is not a
-		 * scale and shear free transform matrix, then this function
-		 * will not give correct results.
-		 *
-		 * @param vector The vector to transform.
-		 */
 		Vector3 transformInverse(const Vector3& vector) const
 		{
 			Vector3 tmp = vector;
@@ -505,23 +363,11 @@ namespace elevate {
 			);
 		}
 
-		/**
-		 * Gets a vector representing one axis (i.e. one column) in the matrix.
-		 *
-		 * @param i The row to return. Row 3 corresponds to the position
-		 * of the transform matrix.
-		 *
-		 * @return The vector.
-		 */
 		Vector3 getAxisVector(int i) const
 		{
 			return Vector3(data[i], data[i + 4], data[i + 8]);
 		}
 
-		/**
-		 * Sets this matrix to be the rotation matrix corresponding to
-		 * the given quaternion.
-		 */
 		void setOrientationAndPos(const Quaternion& q, const Vector3& pos)
 		{
 			data[0] = 1 - (2 * q.j * q.j + 2 * q.k * q.k);
@@ -540,12 +386,6 @@ namespace elevate {
 			data[11] = pos.z;
 		}
 
-		/**
-		 * Fills the given array with this transform matrix, so it is
-		 * usable as an open-gl transform matrix. OpenGL uses a column
-		 * major format, so that the values are transposed as they are
-		 * written.
-		 */
 		void fillGLArray(float array[16]) const
 		{
 			array[0] = (float)data[0];
@@ -573,35 +413,20 @@ namespace elevate {
 	class Matrix3
 	{
 	public:
-		/**
-		 * Holds the tensor matrix data in array form.
-		 */
 		real data[9];
 
-		// ... Other Matrix3 code as before ...
-
-		/**
-		 * Creates a new matrix.
-		 */
 		Matrix3()
 		{
 			data[0] = data[1] = data[2] = data[3] = data[4] = data[5] =
 				data[6] = data[7] = data[8] = 0;
 		}
 
-		/**
-		 * Creates a new matrix with the given three vectors making
-		 * up its columns.
-		 */
 		Matrix3(const Vector3& compOne, const Vector3& compTwo,
 			const Vector3& compThree)
 		{
 			setComponents(compOne, compTwo, compThree);
 		}
 
-		/**
-		 * Creates a new matrix with explicit coefficients.
-		 */
 		Matrix3(real c0, real c1, real c2, real c3, real c4, real c5,
 			real c6, real c7, real c8)
 		{
@@ -610,18 +435,11 @@ namespace elevate {
 			data[6] = c6; data[7] = c7; data[8] = c8;
 		}
 
-		/**
-		 * Sets the matrix to be a diagonal matrix with the given
-		 * values along the leading diagonal.
-		 */
 		void setDiagonal(real a, real b, real c)
 		{
 			setInertiaTensorCoeffs(a, b, c);
 		}
 
-		/**
-		 * Sets the value of the matrix from inertia tensor values.
-		 */
 		void setInertiaTensorCoeffs(real ix, real iy, real iz,
 			real ixy = 0, real ixz = 0, real iyz = 0)
 		{
@@ -633,11 +451,6 @@ namespace elevate {
 			data[8] = iz;
 		}
 
-		/**
-		 * Sets the value of the matrix as an inertia tensor of
-		 * a rectangular block aligned with the body's coordinate
-		 * system with the given axis half-sizes and mass.
-		 */
 		void setBlockInertiaTensor(const Vector3& halfSizes, real mass)
 		{
 			Vector3 squares = halfSizes.componentProduct(halfSizes);
@@ -646,12 +459,6 @@ namespace elevate {
 				0.3f * mass * (squares.x + squares.y));
 		}
 
-		/**
-		 * Sets the matrix to be a skew symmetric matrix based on
-		 * the given vector. The skew symmetric matrix is the equivalent
-		 * of the vector product. So if a,b are vectors. a x b = A_s b
-		 * where A_s is the skew symmetric form of a.
-		 */
 		void setSkewSymmetric(const Vector3 vector)
 		{
 			data[0] = data[4] = data[8] = 0;
@@ -663,10 +470,6 @@ namespace elevate {
 			data[7] = vector.x;
 		}
 
-		/**
-		 * Sets the matrix values from the given three vector components.
-		 * These are arranged as the three columns of the vector.
-		 */
 		void setComponents(const Vector3& compOne, const Vector3& compTwo,
 			const Vector3& compThree)
 		{
@@ -682,11 +485,6 @@ namespace elevate {
 
 		}
 
-		/**
-		 * Transform the given vector by this matrix.
-		 *
-		 * @param vector The vector to transform.
-		 */
 		Vector3 operator*(const Vector3& vector) const
 		{
 			return Vector3(
@@ -696,21 +494,11 @@ namespace elevate {
 			);
 		}
 
-		/**
-		 * Transform the given vector by this matrix.
-		 *
-		 * @param vector The vector to transform.
-		 */
 		Vector3 transform(const Vector3& vector) const
 		{
 			return (*this) * vector;
 		}
 
-		/**
-		 * Transform the given vector by the transpose of this matrix.
-		 *
-		 * @param vector The vector to transform.
-		 */
 		Vector3 transformTranspose(const Vector3& vector) const
 		{
 			return Vector3(
@@ -720,33 +508,16 @@ namespace elevate {
 			);
 		}
 
-		/**
-		 * Gets a vector representing one row in the matrix.
-		 *
-		 * @param i The row to return.
-		 */
 		Vector3 getRowVector(int i) const
 		{
 			return Vector3(data[i * 3], data[i * 3 + 1], data[i * 3 + 2]);
 		}
 
-		/**
-		 * Gets a vector representing one axis (i.e. one column) in the matrix.
-		 *
-		 * @param i The row to return.
-		 *
-		 * @return The vector.
-		 */
 		Vector3 getAxisVector(int i) const
 		{
 			return Vector3(data[i], data[i + 3], data[i + 6]);
 		}
 
-		/**
-		 * Sets the matrix to be the inverse of the given matrix.
-		 *
-		 * @param m The matrix to invert and use to set this.
-		 */
 		void setInverse(const Matrix3& m)
 		{
 			real t4 = m.data[0] * m.data[4];
@@ -775,7 +546,6 @@ namespace elevate {
 			data[8] = (t4 - t8) * t17;
 		}
 
-		/** Returns a new matrix containing the inverse of this matrix. */
 		Matrix3 inverse() const
 		{
 			Matrix3 result;
@@ -783,19 +553,11 @@ namespace elevate {
 			return result;
 		}
 
-		/**
-		 * Inverts the matrix.
-		 */
 		void invert()
 		{
 			setInverse(*this);
 		}
 
-		/**
-		 * Sets the matrix to be the transpose of the given matrix.
-		 *
-		 * @param m The matrix to transpose and use to set this.
-		 */
 		void setTranspose(const Matrix3& m)
 		{
 			data[0] = m.data[0];
@@ -809,7 +571,6 @@ namespace elevate {
 			data[8] = m.data[8];
 		}
 
-		/** Returns a new matrix containing the transpose of this matrix. */
 		Matrix3 transpose() const
 		{
 			Matrix3 result;
@@ -817,10 +578,6 @@ namespace elevate {
 			return result;
 		}
 
-		/**
-		 * Returns a matrix which is this matrix multiplied by the given
-		 * other matrix.
-		 */
 		Matrix3 operator*(const Matrix3& o) const
 		{
 			return Matrix3(
@@ -838,9 +595,6 @@ namespace elevate {
 			);
 		}
 
-		/**
-		 * Multiplies this matrix in place by the given other matrix.
-		 */
 		void operator*=(const Matrix3& o)
 		{
 			real t1;
@@ -869,9 +623,6 @@ namespace elevate {
 			data[8] = t3;
 		}
 
-		/**
-		 * Multiplies this matrix in place by the given scalar.
-		 */
 		void operator*=(const real scalar)
 		{
 			data[0] *= scalar; data[1] *= scalar; data[2] *= scalar;
@@ -879,10 +630,6 @@ namespace elevate {
 			data[6] *= scalar; data[7] *= scalar; data[8] *= scalar;
 		}
 
-		/**
-		 * Does a component-wise addition of this matrix and the given
-		 * matrix.
-		 */
 		void operator+=(const Matrix3& o)
 		{
 			data[0] += o.data[0]; data[1] += o.data[1]; data[2] += o.data[2];
@@ -890,10 +637,6 @@ namespace elevate {
 			data[6] += o.data[6]; data[7] += o.data[7]; data[8] += o.data[8];
 		}
 
-		/**
-		 * Sets this matrix to be the rotation matrix corresponding to
-		 * the given quaternion.
-		 */
 		void setOrientation(const Quaternion& q)
 		{
 			data[0] = 1 - (2 * q.j * q.j + 2 * q.k * q.k);
@@ -907,9 +650,6 @@ namespace elevate {
 			data[8] = 1 - (2 * q.i * q.i + 2 * q.j * q.j);
 		}
 
-		/**
-		 * Interpolates a couple of matrices.
-		 */
 		static Matrix3 linearInterpolate(const Matrix3& a, const Matrix3& b, real prop);
 	};
 

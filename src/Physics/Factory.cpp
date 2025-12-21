@@ -7,10 +7,6 @@
 
 namespace elevate
 {
-	// ------------------------------------------------------------
-	// ShapeFactory
-	// ------------------------------------------------------------
-
 	CollisionPrimitive* ShapeFactory::CreateBoxShape(
 		World& world,
 		const Vector3& halfExtents)
@@ -24,10 +20,6 @@ namespace elevate
 	{
 		return world.CreateSphereShape(radius);
 	}
-
-	// ------------------------------------------------------------
-	// SpawnFactory
-	// ------------------------------------------------------------
 
 	SpawnFactory::SpawnFactory(const SpawnContext& ctx)
 		: m_Ctx(ctx)
@@ -87,7 +79,6 @@ namespace elevate
 		obj->materialId = materialId;
 		obj->body->calculateDerivedData();
 		obj->shape->calculateInternals();
-	//	obj->name = name + std::to_string(itemIndex++);
 
 		if (name == "Box" || name == "Floor" || name == "Wall")
 		{
@@ -192,56 +183,6 @@ namespace elevate
 			shader);
 	}
 
-	//PhysicsObject* SpawnFactory::SpawnCapsule(
-	//    const Vector3& position,
-	//    real radius,
-	//    real halfHeight,
-	//    real mass,
-	//    const std::string& meshId,
-	//    PhysicsMaterialId materialId)
-	//{
-	//    Transform t{};
-	//    t.position = position;
-	//    t.rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
-	//    t.scale = { 1.0f, 1.0f, 1.0f };
-
-	//    CollisionPrimitive* shape = ShapeFactory::CreateCapsuleShape(
-	//        *m_Ctx.World, radius, halfHeight);
-
-	//    return CreatePhysicsObject(
-	//        "Capsule",
-	//        t,
-	//        shape,
-	//        mass,
-	//        meshId,
-	//        materialId);
-	//}
-
-	//PhysicsObject* SpawnFactory::SpawnCylinder(
-	//    const Vector3& position,
-	//    real radius,
-	//    real halfHeight,
-	//    real mass,
-	//    const std::string& meshId,
-	//    PhysicsMaterialId materialId)
-	//{
-	//    Transform t{};
-	//    t.position = position;
-	//    t.rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
-	//    t.scale = { 1.0f, 1.0f, 1.0f };
-
-	//    CollisionPrimitive* shape = ShapeFactory::CreateCylinderShape(
-	//        *m_Ctx.World, radius, halfHeight);
-
-	//    return CreatePhysicsObject(
-	//        "Cylinder",
-	//        t,
-	//        shape,
-	//        mass,
-	//        meshId,
-	//        materialId);
-	//}
-
 	// Domain specific spawners
 
 	PhysicsObject* SpawnFactory::SpawnCrate(
@@ -275,82 +216,6 @@ namespace elevate
 			PhysicsMaterialId::Brick,
 			shader);
 	}
-
-	//PhysicsObject* SpawnFactory::SpawnBarrel(
-	//    const Vector3& position,
-	//    real radius,
-	//    real height,
-	//    real mass)
-	//{
-	//    real halfHeight = height * 0.5f;
-	//    return SpawnCylinder(
-	//        position,
-	//        radius,
-	//        halfHeight,
-	//        mass,
-	//        "Mesh_Barrel",
-	//        PhysicsMaterialId::MetalBarrel);
-	//}
-
-	//PhysicsObject* SpawnFactory::SpawnBullet(
-	//    const Vector3& startPos,
-	//    const Vector3& direction,
-	//    real speed,
-	//    real radius,
-	//    real mass)
-	//{
-	//    PhysicsObject* obj = SpawnSphere(
-	//        startPos,
-	//        radius,
-	//        mass,
-	//        "Mesh_Bullet",
-	//        PhysicsMaterialId::Bullet);
-
-	//    if (obj && obj->body)
-	//    {
-	//        Vector3 vel =
-	//        {
-	//            direction.x * speed,
-	//            direction.y * speed,
-	//            direction.z * speed
-	//        };
-	//        obj->body->SetLinearVelocity(vel);
-	//    }
-
-	//    return obj;
-	//}
-
-	//PhysicsObject* SpawnFactory::SpawnRocket(
-	//    const Vector3& startPos,
-	//    const Vector3& direction,
-	//    real speed,
-	//    real mass)
-	//{
-	//    // Capsule or elongated box would work for collision.
-	//    real radius = 0.1f;
-	//    real halfHeight = 0.5f;
-
-	//    PhysicsObject* obj = SpawnCapsule(
-	//        startPos,
-	//        radius,
-	//        halfHeight,
-	//        mass,
-	//        "Mesh_Rocket",
-	//        PhysicsMaterialId::Rocket);
-
-	//    if (obj && obj->body)
-	//    {
-	//        Vector3 vel =
-	//        {
-	//            direction.x * speed,
-	//            direction.y * speed,
-	//            direction.z * speed
-	//        };
-	//        obj->body->SetLinearVelocity(vel);
-	//    }
-
-	//    return obj;
-	//}
 
 	PhysicsObject* SpawnFactory::SpawnGrenade(
 		const Vector3& startPos,
@@ -701,72 +566,5 @@ namespace elevate
 
 		return ragdoll;
 	}
-
-	// Explosion helper
-
-	//void SpawnFactory::Explode(
-	//    const Vector3& position,
-	//    real radius,
-	//    real impulseStrength)
-	//{
-	//    if (!m_Ctx.World)
-	//        return;
-
-	//    // Iterate all bodies in the physics world.
-	//    auto& bodies = m_Ctx.World->GetRigidBodies();
-
-	//    for (RigidBody* body : bodies)
-	//    {
-	//        ApplyRadialImpulse(body, position, radius, impulseStrength);
-	//    }
-	//}
-
-	//void SpawnFactory::ApplyRadialImpulse(
-	//    RigidBody* body,
-	//    const Vector3& explosionOrigin,
-	//    real radius,
-	//    real impulseStrength)
-	//{
-	//    if (!body)
-	//        return;
-
-	//    Vector3 bodyPos = body->GetPosition();
-
-	//    Vector3 toBody =
-	//    {
-	//        bodyPos.x - explosionOrigin.x,
-	//        bodyPos.y - explosionOrigin.y,
-	//        bodyPos.z - explosionOrigin.z
-	//    };
-
-	//    real distSq = toBody.x * toBody.x +
-	//        toBody.y * toBody.y +
-	//        toBody.z * toBody.z;
-
-	//    if (distSq > radius * radius)
-	//        return;
-
-	//    real dist = std::sqrt(distSq);
-	//    if (dist < 0.0001f)
-	//        dist = 0.0001f;
-
-	//    real falloff = 1.0f - (dist / radius);
-
-	//    Vector3 dir =
-	//    {
-	//        toBody.x / dist,
-	//        toBody.y / dist,
-	//        toBody.z / dist
-	//    };
-
-	//    Vector3 impulse =
-	//    {
-	//        dir.x * impulseStrength * falloff,
-	//        dir.y * impulseStrength * falloff,
-	//        dir.z * impulseStrength * falloff
-	//    };
-
-	//    body->ApplyImpulse(impulse);
-	//}
 
 } // namespace elevate

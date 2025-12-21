@@ -63,7 +63,6 @@ namespace elevate {
 		};
 
 		void setAcceleration(const Vector3& acc) { acceleration = acc; }
-	//	void setAcceleration(const real x, const real y, const real z);
 		Vector3 getAcceleration() const { return acceleration; };
 
 		void addRotation(const Vector3& deltaRot)

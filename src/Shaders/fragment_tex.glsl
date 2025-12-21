@@ -32,10 +32,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal)
 {
 	vec3 lightDir = normalize(-light.direction);
 
-	// diffuse
 	float diff = max(dot(normal, lightDir), 0.0);
-
-	// combine results
 
 	vec3 texColor = texture(tex, texCoord).rgb;
 	vec3 ambient = light.ambient * texColor;

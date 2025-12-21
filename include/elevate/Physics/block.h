@@ -22,7 +22,6 @@ public:
         delete body;
     }
 
-    /** Sets the block to a specific location. */
     void setState(const elevate::Vector3& position,
         const elevate::Quaternion& orientation,
         const elevate::Vector3& extents,
@@ -46,34 +45,25 @@ public:
         body->clearAccumulator();
         body->setAcceleration(elevate::Vector3(0, -10.0f, 0));
 
-        //body->setCanSleep(false);
         body->setAwake(true);
 
         body->calculateDerivedData();
     }
-
-    /**
-     * Calculates and sets the mass and inertia tensor of this block,
-     * assuming it has the given constant density.
-     */
+    
     void calculateMassProperties(elevate::real invDensity)
     {
-        // Check for infinite mass
         if (invDensity <= 0)
         {
-            // Just set zeros for both mass and inertia tensor
             body->setInverseMass(0);
             body->setInverseInertiaTensor(elevate::Matrix3());
         }
         else
         {
-            // Otherwise we need to calculate the mass
             elevate::real volume = halfSize.magnitude() * 2.0;
             elevate::real mass = volume / invDensity;
 
             body->setMass(mass);
 
-            // And calculate the inertia tensor from the mass and size
             mass *= 0.333f;
             elevate::Matrix3 tensor;
             tensor.setInertiaTensorCoeffs(
@@ -86,19 +76,10 @@ public:
 
     }
 
-    /**
-     * Performs the division of the given block into four, writing the
-     * eight new blocks into the given blocks array. The blocks array can be
-     * a pointer to the same location as the target pointer: since the
-     * original block is always deleted, this effectively reuses its storage.
-     * The algorithm is structured to allow this reuse.
-     */
     void divideBlock(const elevate::Contact& contact,
         Block* target, Block* blocks, Cube** cubes)
     {
 
-        // Find out if we're block one or two in the contact structure, and
-        // therefore what the contact normal is.
         elevate::Vector3 normal = contact.contactNormal;
         elevate::RigidBody* body = contact.body[0];
         if (body != target->body)
@@ -107,20 +88,13 @@ public:
             body = contact.body[1];
         }
 
-        // Work out where on the body (in body coordinates) the contact is
-        // and its direction.
         elevate::Vector3 point = body->getPointInLocalSpace(contact.contactPoint);
         normal = body->getDirectionInLocalSpace(normal);
 
-        // Work out the centre of the split: this is the point coordinates
-        // for each of the axes perpendicular to the normal, and 0 for the
-        // axis along the normal.
         point = point - normal * (point * normal);
 
-        // Take a copy of the half size, so we can create the new blocks.
         elevate::Vector3 size = target->halfSize;
 
-        // Take a copy also of the body's other data.
         elevate::RigidBody tempBody;
         tempBody.setPosition(body->getPosition());
         tempBody.setOrientation(body->getOrientation());
@@ -131,18 +105,13 @@ public:
         tempBody.setInverseInertiaTensor(body->getInverseInertiaTensor());
         tempBody.calculateDerivedData();
 
-        // Remove the old block
         target->exists = false;
 
-        // Work out the inverse density of the old block
         elevate::real invDensity =
             halfSize.magnitude() * 8 * body->getInverseMass();
 
-        // Now split the block into eight.
         for (unsigned i = 0; i < 8; i++)
         {
-            // Find the minimum and maximum extents of the new block
-            // in old-block coordinates
             elevate::Vector3 min, max;
             if ((i & 1) == 0) {
                 min.x = -size.x;
@@ -169,15 +138,11 @@ public:
                 max.z = size.z;
             }
 
-            // Get the origin and half size of the block, in old-body
-            // local coordinates.
             elevate::Vector3 halfSize = (max - min) * 0.5f;
             elevate::Vector3 newPos = halfSize + min;
 
-            // Convert the origin to world coordinates.
             newPos = tempBody.getPointInWorldSpace(newPos);
 
-            // Work out the direction to the impact.
             elevate::Vector3 direction = newPos - contact.contactPoint;
             direction.normalize();
 
@@ -190,8 +155,6 @@ public:
                 )
 			);
 
-            // Set the body's properties (we assume the block has a body
-            // already that we're going to overwrite).
             blocks[i].body->setPosition(newPos);
             blocks[i].body->setVelocity(tempBody.getVelocity() + direction * 10.0f);
             blocks[i].body->setOrientation(tempBody.getOrientation());
@@ -206,7 +169,6 @@ public:
             blocks[i].exists = true;
             blocks[i].halfSize = halfSize;
 
-            // Finally calculate the mass and inertia tensor of the new block
             blocks[i].calculateMassProperties(invDensity);
         }
     }

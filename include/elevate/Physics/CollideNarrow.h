@@ -245,74 +245,13 @@ namespace elevate {
 	{
 	public:
 
-		//// Replace existing boxAndHalfSpace inside CollisionDetector
-		//static unsigned boxAndHalfSpace(
-		//	const CollisionBox& box,
-		//	const CollisionPlane& plane,
-		//	CollisionData* data
-		//)
-		//{
-		//	if (data->contactsLeft <= 0) return 0;
-
-		//	// Plane half-space assumed: n · p <= offset (your current convention).
-		//	// We only create a contact if any part of box penetrates: distanceAlongNormal - boxExtent < offset.
-		//	Vector3 n = plane.direction;
-		//	n.normalize();
-
-		//	// Project box center onto plane normal.
-		//	Vector3 boxCenter = box.getAxis(3);
-		//	real centerDistance = n * boxCenter;
-
-		//	// Extent of box along plane normal.
-		//	real radius =
-		//		box.halfSize.x * real_abs(n * box.getAxis(0)) +
-		//		box.halfSize.y * real_abs(n * box.getAxis(1)) +
-		//		box.halfSize.z * real_abs(n * box.getAxis(2));
-
-		//	// Penetration (positive means penetrating under plane).
-		//	// Using current convention (solid region below plane): penetration occurs if (centerDistance - radius) <= plane.offset
-		//	real distanceOfLowestPoint = centerDistance - radius;
-		//	real penetration = plane.offset - distanceOfLowestPoint;
-
-		//	if (penetration <= (real)0) return 0; // not inside
-
-		//	// Penetration slop to reduce jitter
-		//	const real slop = (real)0.01;
-		//	if (penetration < slop) penetration = (real)0; // ignore tiny penetrations
-
-		//	Contact* contact = data->contacts;
-		//	contact->contactNormal = n; // Upwards push
-		//	contact->penetration = penetration;
-
-		//	// Contact point: project center down to plane then move up slightly (average of bottom face).
-		//	// Bottom face center in world:
-		//	Vector3 contactPoint = boxCenter;
-		//	contactPoint.addScaledVector(n, (plane.offset - centerDistance)); // move along normal so that n·point == offset
-		//	contact->contactPoint = contactPoint;
-
-		//	contact->setBodyData(box.body, nullptr, data->friction, data->restitution);
-
-		//	data->addContacts(1);
-		//	data->contacts[data->contactCount - 1] = *contact;
-		//	data->contactArray[data->contactCount - 1] = *contact;
-
-		//	return 1;
-		//}
-
 		static unsigned boxAndHalfSpace(
 			const CollisionBox& box,
 			const CollisionPlane& plane,
 			CollisionData* data
 		)
 		{
-			// Make sure we have contacts
 			if (data->contactsLeft <= 0) return 0;
-
-			// Check for intersection
-			if (!boxAndHalfSpaceIntersect(box, plane))
-			{
-			//	return 0;
-			}
 
 			// We have an intersection, so find the intersection points. We can make
 			// do with only checking vertices. If the box is resting on a plane

@@ -281,15 +281,11 @@ void Contact::applyPositionChange(Vector3 linearChange[2],
 	real linearInertia[2];
 	real angularInertia[2];
 
-	// We need to work out the inertia of each object in the direction
-	// of the contact normal, due to angular inertia only.
 	for (unsigned i = 0; i < 2; i++) if (body[i])
 	{
 		Matrix3 inverseInertiaTensor;
 		body[i]->getInverseInertiaTensorWorld(&inverseInertiaTensor);
 
-		// Use the same procedure as for calculating frictionless
-		// velocity change to work out the angular inertia.
 		Vector3 angularInertiaWorld =
 			relativeContactPosition[i] % contactNormal;
 		angularInertiaWorld =
@@ -299,39 +295,25 @@ void Contact::applyPositionChange(Vector3 linearChange[2],
 		angularInertia[i] =
 			angularInertiaWorld * contactNormal;
 
-		// The linear component is simply the inverse mass
 		linearInertia[i] = body[i]->getInverseMass();
 
-		// Keep track of the total inertia from all components
 		totalInertia += linearInertia[i] + angularInertia[i];
-
-		// We break the loop here so that the totalInertia value is
-		// completely calculated (by both iterations) before
-		// continuing.
 	}
 
-	// Loop through again calculating and applying the changes
 	for (unsigned i = 0; i < 2; i++) if (body[i])
 	{
-		// The linear and angular movements required are in proportion to
-		// the two inverse inertias.
 		real sign = (i == 0) ? 1 : -1;
 		angularMove[i] =
 			sign * penetration * (angularInertia[i] / totalInertia);
 		linearMove[i] =
 			sign * penetration * (linearInertia[i] / totalInertia);
 
-		// To avoid angular projections that are too great (when mass is large
-		// but inertia tensor is small) limit the angular move.
 		Vector3 projection = relativeContactPosition[i];
 		projection.addScaledVector(
 			contactNormal,
 			-relativeContactPosition[i].scalarProduct(contactNormal)
 		);
 
-		// Use the small angle approximation for the sine of the angle (i.e.
-		// the magnitude would be sine(angularLimit) * projection.magnitude
-		// but we approximate sine(angularLimit) to angularLimit).
 		real maxMagnitude = angularLimit * projection.magnitude();
 
 		if (angularMove[i] < -maxMagnitude)
@@ -347,49 +329,33 @@ void Contact::applyPositionChange(Vector3 linearChange[2],
 			linearMove[i] = totalMove - angularMove[i];
 		}
 
-		// We have the linear amount of movement required by turning
-		// the rigid body (in angularMove[i]). We now need to
-		// calculate the desired rotation to achieve that.
 		if (angularMove[i] == 0)
 		{
-			// Easy case - no angular movement means no rotation.
 			angularChange[i].clear();
 		}
 		else
 		{
-			// Work out the direction we'd like to rotate in.
 			Vector3 targetAngularDirection =
 				relativeContactPosition[i].vectorProduct(contactNormal);
 
 			Matrix3 inverseInertiaTensor;
 			body[i]->getInverseInertiaTensorWorld(&inverseInertiaTensor);
 
-			// Work out the direction we'd need to rotate to achieve that
 			angularChange[i] =
 				inverseInertiaTensor.transform(targetAngularDirection) *
 				(angularMove[i] / angularInertia[i]);
 		}
 
-		// Velocity change is easier - it is just the linear movement
-		// along the contact normal.
 		linearChange[i] = contactNormal * linearMove[i];
 
-		// Now we can start to apply the values we've calculated.
-		// Apply the linear movement
 		Vector3 pos = body[i]->getPosition();
 		pos.addScaledVector(contactNormal, linearMove[i]);
 		body[i]->setPosition(pos);
 
-		// And the change in orientation
 		Quaternion q = body[i]->getOrientation();
 		q.addScaledVector(angularChange[i], ((real)1.0));
 		body[i]->setOrientation(q);
 
-		// We need to calculate the derived data for any body that is
-		// asleep, so that the changes are reflected in the object's
-		// data. Otherwise the resolution will not change the position
-		// of the object, and the next collision detection round will
-		// have the same penetration.
 		body[i]->calculateDerivedData();
 	}
 }
@@ -468,11 +434,9 @@ void elevate::ContactResolver::adjustPositions(Contact* c,
 	real max;
 	Vector3 deltaPosition;
 
-	// iteratively resolve interpenetrations in order of severity.
 	positionIterationsUsed = 0;
 	while (positionIterationsUsed < positionIterations)
 	{
-		// Find biggest penetration
 		max = positionEpsilon;
 		index = numContacts;
 		for (i = 0; i < numContacts; i++)
@@ -485,24 +449,17 @@ void elevate::ContactResolver::adjustPositions(Contact* c,
 		}
 		if (index == numContacts) break;
 
-		// Match the awake state at the contact
 		c[index].matchAwakeState();
 
-		// Resolve the penetration.
 		c[index].applyPositionChange(
 			linearChange,
 			angularChange,
 			max);
 
-		// Again this action may have changed the penetration of other
-		// bodies, so we update contacts.
 		for (i = 0; i < numContacts; i++)
 		{
-			// Check each body in the contact
 			for (unsigned b = 0; b < 2; b++) if (c[i].body[b])
 			{
-				// Check for a match with each body in the newly
-				// resolved contact
 				for (unsigned d = 0; d < 2; d++)
 				{
 					if (c[i].body[b] == c[index].body[d])
@@ -511,10 +468,6 @@ void elevate::ContactResolver::adjustPositions(Contact* c,
 							angularChange[d].vectorProduct(
 								c[i].relativeContactPosition[b]);
 
-						// The sign of the change is positive if we're
-						// dealing with the second body in a contact
-						// and negative otherwise (because we're
-						// subtracting the resolution)..
 						c[i].penetration +=
 							deltaPosition.scalarProduct(c[i].contactNormal)
 							* (b ? 1 : -1);

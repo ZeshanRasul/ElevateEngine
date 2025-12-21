@@ -174,8 +174,6 @@ public:
 	glm::mat4 getView() const { return view; }
 	glm::mat4 getProjection() const { return projection; }
 
-	//TODO move this after testing:
-
 	struct RaycastHit
 	{
 		bool hit = false;
@@ -186,29 +184,23 @@ public:
 
 	bool RaycastCollisionBox(
 		const elevate::Vector3& rayOrigin,
-		const elevate::Vector3& rayDir,       // normalized
+		const elevate::Vector3& rayDir,
 		real maxDist,
 		CollisionBox* box,
 		RaycastHit& outHit)
 	{
-		// Get box transform (world space)
-		// box->transform is updated via calculateInternals()
 		const elevate::Matrix4& T = box->getTransform();
 
 		elevate::Vector3 boxCenter = T.getAxisVector(3);
 
-		// Box axes (world space)
-		elevate::Vector3 X = T.getAxisVector(0);   // box local x
-		elevate::Vector3 Y = T.getAxisVector(1);   // box local y
-		elevate::Vector3 Z = T.getAxisVector(2);   // box local z
+		elevate::Vector3 X = T.getAxisVector(0);
+		elevate::Vector3 Y = T.getAxisVector(1);
+		elevate::Vector3 Z = T.getAxisVector(2);
 
-		// Half extents
 		elevate::Vector3 e = box->halfSize;
 
-		// Vector from box center to ray origin
 		elevate::Vector3 p = rayOrigin - boxCenter;
 
-		// Precompute dot products
 		real px = p * X;
 		real py = p * Y;
 		real pz = p * Z;
@@ -222,10 +214,8 @@ public:
 
 		real t1, t2;
 
-		// X slab
 		if (fabs(dx) < 1e-6)
 		{
-			// Parallel to X slab ? fail if outside
 			if (px < -e.x || px > e.x)
 				return false;
 		}
@@ -239,7 +229,6 @@ public:
 			if (tMin > tMax) return false;
 		}
 
-		// Y slab
 		if (fabs(dy) < 1e-6)
 		{
 			if (py < -e.y || py > e.y)
@@ -255,7 +244,6 @@ public:
 			if (tMin > tMax) return false;
 		}
 
-		// Z slab
 		if (fabs(dz) < 1e-6)
 		{
 			if (pz < -e.z || pz > e.z)
@@ -271,7 +259,6 @@ public:
 			if (tMin > tMax) return false;
 		}
 
-		// Hit detected
 		real tHit = (tMin > 0.0f) ? tMin : tMax;
 		if (tHit < 0.0f || tHit > maxDist)
 			return false;
@@ -280,7 +267,6 @@ public:
 		outHit.distance = tHit;
 		outHit.point = rayOrigin + rayDir * tHit;
 
-		// Compute hit normal: compare penetration side
 		elevate::Vector3 local = elevate::Vector3(px + tHit * dx, py + tHit * dy, pz + tHit * dz);
 
 		elevate::Vector3 nLocal(0, 0, 0);
@@ -293,7 +279,6 @@ public:
 		else if (fabs(local.z - (-e.z)) < bias) nLocal = elevate::Vector3(0, 0, -1);
 		else if (fabs(local.z - e.z) < bias) nLocal = elevate::Vector3(0, 0, +1);
 
-		// Transform normal to world space
 		outHit.normal =
 			X * nLocal.x +
 			Y * nLocal.y +
