@@ -337,4 +337,21 @@
     <None Include="src\Shaders\cubemap_fragment.glsl" />
     <None Include="README.md" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="docs\images\elevate-ragdolls.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="docs\images\elevate-crate-stack.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="docs\images\elevate-debug-vis.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="docs\images\elevate-fracture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="docs\images\elevate-gui.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

@@ -256,6 +256,13 @@
     <None Include="src\Shaders\vertex.glsl" />
     <None Include="src\Shaders\fragment_tex.glsl" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="docs\images\elevate-crate-stack.png" />
+    <Image Include="docs\images\elevate-debug-vis.png" />
+    <Image Include="docs\images\elevate-fracture.png" />
+    <Image Include="docs\images\elevate-gui.png" />
+    <Image Include="docs\images\elevate-ragdolls.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
