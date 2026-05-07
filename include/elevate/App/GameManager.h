@@ -106,51 +106,48 @@ struct AircraftParts {
 	CollisionBox* coll;
 };
 
-struct CarVisuals {
+struct CarVisuals
+{
 	elevate::Vector3 offset;
-	GameObject* mesh;
+	elevate::Vector3 size;
+	glm::vec3 color;
+	Cube* mesh = nullptr;
 };
 
-struct Car {
+struct Car
+{
 	elevate::RigidBody* body;
 	elevate::CollisionBox* chassis;
 	GameObject* chassisMesh;
 
-	struct Wheel {
+	struct Wheel
+	{
 		elevate::Vector3 offset;
 		elevate::Vector3 contactPointWorld;
 		elevate::Vector3 contactNormalWorld;
 
 		bool grounded = false;
 
-		real restLength = 0.4f;     // suspension length
-		real minLength = 0.1f;      // bump stop
-		real maxLength = 0.6f;      // max extension
-		real springK = 25000.0f;    // spring stiffness
-		real damperC = 3000.0f;     // damping
+		real restLength = 0.4f;
+		real minLength = 0.1f;
+		real maxLength = 0.6f;
+		real springK = 25000.0f;
+		real damperC = 3000.0f;
 
 		real compression = 0.0f;
 		real lastCompression = 0.0f;
 
 		real wheelRadius = 0.55f;
-		GameObject* mesh;
+		GameObject* mesh = nullptr;
 	};
-	
+
 	Wheel wheels[4];
 
-	float throttle;
-	float brake;
-	float steerAngle;
+	float throttle = 0.0f;
+	float brake = 0.0f;
+	float steerAngle = 0.0f;
 
-	Cube* roofMesh = nullptr;
-	Cube* hoodMesh = nullptr;
-	Cube* rearMesh = nullptr;
-	Cube* frontBumperMesh = nullptr;
-
-	elevate::Vector3 roofOffset;
-	elevate::Vector3 hoodOffset;
-	elevate::Vector3 rearOffset;
-	elevate::Vector3 frontBumperOffset;
+	std::vector<CarVisuals> visualParts;
 };
 
 class GameManager {
@@ -364,7 +361,7 @@ public:
 	float car_steerAngle = 0.0f;
 	bool fpsSandboxDemo = false;
 
-	SceneType currentScene = SceneType::DemoShowcase;
+	SceneType currentScene = SceneType::Car;
 	int selectedIndex = 7;
 
 

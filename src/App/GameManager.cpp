@@ -1728,7 +1728,7 @@ void GameManager::update(float deltaTime)
 
 			Vector3 wheelForward = forward;
 
-			if (i == 2 || i == 3)
+			if (i == 0 || i == 1)
 			{
 				elevate::Quaternion steerQ;
 				steerQ.setEuler(0, car->steerAngle, 0);
@@ -1860,7 +1860,19 @@ void GameManager::update(float deltaTime)
 			(float)car->body->getOrientation().r,
 			(float)car->body->getOrientation().i,
 			(float)car->body->getOrientation().j,
-			(float)car->body->getOrientation().k);
+			(float)car->body->getOrientation().k
+		);
+
+		for (CarVisuals& part : car->visualParts)
+		{
+			if (!part.mesh) continue;
+
+			elevate::Vector3 worldPos =
+				car->body->getPointInWorldSpace(part.offset);
+
+			part.mesh->SetPosition(worldPos);
+			part.mesh->SetOrientation(bodyQ);
+		}
 
 		glm::quat steerQ = glm::angleAxis(steerAngleRad, glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -1879,19 +1891,6 @@ void GameManager::update(float deltaTime)
 				car->wheels[i].mesh->SetOrientation(bodyQ);
 			}
 		}
-
-		auto updatePart = [&](Cube* mesh, const elevate::Vector3& localOffset)
-			{
-				if (!mesh) return;
-				elevate::Vector3 worldPos = car->body->getPointInWorldSpace(localOffset);
-				mesh->SetPosition(worldPos);
-				mesh->SetOrientation(bodyQ);
-			};
-
-		updatePart(car->roofMesh, car->roofOffset);
-		updatePart(car->hoodMesh, car->hoodOffset);
-		updatePart(car->rearMesh, car->rearOffset);
-		updatePart(car->frontBumperMesh, car->frontBumperOffset);
 
 		if (showCar)
 		{

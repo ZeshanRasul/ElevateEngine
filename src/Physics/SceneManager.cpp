@@ -101,11 +101,6 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->car->body->setMass(totalMass);
 	elevate::Vector3 halfSize = gm->car->chassis->halfSize;
 
-	gm->car->chassisMesh = new Cube(elevate::Vector3(0.0f, 4.9f, 0.0f), halfSize * 2, &gm->ammoShader, gm);
-	gm->car->chassisMesh->LoadMesh();
-	gm->car->chassisMesh->SetColor(glm::vec3(0.8f, 0.1f, 0.1f));
-	gameObjects.push_back(gm->car->chassisMesh);
-
 	real wheelRadius = 1.55f;
 	real wheelWidth = 0.7f;
 
@@ -128,7 +123,13 @@ void Scenes::LoadCarTest(GameManager* gm)
 
 		elevate::Vector3 worldPos = gm->car->body->getPointInWorldSpace(wheelOffsets[i]);
 
-		w.mesh = new Sphere(worldPos, elevate::Vector3(wheelRadius, wheelRadius, wheelRadius), &gm->ammoShader, gm, glm::vec3(0.0f));
+		w.mesh = new Sphere(
+			worldPos,
+			elevate::Vector3(wheelWidth, wheelRadius, wheelRadius),
+			&gm->ammoShader,
+			gm,
+			glm::vec3(0.0f)
+		);
 		w.mesh->SetColor(glm::vec3(0.1f, 0.1f, 0.1f));
 		w.mesh->LoadMesh();
 		gameObjects.push_back(w.mesh);
@@ -136,49 +137,117 @@ void Scenes::LoadCarTest(GameManager* gm)
 
 	elevate::Vector3 carComWorld = gm->car->body->getTransform().getAxisVector(3);
 
-	gm->car->roofOffset = elevate::Vector3(0.0f, halfSize.y * 0.7f, -halfSize.z * 0.3f);
-	elevate::Vector3 roofSize(halfSize.x * 1.4f, halfSize.y * 0.7f, halfSize.z * 0.8f);
+	auto AddCarPart = [&](const elevate::Vector3& localOffset,
+		const elevate::Vector3& size,
+		const glm::vec3& color) -> Cube*
+		{
+			elevate::Vector3 worldPos = gm->car->body->getPointInWorldSpace(localOffset);
 
-	{
-		elevate::Vector3 roofWorldPos = gm->car->body->getPointInWorldSpace(gm->car->roofOffset);
-		gm->car->roofMesh = new Cube(roofWorldPos, roofSize * 2.0f, &gm->ammoShader, gm);
-		gm->car->roofMesh->LoadMesh();
-		gm->car->roofMesh->SetColor(glm::vec3(0.8f, 0.8f, 0.85f));
-		gameObjects.push_back(gm->car->roofMesh);
-	}
+			Cube* part = new Cube(worldPos, size, &gm->ammoShader, gm);
+			part->LoadMesh();
+			part->SetColor(color);
 
-	gm->car->hoodOffset = elevate::Vector3(0.0f, -halfSize.y * 0.2f, halfSize.z * 0.5f);
-	elevate::Vector3 hoodSize(halfSize.x * 1.6f, halfSize.y * 0.5f, halfSize.z * 0.5f);
+			CarVisuals visual;
+			visual.offset = localOffset;
+			visual.size = size;
+			visual.color = color;
+			visual.mesh = part;
 
-	{
-		elevate::Vector3 hoodWorldPos = gm->car->body->getPointInWorldSpace(gm->car->hoodOffset);
-		gm->car->hoodMesh = new Cube(hoodWorldPos, hoodSize * 2.0f, &gm->ammoShader, gm);
-		gm->car->hoodMesh->LoadMesh();
-		gm->car->hoodMesh->SetColor(glm::vec3(0.7f, 0.1f, 0.1f));
-		gameObjects.push_back(gm->car->hoodMesh);
-	}
+			gm->car->visualParts.push_back(visual);
+			gameObjects.push_back(part);
 
-	gm->car->rearOffset = elevate::Vector3(0.0f, -halfSize.y * 0.2f, -halfSize.z * 0.5f);
-	elevate::Vector3 rearSize(halfSize.x * 1.5f, halfSize.y * 0.6f, halfSize.z * 0.5f);
+			return part;
+		};
 
-	{
-		elevate::Vector3 rearWorldPos = gm->car->body->getPointInWorldSpace(gm->car->rearOffset);
-		gm->car->rearMesh = new Cube(rearWorldPos, rearSize * 2.0f, &gm->ammoShader, gm);
-		gm->car->rearMesh->LoadMesh();
-		gm->car->rearMesh->SetColor(glm::vec3(0.75f, 0.15f, 0.15f));
-		gameObjects.push_back(gm->car->rearMesh);
-	}
+	gm->car->chassisMesh = AddCarPart(
+		elevate::Vector3(0.0f, -0.35f, 0.0f),
+		elevate::Vector3(6.8f, 1.1f, 8.4f),
+		glm::vec3(0.75f, 0.05f, 0.04f)
+	);
 
-	gm->car->frontBumperOffset = elevate::Vector3(0.0f, -halfSize.y * 0.8f, halfSize.z * 0.95f);
-	elevate::Vector3 bumperSize(halfSize.x * 1.7f, halfSize.y * 0.3f, halfSize.z * 0.15f);
+	AddCarPart(
+		elevate::Vector3(0.0f, 0.55f, 1.7f),
+		elevate::Vector3(5.8f, 0.75f, 3.8f),
+		glm::vec3(0.9f, 0.08f, 0.06f)
+	);
 
-	{
-		elevate::Vector3 bumperWorldPos = gm->car->body->getPointInWorldSpace(gm->car->frontBumperOffset);
-		gm->car->frontBumperMesh = new Cube(bumperWorldPos, bumperSize * 2.0f, &gm->ammoShader, gm);
-		gm->car->frontBumperMesh->LoadMesh();
-		gm->car->frontBumperMesh->SetColor(glm::vec3(0.2f, 0.2f, 0.25f));
-		gameObjects.push_back(gm->car->frontBumperMesh);
-	}
+	AddCarPart(
+		elevate::Vector3(0.0f, 0.65f, -2.4f),
+		elevate::Vector3(5.9f, 0.85f, 3.0f),
+		glm::vec3(0.65f, 0.04f, 0.04f)
+	);
+
+	AddCarPart(
+		elevate::Vector3(0.0f, 1.55f, -0.65f),
+		elevate::Vector3(4.6f, 1.9f, 3.4f),
+		glm::vec3(0.8f, 0.08f, 0.06f)
+	);
+
+	AddCarPart(
+		elevate::Vector3(0.0f, 1.65f, 0.25f),
+		elevate::Vector3(4.8f, 1.15f, 1.4f),
+		glm::vec3(0.1f, 0.13f, 0.16f)
+	);
+
+	AddCarPart(
+		elevate::Vector3(0.0f, 1.65f, -1.55f),
+		elevate::Vector3(4.5f, 1.05f, 1.2f),
+		glm::vec3(0.08f, 0.1f, 0.13f)
+	);
+
+	AddCarPart(
+		elevate::Vector3(0.0f, 2.55f, -0.65f),
+		elevate::Vector3(4.2f, 0.35f, 2.6f),
+		glm::vec3(0.68f, 0.04f, 0.04f)
+	);
+
+	AddCarPart(
+		elevate::Vector3(0.0f, -0.75f, 4.35f),
+		elevate::Vector3(7.3f, 0.55f, 0.55f),
+		glm::vec3(0.08f, 0.08f, 0.09f)
+	);
+
+	AddCarPart(
+		elevate::Vector3(0.0f, -0.75f, -4.35f),
+		elevate::Vector3(7.1f, 0.55f, 0.55f),
+		glm::vec3(0.08f, 0.08f, 0.09f)
+	);
+
+	AddCarPart(
+		elevate::Vector3(-3.65f, -0.4f, 0.0f),
+		elevate::Vector3(0.35f, 0.5f, 6.8f),
+		glm::vec3(0.05f, 0.05f, 0.06f)
+	);
+
+	AddCarPart(
+		elevate::Vector3(3.65f, -0.4f, 0.0f),
+		elevate::Vector3(0.35f, 0.5f, 6.8f),
+		glm::vec3(0.05f, 0.05f, 0.06f)
+	);
+
+	AddCarPart(
+		elevate::Vector3(-1.9f, -0.15f, 4.85f),
+		elevate::Vector3(1.0f, 0.35f, 0.15f),
+		glm::vec3(1.0f, 0.9f, 0.45f)
+	);
+
+	AddCarPart(
+		elevate::Vector3(1.9f, -0.15f, 4.85f),
+		elevate::Vector3(1.0f, 0.35f, 0.15f),
+		glm::vec3(1.0f, 0.9f, 0.45f)
+	);
+
+	AddCarPart(
+		elevate::Vector3(-2.0f, -0.1f, -4.85f),
+		elevate::Vector3(0.9f, 0.35f, 0.15f),
+		glm::vec3(1.0f, 0.0f, 0.0f)
+	);
+
+	AddCarPart(
+		elevate::Vector3(2.0f, -0.1f, -4.85f),
+		elevate::Vector3(0.9f, 0.35f, 0.15f),
+		glm::vec3(1.0f, 0.0f, 0.0f)
+	);
 
 	real a = halfSize.x;
 	real b = halfSize.y;
