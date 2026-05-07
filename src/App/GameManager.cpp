@@ -1853,7 +1853,7 @@ void GameManager::update(float deltaTime)
 			(float)car->body->getOrientation().k
 		);
 
-		elevate::Vector3 visualOffset(0.0f, -1.8f, 0.0f);
+		elevate::Vector3 visualOffset(0.0f, -2.9f, 0.0f);
 
 		elevate::Vector3 visualWorldPos =
 			car->body->getPointInWorldSpace(car->visualOffset);
@@ -1872,23 +1872,26 @@ void GameManager::update(float deltaTime)
 
 		for (int i = 0; i < 4; ++i)
 		{
-			if (!car->wheels[i].mesh)
+			Car::Wheel& w = car->wheels[i];
+
+			if (!w.visualModel)
 			{
 				continue;
 			}
 
 			Vector3 wheelPos =
-				car->body->getPointInWorldSpace(car->wheels[i].offset);
+				car->body->getPointInWorldSpace(w.offset);
 
-			car->wheels[i].mesh->SetPosition(wheelPos);
+			w.visualModel->SetPosition(wheelPos);
+			w.visualModel->SetScale(w.visualScale);
 
 			if (i == 0 || i == 1)
 			{
-				car->wheels[i].mesh->SetOrientation(bodyQ * steerQ);
+				w.visualModel->SetOrientation(bodyQ * steerQ * w.visualRotationOffset);
 			}
 			else
 			{
-				car->wheels[i].mesh->SetOrientation(bodyQ);
+				w.visualModel->SetOrientation(bodyQ * w.visualRotationOffset);
 			}
 		}
 
@@ -2989,6 +2992,14 @@ void GameManager::render()
 			renderer->draw(part.mesh, view, projection);
 		}*/
 		car->visualModel->Draw(view, projection, glm::mat4(1.0f));
+
+		for (int i = 0; i < 4; ++i)
+		{
+			if (car->wheels[i].visualModel)
+			{
+				car->wheels[i].visualModel->Draw(view, projection, glm::mat4(1.0f));
+			}
+		}
 
 		for (auto& domino : dominoes)
 		{

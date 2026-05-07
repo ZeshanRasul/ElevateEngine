@@ -145,7 +145,9 @@ struct Car
 		real lastCompression = 0.0f;
 
 		real wheelRadius = 0.55f;
-		GameObject* mesh = nullptr;
+		GltfModel* visualModel = nullptr;
+		glm::quat visualRotationOffset = glm::quat(1, 0, 0, 0);
+		float visualScale = 1.0f;
 	};
 
 	Wheel wheels[4];
