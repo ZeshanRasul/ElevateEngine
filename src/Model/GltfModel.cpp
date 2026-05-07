@@ -485,6 +485,7 @@ void GltfModel::Draw(glm::mat4 view, glm::mat4 proj, glm::mat4 world)
 	matrixData.push_back(proj);
 	matrixData.push_back(m_modelMatrix);
 	mUniformBuffer.uploadUboData(matrixData, 0);
+	m_shader->setVec3("objectColor", 1.0f, 0.0f, 0.0f);
 
 	for (size_t meshIndex = 0; meshIndex < meshData.size(); ++meshIndex)
 	{
@@ -493,7 +494,7 @@ void GltfModel::Draw(glm::mat4 view, glm::mat4 proj, glm::mat4 world)
 			const GLTFPrimitive& prim = meshData[meshIndex].primitives[primIndex];
 
 			glBindVertexArray(prim.vao);
-
+			m_shader->setInt("tex", 0);
 			if (prim.indexBuffer)
 			{
 				glDrawElements(GL_TRIANGLES, prim.indexCount, prim.indexType, 0);

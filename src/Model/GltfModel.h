@@ -9,6 +9,7 @@
 #include "Physics/core.h"
 #include "GltfPrimitive.h"
 #include "OpenGL/UniformBuffer.h"
+#include "OpenGL/Texture.h"
 
 class GltfModel
 {
@@ -76,4 +77,6 @@ private:
 		std::vector<GLTFPrimitive> primitives;
 	};
 	std::vector<GLTFMesh> meshData;
+
+	Texture* m_Texture = nullptr;
 };

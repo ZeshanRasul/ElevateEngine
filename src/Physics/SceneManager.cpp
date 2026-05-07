@@ -129,7 +129,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 		elevate::Vector3 worldPos =
 			gm->car->body->getPointInWorldSpace(wheelOffsets[i]);
 
-		w.visualModel = new GltfModel("src/Assets/Vehicles/wheel.glb", &gm->cubeShader);
+		w.visualModel = new GltfModel("src/Assets/Vehicles/wheel.glb", &gm->ammoShader);
 		w.visualScale = gm->car->visualScale;
 
 	}
@@ -138,7 +138,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 
 	gm->car->visualModel = new GltfModel(
 		"src/Assets/Vehicles/car_no_wheels.glb",
-		&gm->cubeShader
+		&gm->ammoShader
 	); 
 	
 	gm->car->visualRotationOffset =
