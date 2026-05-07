@@ -14,7 +14,7 @@
 class GltfModel
 {
 public:
-	GltfModel(std::string modelFilename, Shader* shader);
+	GltfModel(std::string modelFilename, Shader* shader, std::string texFilename);
 
 	bool LoadModel();
 	void CreateVertexBuffers();
@@ -79,4 +79,5 @@ private:
 	std::vector<GLTFMesh> meshData;
 
 	Texture* m_Texture = nullptr;
+	std::string m_texFilename;
 };

@@ -1,8 +1,8 @@
 #include "Tools/Logger.h"
 #include "GltfModel.h"
 
-GltfModel::GltfModel(std::string modelFilename, Shader* shader)
-	: m_filename(modelFilename), m_shader(shader)
+GltfModel::GltfModel(std::string modelFilename, Shader* shader, std::string texFilename)
+	: m_filename(modelFilename), m_shader(shader), m_texFilename(texFilename)
 {
 	LoadModel();
 }
@@ -20,8 +20,13 @@ bool GltfModel::LoadModel()
 	std::string loaderWarnings;
 	bool result = false;
 
-	result = gltfLoader.LoadBinaryFromFile(m_model.get(), &loaderErrors, &loaderWarnings,
+	result = gltfLoader.LoadASCIIFromFile(m_model.get(), &loaderErrors, &loaderWarnings,
 		m_filename);
+
+
+	m_Texture = new Texture();
+
+	m_Texture->loadTexture(m_texFilename, false);
 
 	if (!loaderWarnings.empty())
 	{
@@ -494,7 +499,10 @@ void GltfModel::Draw(glm::mat4 view, glm::mat4 proj, glm::mat4 world)
 			const GLTFPrimitive& prim = meshData[meshIndex].primitives[primIndex];
 
 			glBindVertexArray(prim.vao);
+			glActiveTexture(GL_TEXTURE0);
+			m_Texture->bind();
 			m_shader->setInt("tex", 0);
+
 			if (prim.indexBuffer)
 			{
 				glDrawElements(GL_TRIANGLES, prim.indexCount, prim.indexType, 0);
