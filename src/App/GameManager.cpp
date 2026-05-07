@@ -749,8 +749,6 @@ void GameManager::ResetCar()
 	car->body->setVelocity(elevate::Vector3(0.0f, 0.0f, 0.0f));
 	car->body->setRotation(elevate::Vector3(0.0f, 0.0f, 0.0f));
 	car->body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
-	car->chassisMesh->SetOrientation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-	car->chassisMesh->SetPosition(elevate::Vector3(0.0f, 4.9f, 0.0f));
 	car->body->calculateDerivedData();
 	car->chassis->calculateInternals();
 }
@@ -1847,14 +1845,6 @@ void GameManager::update(float deltaTime)
 		Matrix4 boxTx = car->chassis->getTransform();;
 
 		Vector3 chassisPos = boxTx.getAxisVector(3);
-		car->chassisMesh->SetPosition(chassisPos);
-
-		car->chassisMesh->SetOrientation(glm::quat(
-			(float)car->body->getOrientation().r,
-			(float)car->body->getOrientation().i,
-			(float)car->body->getOrientation().j,
-			(float)car->body->getOrientation().k));
-
 
 		glm::quat bodyQ(
 			(float)car->body->getOrientation().r,
@@ -1863,33 +1853,28 @@ void GameManager::update(float deltaTime)
 			(float)car->body->getOrientation().k
 		);
 
-		for (CarVisuals& part : car->visualParts)
-		{
-			if (!part.mesh) continue;
+		elevate::Vector3 worldPos =
+			car->body->getPointInWorldSpace(car->visualOffset);
 
-			elevate::Vector3 worldPos =
-				car->body->getPointInWorldSpace(part.offset);
+		car->visualModel->SetPosition(car->body->getPosition());
 
-			part.mesh->SetPosition(worldPos);
-			part.mesh->SetOrientation(bodyQ);
-		}
+		car->visualModel->SetOrientation(
+			glm::quat(1.0f, 0.0f, 0.0f, 0.0f)* bodyQ
+		);
+
+		car->visualModel->SetScale(
+			glm::vec3(
+				car->visualScale,
+				car->visualScale,
+				car->visualScale
+			)
+		);
 
 		glm::quat steerQ = glm::angleAxis(steerAngleRad, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		for (int i = 0; i < 4; ++i)
 		{
 			Vector3 wheelPos = car->body->getPointInWorldSpace(car->wheels[i].offset);
-			car->wheels[i].mesh->SetPosition(wheelPos);
-
-			if (i < 2)
-			{
-				glm::quat wheelOrientation = bodyQ * steerQ;
-				car->wheels[i].mesh->SetOrientation(wheelOrientation);
-			}
-			else
-			{
-				car->wheels[i].mesh->SetOrientation(bodyQ);
-			}
 		}
 
 		if (showCar)
@@ -2982,12 +2967,14 @@ void GameManager::render()
 			renderer->draw(part.mesh, view, projection);
 		}
 	}
-	if (showCar)
+	if (true)
 	{
-		for (CarVisuals part : carParts)
+	/*	for (CarVisuals part : carParts)
 		{
 			renderer->draw(part.mesh, view, projection);
-		}
+		}*/
+		car->visualModel->SetScale(5.0f);
+		car->visualModel->Draw(view, projection, glm::mat4(10.0f));
 
 		for (auto& domino : dominoes)
 		{

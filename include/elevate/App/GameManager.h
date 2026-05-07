@@ -25,6 +25,7 @@
 #include "Physics/block.h"
 #include "Physics/Aero.h"
 #include "OpenGL/DebugDraw.h"
+#include "Model/GltfModel.h"
 
 enum class SceneType
 {
@@ -120,6 +121,12 @@ struct Car
 	elevate::CollisionBox* chassis;
 	GameObject* chassisMesh;
 
+	GltfModel* visualModel = nullptr;
+
+	elevate::Vector3 visualOffset;
+	glm::quat visualRotationOffset;
+	float visualScale = 5.0f;
+
 	struct Wheel
 	{
 		elevate::Vector3 offset;
@@ -147,7 +154,6 @@ struct Car
 	float brake = 0.0f;
 	float steerAngle = 0.0f;
 
-	std::vector<CarVisuals> visualParts;
 };
 
 class GameManager {

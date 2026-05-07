@@ -104,7 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)include\elevate;$(ProjectDir)include\external;$(ProjectDir)include\external\imgui;$(ProjectDir)src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)include\elevate;$(ProjectDir)include\external;$(ProjectDir)include\external\imgui;$(ProjectDir)src;$(ProjectDir)Tools</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -123,7 +123,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)include\elevate;$(ProjectDir)include\external;$(ProjectDir)include\external\imgui;$(ProjectDir)src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)include\elevate;$(ProjectDir)include\external;$(ProjectDir)include\external\imgui;$(ProjectDir)src;$(ProjectDir)Tools</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -191,11 +191,16 @@
     <ClInclude Include="include\elevate\Physics\body.h" />
     <ClInclude Include="include\elevate\Physics\bone.h" />
     <ClInclude Include="include\elevate\OpenGL\DebugDraw.h" />
+    <ClInclude Include="src\Model\GltfModel.h" />
+    <ClInclude Include="src\Model\GltfPrimitive.h" />
     <ClInclude Include="src\Tools\ImGuiStyles.h" />
+    <ClInclude Include="src\Tools\json.hpp" />
     <ClInclude Include="src\Tools\Logger.h" />
+    <ClInclude Include="src\Tools\tiny_gltf.h" />
     <ClInclude Include="src\Window\Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Model\GltfModel.cpp" />
     <ClCompile Include="src\OpenGL\Cubemap.cpp" />
     <ClCompile Include="src\OpenGL\DebugDraw.cpp" />
     <ClCompile Include="src\Physics\SceneManager.cpp" />
@@ -241,6 +246,7 @@
     <ClCompile Include="src\Physics\random.cpp" />
     <ClCompile Include="src\Physics\World.cpp" />
     <ClCompile Include="src\Tools\Logger.cpp" />
+    <ClCompile Include="src\Tools\tiny_gltf.cc" />
     <ClCompile Include="src\Window\Window.cpp" />
   </ItemGroup>
   <ItemGroup>

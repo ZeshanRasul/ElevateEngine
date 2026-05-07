@@ -122,132 +122,27 @@ void Scenes::LoadCarTest(GameManager* gm)
 		w.offset = wheelOffsets[i];
 
 		elevate::Vector3 worldPos = gm->car->body->getPointInWorldSpace(wheelOffsets[i]);
-
-		w.mesh = new Sphere(
-			worldPos,
-			elevate::Vector3(wheelWidth, wheelRadius, wheelRadius),
-			&gm->ammoShader,
-			gm,
-			glm::vec3(0.0f)
-		);
-		w.mesh->SetColor(glm::vec3(0.1f, 0.1f, 0.1f));
-		w.mesh->LoadMesh();
-		gameObjects.push_back(w.mesh);
+	//	gameObjects.push_back(w.mesh);
 	}
 
 	elevate::Vector3 carComWorld = gm->car->body->getTransform().getAxisVector(3);
 
-	auto AddCarPart = [&](const elevate::Vector3& localOffset,
-		const elevate::Vector3& size,
-		const glm::vec3& color) -> Cube*
-		{
-			elevate::Vector3 worldPos = gm->car->body->getPointInWorldSpace(localOffset);
-
-			Cube* part = new Cube(worldPos, size, &gm->ammoShader, gm);
-			part->LoadMesh();
-			part->SetColor(color);
-
-			CarVisuals visual;
-			visual.offset = localOffset;
-			visual.size = size;
-			visual.color = color;
-			visual.mesh = part;
-
-			gm->car->visualParts.push_back(visual);
-			gameObjects.push_back(part);
-
-			return part;
-		};
-
-	gm->car->chassisMesh = AddCarPart(
-		elevate::Vector3(0.0f, -0.35f, 0.0f),
-		elevate::Vector3(6.8f, 1.1f, 8.4f),
-		glm::vec3(0.75f, 0.05f, 0.04f)
+	gm->car->visualModel = new GltfModel(
+		"src/Assets/Vehicles/car.glb",
+		&gm->ammoShader
 	);
 
-	AddCarPart(
-		elevate::Vector3(0.0f, 0.55f, 1.7f),
-		elevate::Vector3(5.8f, 0.75f, 3.8f),
-		glm::vec3(0.9f, 0.08f, 0.06f)
+	gm->car->visualScale = 0.01f;
+
+	gm->car->visualOffset = elevate::Vector3(
+		0.0f,
+		-2.2f,
+		0.0f
 	);
 
-	AddCarPart(
-		elevate::Vector3(0.0f, 0.65f, -2.4f),
-		elevate::Vector3(5.9f, 0.85f, 3.0f),
-		glm::vec3(0.65f, 0.04f, 0.04f)
-	);
-
-	AddCarPart(
-		elevate::Vector3(0.0f, 1.55f, -0.65f),
-		elevate::Vector3(4.6f, 1.9f, 3.4f),
-		glm::vec3(0.8f, 0.08f, 0.06f)
-	);
-
-	AddCarPart(
-		elevate::Vector3(0.0f, 1.65f, 0.25f),
-		elevate::Vector3(4.8f, 1.15f, 1.4f),
-		glm::vec3(0.1f, 0.13f, 0.16f)
-	);
-
-	AddCarPart(
-		elevate::Vector3(0.0f, 1.65f, -1.55f),
-		elevate::Vector3(4.5f, 1.05f, 1.2f),
-		glm::vec3(0.08f, 0.1f, 0.13f)
-	);
-
-	AddCarPart(
-		elevate::Vector3(0.0f, 2.55f, -0.65f),
-		elevate::Vector3(4.2f, 0.35f, 2.6f),
-		glm::vec3(0.68f, 0.04f, 0.04f)
-	);
-
-	AddCarPart(
-		elevate::Vector3(0.0f, -0.75f, 4.35f),
-		elevate::Vector3(7.3f, 0.55f, 0.55f),
-		glm::vec3(0.08f, 0.08f, 0.09f)
-	);
-
-	AddCarPart(
-		elevate::Vector3(0.0f, -0.75f, -4.35f),
-		elevate::Vector3(7.1f, 0.55f, 0.55f),
-		glm::vec3(0.08f, 0.08f, 0.09f)
-	);
-
-	AddCarPart(
-		elevate::Vector3(-3.65f, -0.4f, 0.0f),
-		elevate::Vector3(0.35f, 0.5f, 6.8f),
-		glm::vec3(0.05f, 0.05f, 0.06f)
-	);
-
-	AddCarPart(
-		elevate::Vector3(3.65f, -0.4f, 0.0f),
-		elevate::Vector3(0.35f, 0.5f, 6.8f),
-		glm::vec3(0.05f, 0.05f, 0.06f)
-	);
-
-	AddCarPart(
-		elevate::Vector3(-1.9f, -0.15f, 4.85f),
-		elevate::Vector3(1.0f, 0.35f, 0.15f),
-		glm::vec3(1.0f, 0.9f, 0.45f)
-	);
-
-	AddCarPart(
-		elevate::Vector3(1.9f, -0.15f, 4.85f),
-		elevate::Vector3(1.0f, 0.35f, 0.15f),
-		glm::vec3(1.0f, 0.9f, 0.45f)
-	);
-
-	AddCarPart(
-		elevate::Vector3(-2.0f, -0.1f, -4.85f),
-		elevate::Vector3(0.9f, 0.35f, 0.15f),
-		glm::vec3(1.0f, 0.0f, 0.0f)
-	);
-
-	AddCarPart(
-		elevate::Vector3(2.0f, -0.1f, -4.85f),
-		elevate::Vector3(0.9f, 0.35f, 0.15f),
-		glm::vec3(1.0f, 0.0f, 0.0f)
-	);
+	gm->car->visualRotationOffset =
+		glm::angleAxis(glm::radians(180.0f),
+			glm::vec3(0, 1, 0));
 
 	real a = halfSize.x;
 	real b = halfSize.y;
