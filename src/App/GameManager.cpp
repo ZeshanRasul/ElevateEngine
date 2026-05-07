@@ -1864,6 +1864,12 @@ void GameManager::update(float deltaTime)
 		car->visualModel->SetOrientation(bodyQ);
 		glm::quat steerQ = glm::angleAxis(steerAngleRad, glm::vec3(0.0f, 1.0f, 0.0f));
 
+		glm::quat wheelVisualOffset =
+			glm::angleAxis(
+				glm::radians(90.0f),
+				glm::vec3(0.0f, 0.0f, 1.0f)
+			);
+
 		for (int i = 0; i < 4; ++i)
 		{
 			if (!car->wheels[i].mesh)
@@ -2982,8 +2988,7 @@ void GameManager::render()
 		{
 			renderer->draw(part.mesh, view, projection);
 		}*/
-		car->visualModel->SetScale(5.0f);
-		car->visualModel->Draw(view, projection, glm::mat4(10.0f));
+		car->visualModel->Draw(view, projection, glm::mat4(1.0f));
 
 		for (auto& domino : dominoes)
 		{

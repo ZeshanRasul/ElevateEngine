@@ -102,31 +102,46 @@ void Scenes::LoadCarTest(GameManager* gm)
 	elevate::Vector3 halfSize = gm->car->chassis->halfSize;
 
 	gm->car->visualOffset = elevate::Vector3(0.0f, -1.8f, 0.0f);
-	gm->car->visualScale = 4.0f;
+	gm->car->visualScale = 5.0f;
 	gm->car->visualRotationOffset = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 
-	real wheelRadius = 1.55f;
-	real wheelWidth = 0.7f;
-
-	real wheelOffsetX = halfSize.x + wheelRadius * 0.05f;
-	real wheelOffsetZ = halfSize.z + wheelRadius * 0.05f;
+	real wheelOffsetX = 2.7f;
+	real wheelOffsetZ = 3.2f;
+	real wheelYOffset = -1.55f;
 
 	Vector3 wheelOffsets[4] =
 	{
-		Vector3(-wheelOffsetX, -halfSize.y,  wheelOffsetZ),
-		Vector3(wheelOffsetX, -halfSize.y,  wheelOffsetZ),
-		Vector3(-wheelOffsetX, -halfSize.y, -wheelOffsetZ),
-		Vector3(wheelOffsetX, -halfSize.y, -wheelOffsetZ)
+		Vector3(-wheelOffsetX, wheelYOffset,  wheelOffsetZ),
+		Vector3(wheelOffsetX, wheelYOffset,  wheelOffsetZ),
+		Vector3(-wheelOffsetX, wheelYOffset, -wheelOffsetZ),
+		Vector3(wheelOffsetX, wheelYOffset, -wheelOffsetZ) 
 	};
+
+	real wheelRadius = 1.75f;
+	real wheelWidth = 0.65f;
 
 	for (int i = 0; i < 4; ++i)
 	{
 		Car::Wheel& w = gm->car->wheels[i];
 
 		w.offset = wheelOffsets[i];
+		w.wheelRadius = wheelRadius;
 
-		elevate::Vector3 worldPos = gm->car->body->getPointInWorldSpace(wheelOffsets[i]);
-	//	gameObjects.push_back(w.mesh);
+		elevate::Vector3 worldPos =
+			gm->car->body->getPointInWorldSpace(wheelOffsets[i]);
+
+		w.mesh = new Sphere(
+			worldPos,
+			elevate::Vector3(wheelWidth, wheelRadius, wheelRadius),
+			&gm->ammoShader,
+			gm,
+			glm::vec3(0.0f)
+		);
+
+		w.mesh->LoadMesh();
+		w.mesh->SetColor(glm::vec3(0.02f, 0.02f, 0.02f));
+
+		gameObjects.push_back(w.mesh);
 	}
 
 	elevate::Vector3 carComWorld = gm->car->body->getTransform().getAxisVector(3);
@@ -136,7 +151,6 @@ void Scenes::LoadCarTest(GameManager* gm)
 		&gm->ammoShader
 	);
 
-	gm->car->visualScale = 0.01f;
 
 	gm->car->visualOffset = elevate::Vector3(
 		0.0f,
