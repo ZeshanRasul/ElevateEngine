@@ -479,7 +479,7 @@ void GltfModel::Draw(glm::mat4 view, glm::mat4 proj, glm::mat4 world)
 	glDisable(GL_CULL_FACE);
 
 	m_shader->use();
-
+	RecalculateModelMatrix();
 	std::vector<glm::mat4> matrixData;
 	matrixData.push_back(view);
 	matrixData.push_back(proj);

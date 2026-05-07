@@ -101,6 +101,10 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->car->body->setMass(totalMass);
 	elevate::Vector3 halfSize = gm->car->chassis->halfSize;
 
+	gm->car->visualOffset = elevate::Vector3(0.0f, -1.8f, 0.0f);
+	gm->car->visualScale = 4.0f;
+	gm->car->visualRotationOffset = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+
 	real wheelRadius = 1.55f;
 	real wheelWidth = 0.7f;
 

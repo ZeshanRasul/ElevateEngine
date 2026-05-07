@@ -1796,7 +1796,7 @@ void GameManager::update(float deltaTime)
 
 			Vector3 forceWorld =
 				wheelForward * Fx
-				+ right * Fy;
+				+ wheelRight * Fy;
 
 			car->body->addForceAtPoint(forceWorld, w.contactPointWorld);
 
@@ -1853,28 +1853,37 @@ void GameManager::update(float deltaTime)
 			(float)car->body->getOrientation().k
 		);
 
-		elevate::Vector3 worldPos =
+		elevate::Vector3 visualOffset(0.0f, -1.8f, 0.0f);
+
+		elevate::Vector3 visualWorldPos =
 			car->body->getPointInWorldSpace(car->visualOffset);
 
-		car->visualModel->SetPosition(car->body->getPosition());
+		car->visualModel->SetPosition(visualWorldPos);
+		car->visualModel->SetScale(car->visualScale);
 
-		car->visualModel->SetOrientation(
-			glm::quat(1.0f, 0.0f, 0.0f, 0.0f)* bodyQ
-		);
-
-		car->visualModel->SetScale(
-			glm::vec3(
-				car->visualScale,
-				car->visualScale,
-				car->visualScale
-			)
-		);
-
+		car->visualModel->SetOrientation(bodyQ);
 		glm::quat steerQ = glm::angleAxis(steerAngleRad, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		for (int i = 0; i < 4; ++i)
 		{
-			Vector3 wheelPos = car->body->getPointInWorldSpace(car->wheels[i].offset);
+			if (!car->wheels[i].mesh)
+			{
+				continue;
+			}
+
+			Vector3 wheelPos =
+				car->body->getPointInWorldSpace(car->wheels[i].offset);
+
+			car->wheels[i].mesh->SetPosition(wheelPos);
+
+			if (i == 0 || i == 1)
+			{
+				car->wheels[i].mesh->SetOrientation(bodyQ * steerQ);
+			}
+			else
+			{
+				car->wheels[i].mesh->SetOrientation(bodyQ);
+			}
 		}
 
 		if (showCar)
