@@ -10,6 +10,21 @@ Elevate is built with modularity and extensibility in mind, using a modern C++ a
 
 Beyond foundational systems such as rigid body dynamics and collision detection, Elevate Engine also implements a number of advanced systems used directly in the AAA games of today such as vehicle physics (including car and aeroplane systems), ragdoll simulations and dynamic fracture destruction systems. Ian Millington's Game Physics Engine Development served as a key reference in the design and grounding of the project while opening up many opportunities for extension and enhancement.
 
+## Example Scenarios and Demos
+
+![Elevate Engine Ragdoll Demonstration](./docs/images/elevate-ragdolls.png)
+
+Figure 1: Ragdoll physics demonstration within Elevate Engine, showcasing articulated rigid body systems with joint constraints for realistic character simulations.
+
+![Elevate Engine Collision Response and Object Stacking](./docs/images/elevate-crate-stack.png)
+
+Figure 2: Collision response and object stacking demonstration, highlighting Elevate Engine's robust collision detection and resolution capabilities and stable stacking of multiple objects.
+
+![Elevate Engine Fracture Physics](./docs/images/elevate-fracture.png)
+
+Figure 3: Dynamic fracture physics demonstration, illustrating Elevate Engine's ability to simulate realistic breakage of objects upon impact. Fracture patterns are generated based on contact points during collisions.
+
+
 ## Project Goals
 
 Not only did Elevate allow me to demonstrate and showcase my abilities in systems development, low-level programming and the integration of complex mathematics and physics theory, it was a core experience in enhancing my knowledge of real-world engine and simulation considerations to further my qualities as a developer in production level engines. 
@@ -101,11 +116,11 @@ This UI is essential to achieving the project goals, allowing for fast and effic
 
 ![Elevate Engine Runtime GUI](./docs/images/elevate-gui.png)
 
-Figure 1: Integrated Runtime tooling built with ImGui, allowing for real-time spawning of physics objects, adjustment of simulation parameters and live monitoring of performance metrics.
+Figure 4: Integrated Runtime tooling built with ImGui, allowing for real-time spawning of physics objects, adjustment of simulation parameters and live monitoring of performance metrics.
 
 ![Elevate Engine Debug Visualization](./docs/images/elevate-debug-vis.png)
 
-Figure 2: Debug visualization of collision shapes and contact points within the Elevate Engine, aiding in development and testing of physics simulations.
+Figure 5: Debug visualization of collision shapes and contact points within the Elevate Engine, aiding in development and testing of physics simulations.
 
 ## Technical Challenges and Solutions
 
@@ -122,20 +137,6 @@ Although in early stage development, vehicle physics has not just been a journey
 
 ### Performance Optimization
 Finally, performance in terms of maintaining a steady frame rate and maintain stutter free physical behaviours was a consideration throughout. Although the single phase collision detection works at a stable framerate at present and does not dip below 60FPS in regular scenarios, a more complex and scaled scenario will require the implmentation of a broad and narrow phase collision detection system. This is something that is a work-in-progress at present and is high on my prioity list for future work. 
-
-## Example Scenarios and Demos
-
-![Elevate Engine Ragdoll Demonstration](./docs/images/elevate-ragdolls.png)
-
-Figure 3: Ragdoll physics demonstration within Elevate Engine, showcasing articulated rigid body systems with joint constraints for realistic character simulations.
-
-![Elevate Engine Collision Response and Object Stacking](./docs/images/elevate-crate-stack.png)
-
-Figure 4: Collision response and object stacking demonstration, highlighting Elevate Engine's robust collision detection and resolution capabilities and stable stacking of multiple objects.
-
-![Elevate Engine Fracture Physics](./docs/images/elevate-fracture.png)
-
-Figure 5: Dynamic fracture physics demonstration, illustrating Elevate Engine's ability to simulate realistic breakage of objects upon impact. Fracture patterns are generated based on contact points during collisions.
 
 ## Integration and Use Cases
 
