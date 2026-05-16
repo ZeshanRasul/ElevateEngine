@@ -325,7 +325,7 @@ void GameManager::reset()
 		crates[i]->body->setAwake(true);
 
 		elevate::Matrix3 boxInertia;
-		boxInertia.setBlockInertiaTensor(crates[i]->mesh->GetScale()* 0.5f, mass);
+		boxInertia.setBlockInertiaTensor(crates[i]->mesh->GetScale() * 0.5f, mass);
 		crates[i]->body->setInertiaTensor(boxInertia);
 		crates[i]->body->setPosition(crates[i]->body->getPosition());
 		crates[i]->body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
@@ -1504,7 +1504,7 @@ void GameManager::CalculatePerformanceMetrics(float deltaTime)
 	frameTimeMs = deltaTime * 1000.0f;
 
 	timeElapsed += deltaTime;
-//	physicsTime = 0.0f;
+	//	physicsTime = 0.0f;
 }
 
 void GameManager::RemoveDestroyedGameObjects()
@@ -1670,11 +1670,11 @@ void GameManager::update(float deltaTime)
 		{
 			Car::Wheel& w = car->wheels[i];
 			Matrix4 bodyT = car->body->getTransform();
-			Vector3 chassisForward = bodyT.getAxisVector(2);  
+			Vector3 chassisForward = bodyT.getAxisVector(2);
 			Vector3 chassisUp = bodyT.getAxisVector(1);  // Y-up
 			chassisForward.normalize();
 			chassisUp.normalize();
-			
+
 			Vector3 attachWorld = car->body->getPointInWorldSpace(w.offset);
 
 			Vector3 suspDir(0, -1, 0);
@@ -1856,7 +1856,7 @@ void GameManager::update(float deltaTime)
 		elevate::Vector3 visualOffset(0.0f, -2.9f, 0.0f);
 
 		elevate::Vector3 visualWorldPos =
-			car->body->getPointInWorldSpace(car->visualOffset);
+			car->body->getPointInWorldSpace(visualOffset);
 
 		car->visualModel->SetPosition(visualWorldPos);
 		car->visualModel->SetScale(car->visualScale);
@@ -2986,10 +2986,10 @@ void GameManager::render()
 	}
 	if (true)
 	{
-	/*	for (CarVisuals part : carParts)
-		{
-			renderer->draw(part.mesh, view, projection);
-		}*/
+		/*	for (CarVisuals part : carParts)
+			{
+				renderer->draw(part.mesh, view, projection);
+			}*/
 		car->visualModel->Draw(view, projection, glm::mat4(1.0f));
 
 		for (int i = 0; i < 4; ++i)

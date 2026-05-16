@@ -88,7 +88,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->car->body = gm->carBody;
 	gm->car->chassis = new CollisionBox();
 	gm->car->chassis->body = gm->carBody;
-	gm->car->chassis->halfSize = elevate::Vector3(2.8f, 0.75f, 3.8f);
+	gm->car->chassis->halfSize = elevate::Vector3(2.8f, 0.85f, 3.8f);
 	gm->car->chassis->body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 	gm->car->chassis->body->getTransform().getAxisVector(3);
 
