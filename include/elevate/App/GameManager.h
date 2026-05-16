@@ -341,6 +341,7 @@ public:
 
 	Shader ammoShader;
 	Shader cubeShader;
+	Shader carShader;
 	Shader lineShader;
 	Shader cubemapShader;
 

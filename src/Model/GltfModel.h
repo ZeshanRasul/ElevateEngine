@@ -33,8 +33,7 @@ public:
 	GLuint m_indexVbo = 0;
 	std::map<std::string, GLint> m_attributes =
 	{
-		{"POSITION", 0}, {"NORMAL", 1}, {"TEXCOORD_0", 2}, {"TEXCOORD_1", 3}, {"COLOR_0", 4}, {"COLOR_1", 5},
-		{"JOINTS_0", 6}, {"WEIGHTS_0", 7}, {"TANGENT", 8}
+		{"POSITION", 0}, {"NORMAL", 1}, {"TEXCOORD_0", 2}
 	};
 	std::vector<int> m_attribAccessors{};
 

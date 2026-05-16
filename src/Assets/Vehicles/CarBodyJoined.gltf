@@ -4,7 +4,8 @@
 		"version":"2.0"
 	},
 	"extensionsUsed":[
-		"KHR_materials_clearcoat"
+		"KHR_materials_clearcoat",
+		"KHR_materials_emissive_strength"
 	],
 	"scene":0,
 	"scenes":[
@@ -18,7 +19,7 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"Camaro_CarPaint_0",
+			"name":"Camaro_FrontLights_0",
 			"translation":[
 				0,
 				0,
@@ -29,35 +30,99 @@
 	"materials":[
 		{
 			"doubleSided":true,
+			"emissiveFactor":[
+				1,
+				0.9429435117100123,
+				0.5261550339590022
+			],
+			"extensions":{
+				"KHR_materials_emissive_strength":{
+					"emissiveStrength":1.9599727392196655
+				}
+			},
+			"name":"FrontLights.001",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":0
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.5
+			}
+		},
+		{
+			"doubleSided":true,
 			"extensions":{
 				"KHR_materials_clearcoat":{
 					"clearcoatFactor":1,
 					"clearcoatRoughnessFactor":0.20000000298023224
 				}
 			},
-			"name":"CarPaint.003",
-			"pbrMetallicRoughness":{
-				"baseColorTexture":{
-					"index":0
-				},
-				"roughnessFactor":0.5
-			}
-		},
-		{
-			"doubleSided":true,
-			"name":"Window.003",
+			"name":"CarPaint",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":1
 				},
 				"metallicFactor":0,
+				"roughnessFactor":0.2552869915962219
+			}
+		},
+		{
+			"doubleSided":true,
+			"name":"Plastic.003",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":2
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.6000000238418579
+			}
+		},
+		{
+			"doubleSided":true,
+			"name":"Window.004",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":3
+				},
+				"metallicFactor":0,
 				"roughnessFactor":0.10000000149011612
+			}
+		},
+		{
+			"doubleSided":true,
+			"emissiveFactor":[
+				1,
+				0,
+				0
+			],
+			"extensions":{
+				"KHR_materials_emissive_strength":{
+					"emissiveStrength":2
+				}
+			},
+			"name":"RearLights.001",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":4
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.9619689583778381
+			}
+		},
+		{
+			"doubleSided":true,
+			"name":"Rims.002",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":5
+				},
+				"roughnessFactor":0.20000000298023224
 			}
 		}
 	],
 	"meshes":[
 		{
-			"name":"Camaro_CarPaint_0.003",
+			"name":"Camaro_FrontLights_0.001",
 			"primitives":[
 				{
 					"attributes":{
@@ -70,12 +135,57 @@
 				},
 				{
 					"attributes":{
-						"POSITION":4,
-						"NORMAL":5,
-						"TEXCOORD_0":6
+						"POSITION":0,
+						"NORMAL":1,
+						"TEXCOORD_0":2
+					},
+					"indices":4,
+					"material":1
+				},
+				{
+					"attributes":{
+						"POSITION":0,
+						"NORMAL":1,
+						"TEXCOORD_0":2
+					},
+					"indices":5,
+					"material":2
+				},
+				{
+					"attributes":{
+						"POSITION":0,
+						"NORMAL":1,
+						"TEXCOORD_0":2
+					},
+					"indices":6,
+					"material":1
+				},
+				{
+					"attributes":{
+						"POSITION":0,
+						"NORMAL":1,
+						"TEXCOORD_0":2
 					},
 					"indices":7,
-					"material":1
+					"material":3
+				},
+				{
+					"attributes":{
+						"POSITION":0,
+						"NORMAL":1,
+						"TEXCOORD_0":2
+					},
+					"indices":8,
+					"material":4
+				},
+				{
+					"attributes":{
+						"POSITION":0,
+						"NORMAL":1,
+						"TEXCOORD_0":2
+					},
+					"indices":9,
+					"material":5
 				}
 			]
 		}
@@ -88,20 +198,36 @@
 		{
 			"sampler":0,
 			"source":0
+		},
+		{
+			"sampler":0,
+			"source":0
+		},
+		{
+			"sampler":0,
+			"source":0
+		},
+		{
+			"sampler":0,
+			"source":0
+		},
+		{
+			"sampler":0,
+			"source":0
 		}
 	],
 	"images":[
 		{
 			"mimeType":"image/png",
-			"name":"CarPaint",
-			"uri":"CarPaint.png"
+			"name":"CarBodyTexture",
+			"uri":"CarBodyTexture.png"
 		}
 	],
 	"accessors":[
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":1567,
+			"count":3122,
 			"max":[
 				0.9956030249595642,
 				1.3310834169387817,
@@ -110,110 +236,124 @@
 			"min":[
 				-0.9956030249595642,
 				0.16604739427566528,
-				-0.003949670121073723
+				-0.014613171108067036
 			],
 			"type":"VEC3"
 		},
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":1567,
+			"count":3122,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":1567,
+			"count":3122,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":5064,
+			"count":60,
 			"type":"SCALAR"
 		},
 		{
 			"bufferView":4,
-			"componentType":5126,
-			"count":70,
-			"max":[
-				0.7820208668708801,
-				1.262757420539856,
-				3.199636697769165
-			],
-			"min":[
-				-0.7820208668708801,
-				0.9289764761924744,
-				0.5446141958236694
-			],
-			"type":"VEC3"
+			"componentType":5123,
+			"count":5064,
+			"type":"SCALAR"
 		},
 		{
 			"bufferView":5,
-			"componentType":5126,
-			"count":70,
-			"type":"VEC3"
+			"componentType":5123,
+			"count":2508,
+			"type":"SCALAR"
 		},
 		{
 			"bufferView":6,
-			"componentType":5126,
-			"count":70,
-			"type":"VEC2"
+			"componentType":5123,
+			"count":144,
+			"type":"SCALAR"
 		},
 		{
 			"bufferView":7,
 			"componentType":5123,
 			"count":204,
 			"type":"SCALAR"
+		},
+		{
+			"bufferView":8,
+			"componentType":5123,
+			"count":168,
+			"type":"SCALAR"
+		},
+		{
+			"bufferView":9,
+			"componentType":5123,
+			"count":456,
+			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":18804,
+			"byteLength":37464,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":18804,
-			"byteOffset":18804,
+			"byteLength":37464,
+			"byteOffset":37464,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":12536,
-			"byteOffset":37608,
+			"byteLength":24976,
+			"byteOffset":74928,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":10128,
-			"byteOffset":50144,
+			"byteLength":120,
+			"byteOffset":99904,
 			"target":34963
 		},
 		{
 			"buffer":0,
-			"byteLength":840,
-			"byteOffset":60272,
-			"target":34962
+			"byteLength":10128,
+			"byteOffset":100024,
+			"target":34963
 		},
 		{
 			"buffer":0,
-			"byteLength":840,
-			"byteOffset":61112,
-			"target":34962
+			"byteLength":5016,
+			"byteOffset":110152,
+			"target":34963
 		},
 		{
 			"buffer":0,
-			"byteLength":560,
-			"byteOffset":61952,
-			"target":34962
+			"byteLength":288,
+			"byteOffset":115168,
+			"target":34963
 		},
 		{
 			"buffer":0,
 			"byteLength":408,
-			"byteOffset":62512,
+			"byteOffset":115456,
+			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":336,
+			"byteOffset":115864,
+			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":912,
+			"byteOffset":116200,
 			"target":34963
 		}
 	],
@@ -225,7 +365,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":62920,
+			"byteLength":117112,
 			"uri":"CarBodyJoined.bin"
 		}
 	]

@@ -354,6 +354,8 @@
     <None Include="src\Shaders\cubemap_vertex.glsl" />
     <None Include="src\Shaders\cubemap_fragment.glsl" />
     <None Include="README.md" />
+    <None Include="src\Shaders\car_frag.glsl" />
+    <None Include="src\Shaders\car_vert.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="docs\images\elevate-ragdolls.png">

@@ -98,8 +98,8 @@ bool GltfModel::LoadModel()
 					}
 				}
 
-				const void* dataPtr = &buffer.data[accessor.byteOffset + bufferView.byteOffset];
-				size_t dataSize = accessor.count * tinygltf::GetNumComponentsInType(accessor.type) * tinygltf::GetComponentSizeInBytes(accessor.componentType);
+				const void* dataPtr = &buffer.data[bufferView.byteOffset];
+				size_t dataSize = bufferView.byteLength;
 
 				glBufferData(GL_ARRAY_BUFFER, dataSize, dataPtr, GL_STATIC_DRAW);
 
@@ -115,12 +115,14 @@ bool GltfModel::LoadModel()
 				if (location >= 0) {
 					GLint numComponents = tinygltf::GetNumComponentsInType(accessor.type); // e.g. VEC3 -> 3
 					GLenum glType = accessor.componentType; // GL_FLOAT, GL_UNSIGNED_SHORT, etc.
+					GLsizei stride = bufferView.byteStride ? static_cast<GLsizei>(bufferView.byteStride) : 0;
+					const void* attributeOffset = reinterpret_cast<const void*>(static_cast<uintptr_t>(accessor.byteOffset));
 
 					glEnableVertexAttribArray(location);
 					glVertexAttribPointer(location, numComponents, glType,
 						accessor.normalized ? GL_TRUE : GL_FALSE,
-						bufferView.byteStride ? bufferView.byteStride : 0,
-						(const void*)0);
+						stride,
+						attributeOffset);
 				}
 
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -262,6 +264,10 @@ void GltfModel::CreateVertexBuffers()
 		}
 		else if (attribType.compare("TEXCOORD_0") == 0)
 		{
+			int numPositionEntries = accessor.count;
+			Logger::log(1, "%s: loaded %i texture coords from glTF file\n", __FUNCTION__,
+				numPositionEntries);
+
 			int numTexCoordEntries = (int)accessor.count;
 			auto texCoordsData = reinterpret_cast<const float*>(
 				buffer.data.data() + bufferView.byteOffset + accessor.byteOffset);

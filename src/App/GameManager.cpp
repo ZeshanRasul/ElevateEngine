@@ -34,6 +34,7 @@ GameManager::GameManager(Window* window, unsigned int width, unsigned int height
 
 	ammoShader.loadShaders("src/Shaders/vertex.glsl", "src/Shaders/fragment.glsl");
 	cubeShader.loadShaders("src/Shaders/vertex.glsl", "src/Shaders/fragment_tex.glsl");
+	carShader.loadShaders("src/Shaders/car_vert.glsl", "src/Shaders/car_frag.glsl");
 	lineShader.loadShaders("src/Shaders/line_vert.glsl", "src/Shaders/line_frag.glsl");
 
 	cubemapShader.loadShaders("src/Shaders/cubemap_vertex.glsl", "src/Shaders/cubemap_fragment.glsl");
@@ -2984,12 +2985,18 @@ void GameManager::render()
 			renderer->draw(part.mesh, view, projection);
 		}
 	}
-	if (true)
+	if (showCar)
 	{
 		/*	for (CarVisuals part : carParts)
 			{
 				renderer->draw(part.mesh, view, projection);
 			}*/
+		car->visualModel->m_shader->use();
+		car->visualModel->m_shader->setVec3("dirLight.direction", dirLight.direction);
+		car->visualModel->m_shader->setVec3("dirLight.ambient", dirLight.ambient);
+		car->visualModel->m_shader->setVec3("dirLight.diffuse", dirLight.diffuse);
+		car->visualModel->m_shader->setVec3("dirLight.specular", dirLight.specular);
+
 		car->visualModel->Draw(view, projection, glm::mat4(1.0f));
 
 		for (int i = 0; i < 4; ++i)

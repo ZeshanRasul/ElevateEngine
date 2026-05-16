@@ -83,7 +83,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->carBody = new elevate::RigidBody();
 	gm->carBody->setAwake(true);
 	gm->carBody->setCanSleep(false);
-	gm->carBody->setPosition(elevate::Vector3(0.0f, 1.85f, 0.0f));
+	gm->carBody->setPosition(elevate::Vector3(0.0f, 2.0f, 0.0f));
 	gm->carBody->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 	gm->car->body = gm->carBody;
 	gm->car->chassis = new CollisionBox();
@@ -136,8 +136,8 @@ void Scenes::LoadCarTest(GameManager* gm)
 
 	gm->car->visualModel = new GltfModel(
 		"src/Assets/Vehicles/CarBodyJoined.gltf",
-		&gm->cubeShader,
-		"src/Assets/Vehicles/CarPaint.png"
+		&gm->carShader,
+		"src/Assets/Vehicles/CarBodyTexture.png"
 	); 
 	
 	gm->car->visualRotationOffset =

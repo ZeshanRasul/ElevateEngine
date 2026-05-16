@@ -254,6 +254,8 @@
       <SubType>
       </SubType>
     </None>
+    <None Include="src\Shaders\car_frag.glsl" />
+    <None Include="src\Shaders\car_vert.glsl" />
     <None Include="src\Shaders\cubemap_fragment.glsl" />
     <None Include="src\Shaders\cubemap_vertex.glsl" />
     <None Include="src\Shaders\fragment.glsl" />
