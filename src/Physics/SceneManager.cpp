@@ -83,15 +83,12 @@ void Scenes::LoadCarTest(GameManager* gm)
 	gm->carBody = new elevate::RigidBody();
 	gm->carBody->setAwake(true);
 	gm->carBody->setCanSleep(false);
-	gm->carBody->getTransform().setOrientationAndPos(
-		elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
-		elevate::Vector3(0.0f, 7.5f, 0.0f)
-	);
-	gm->carBody->setPosition(elevate::Vector3(0.0f, 4.9f, 0.0f));
+	gm->carBody->setPosition(elevate::Vector3(0.0f, 1.85f, 0.0f));
+	gm->carBody->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 	gm->car->body = gm->carBody;
 	gm->car->chassis = new CollisionBox();
 	gm->car->chassis->body = gm->carBody;
-	gm->car->chassis->halfSize = elevate::Vector3(3.3f, 2.5f, 4.0f);
+	gm->car->chassis->halfSize = elevate::Vector3(2.8f, 0.75f, 3.8f);
 	gm->car->chassis->body->setOrientation(elevate::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 	gm->car->chassis->body->getTransform().getAxisVector(3);
 
@@ -103,10 +100,14 @@ void Scenes::LoadCarTest(GameManager* gm)
 
 	gm->car->visualScale = 5.0f;
 	gm->car->visualRotationOffset = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+	gm->car->body->calculateDerivedData();
 
-	real wheelOffsetX = 3.7f;
-	real wheelOffsetZ = 5.2f;
-	real wheelYOffset = -0.05f;
+	real wheelRadius = 0.75f;
+	real wheelWidth = 0.65f;
+
+	real wheelOffsetX = 2.45f;
+	real wheelOffsetZ = 2.65f;
+	real wheelYOffset = -0.75f;
 
 	Vector3 wheelOffsets[4] =
 	{
@@ -115,9 +116,6 @@ void Scenes::LoadCarTest(GameManager* gm)
 		Vector3(-wheelOffsetX, wheelYOffset, -wheelOffsetZ),
 		Vector3(wheelOffsetX, wheelYOffset, -wheelOffsetZ) 
 	};
-
-	real wheelRadius = 1.75f;
-	real wheelWidth = 0.65f;
 
 	for (int i = 0; i < 4; ++i)
 	{
@@ -137,7 +135,7 @@ void Scenes::LoadCarTest(GameManager* gm)
 	elevate::Vector3 carComWorld = gm->car->body->getTransform().getAxisVector(3);
 
 	gm->car->visualModel = new GltfModel(
-		"src/Assets/Vehicles/car_textured.gltf",
+		"src/Assets/Vehicles/CarBodyJoined.gltf",
 		&gm->cubeShader,
 		"src/Assets/Vehicles/CarPaint.png"
 	); 

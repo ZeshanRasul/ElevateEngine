@@ -2387,7 +2387,6 @@ void GameManager::generateContacts()
 	if (showCar)
 	{
 		if (!cData.hasMoreContacts()) return;
-		if (!cData.hasMoreContacts()) return;
 		elevate::CollisionDetector::boxAndBox(*static_cast<CollisionBox*>(floor->shape), *car->chassis, &cData);
 
 		for (auto& domino : dominoes)
