@@ -24,6 +24,7 @@ Figure 2: Collision response and object stacking demonstration, highlighting Ele
 
 Figure 3: Dynamic fracture physics demonstration, illustrating Elevate Engine's ability to simulate realistic breakage of objects upon impact. Fracture patterns are generated based on contact points during collisions.
 
+https://github.com/user-attachments/assets/f8fd04c7-ac04-411b-8243-7775b4ed7643
 
 ## Project Goals
 
